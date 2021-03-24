@@ -1,5 +1,7 @@
 module Main exposing (Model, Message, initialize, view, update, main)
 
+import Basics exposing (..)
+
 import Html exposing (Html, div, input, button, text)
 import Html.Attributes exposing (class, placeholder, value)
 import Html.Events exposing (onClick, onInput)
