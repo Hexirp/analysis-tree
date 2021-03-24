@@ -17,7 +17,7 @@ view : Model -> Html Message
 view model
   =
     div
-      []
+      [ class "element" ]
       [
         div
           [ class "input-element" ]
