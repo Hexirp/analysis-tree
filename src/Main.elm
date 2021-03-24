@@ -1,7 +1,7 @@
 module Main exposing (Model, Message, initialize, view, update, main)
 
 import Html exposing (Html, div, input, button, text)
-import Html.Attributes exposing (placeholder, value)
+import Html.Attributes exposing (class, placeholder, value)
 import Html.Events exposing (onClick, onInput)
 
 import Browser
@@ -19,15 +19,25 @@ view model
     div
       []
       [
-        input
+        div
+          [ class "input-element" ]
           [
-            placeholder "matrix or sequence with parentheses",
-            value model.content,
-            onInput Change ]
-          [],
-        button [ onClick Expand ] [ text "Expand" ],
-        button [ onClick Clear ] [ text "Clear" ],
-        div [] [ text "This is not implemented." ]
+            input
+              [
+                class "input-text-element",
+                placeholder "matrix or sequence with parentheses",
+                value model.content,
+                onInput Change
+              ]
+              [],
+            button
+              [ class "input-expand-element", onClick Expand ]
+              [ text "Expand" ],
+            button
+              [ class "input-clear-element", onClick Clear ]
+              [ text "Clear" ]
+          ],
+        div [ class "output-element" ] [ text "This is not implemented." ]
       ]
 
 update : Message -> Model -> Model
