@@ -6,6 +6,13 @@ build-job:
     - npm install -g --unsafe-perm elm
     - elm make src/Main.elm
 
+test-job1:
+  stage: test
+  script:
+    - npm install -g --unsafe-perm elm
+    - npm install -g --unsafe-perm elm-test
+    - elm-test
+
 pages:
   stage: deploy
   script:
