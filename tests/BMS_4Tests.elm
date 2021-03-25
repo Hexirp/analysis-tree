@@ -2,7 +2,7 @@ module BMS_4Tests exposing (suite)
 
 import Basics exposing (..)
 
-import List exposing (List)
+import List
 
 import BMS_4
 
