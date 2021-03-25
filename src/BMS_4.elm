@@ -4,9 +4,12 @@ import Basics exposing (..)
 
 import Array exposing (Array)
 
-{-| Representation of matrixes, the notion on Bashicu Matrix System. -}
+{-| これは自然数です。 -}
+type Nat = Nat Int
+
+{-| これはバシク行列システムにおける行列です。 -}
 type Matrix = Matrix Int Int (Array (Array Int))
 
-{-| Expand a matrix with an integer. Return `Just` the result. Return `Nothing` if the cofinal type is less than the integer. Return `Nothing` if the integer is negative. -}
-expand : Matrix -> Int -> Maybe Matrix
+{-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。 -}
+expand : Matrix -> Nat -> Maybe Matrix
 expand n x = expand n x
