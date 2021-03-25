@@ -16,8 +16,3 @@ pages:
       - public
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
-
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-    - node_modules/
