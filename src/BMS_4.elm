@@ -1,4 +1,14 @@
-module BMS_4 exposing (Matrix, expand)
+module BMS_4
+  exposing
+    (
+      Nat,
+      Matrix,
+      fromListToMatrix,
+      expand,
+      Pindex,
+      Patrix,
+      fromMatrixToPatrix
+    )
 
 import Basics exposing (..)
 
