@@ -2,11 +2,11 @@ module BMS_4 exposing (Matrix, expand)
 
 import Basics exposing (..)
 
+import Maybe
+
 import List
 
 import Array exposing (Array)
-
-import Debug
 
 {-| これは自然数です。 -}
 type Nat = Nat Int
@@ -18,16 +18,53 @@ type Matrix = Matrix Int Int (Array (Array Int))
 fromListToMatrix : List (List Int) -> Matrix
 fromListToMatrix x_y_list
   =
-    case fromListToMatrix_helper x_y_list of
-      (x, y, generator) -> Matrix x y (generator y)
+    case fromListToMatrix_helper_1 x_y_list of
+      (x, y, gen) -> Matrix x y (gen y)
 
-fromListToMatrix_helper
+fromListToMatrix_helper_1
   : List (List Int) -> (Int, Int, Int -> Array (Array Int))
-fromListToMatrix_helper x_y_list
+fromListToMatrix_helper_1 x_y_list
   =
     case x_y_list of
-      [] -> (0, 0, \n -> Array.empty)
-      _ :: _ -> Debug.todo "fromListToMatrix_helper"
+      [] -> (0, 0, fromListToMatrix_helper_2)
+      y_list :: x_y_list_ ->
+        case fromListToMatrix_helper_1 x_y_list_ of
+          (x_, y_, gen_) ->
+            let
+              x = x_ + 1
+              y = max y_ (List.length y_list)
+              gen = fromListToMatrix_helper_3 y_list x gen_
+            in
+              (x, y, gen)
+
+fromListToMatrix_helper_2 : Int -> Array (Array Int)
+fromListToMatrix_helper_2 = \n -> Array.empty
+
+fromListToMatrix_helper_3
+  : List Int -> Int -> (Int -> Array (Array Int)) -> Int -> Array (Array Int)
+fromListToMatrix_helper_3 y_list x gen_
+  =
+    \n ->
+      Array.initialize
+        x
+        (\i ->
+          if i == 0
+            then fromListToMatrix_helper_4 y_list n
+            else Maybe.withDefault Array.empty (Array.get (i - 1) (gen_ n)))
+
+fromListToMatrix_helper_4 : List Int -> Int -> Array Int
+fromListToMatrix_helper_4 y_list n
+  = Array.initialize n (\i -> fromListToMatrix_helper_5 y_list i)
+
+fromListToMatrix_helper_5 : List Int -> Int -> Int
+fromListToMatrix_helper_5 y_list i -- i > 0, from fromListToMatrix_helper_4.
+  =
+    case y_list of
+      [] -> 0
+      y_list_el :: y_list_ ->
+        if i == 0
+          then y_list_el
+          else fromListToMatrix_helper_5 y_list_ (i - 1)
 
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。 -}
 expand : Matrix -> Nat -> Maybe Matrix
