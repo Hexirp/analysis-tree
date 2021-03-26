@@ -1,4 +1,4 @@
-module BMS_4Tests exposing (matrix)
+module BMS_4Tests exposing (test_Matrix)
 
 import Basics exposing (..)
 
