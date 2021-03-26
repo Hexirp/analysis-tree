@@ -12,17 +12,18 @@ import Fuzz exposing (Fuzzer)
 
 import Test exposing (..)
 
-matrix : Test
-matrix = describe "Matrix" [ matrixAndArray, matrixAndList ]
+test_Matrix : Test
+test_Matrix
+  = describe "Matrix" [ test_fromArrayToMatrix, test_fromListToMatrix ]
 
-matrixAndArray : Test
-matrixAndArray
+test_fromArrayToMatrix : Test
+test_fromArrayToMatrix
   =
-    describe "Matrix and Array"
+    describe "fromArrayToMatrix"
       [
         fuzz
           (Fuzz.array (Fuzz.array Fuzz.int))
-          "consisty with List"
+          "consisty with fromListToMatrix"
           (\array
             ->
               Expect.equal
@@ -30,10 +31,10 @@ matrixAndArray
                 (fromListToMatrix (fromArrayToList array)))
       ]
 
-matrixAndList : Test
-matrixAndList
+test_fromListToMatrix : Test
+test_fromListToMatrix
   =
-    describe "Matrix and List"
+    describe "fromListToMatrix"
       [
         test
           "normal case"
