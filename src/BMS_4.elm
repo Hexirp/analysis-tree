@@ -7,8 +7,10 @@ module BMS_4
       Matrix,
       fromMatrixToArray,
       fromArrayToMatrix,
+      fromArrayToMatrixRawly,
       fromMatrixToList,
       fromListToMatrix,
+      fromListToMatrixRawly,
       expand,
       Pindex,
       Patrix,
@@ -79,6 +81,10 @@ fromMatrixToList matrix
     case matrix of
       Matrix x y x_y_array -> fromArrayToList x_y_array
 
+{-| 或る配列を或る行列へ生のまま変換します。 -}
+fromArrayToMatrixRawly : Int -> Int -> Array (Array Int) -> Matrix
+fromArrayToMatrixRawly x y x_y_array = Matrix x y x_y_array
+
 {-| 或るリストを或る行列へと変換します。
 
 其のリストが行列を正しく表していれば、そのようになります。もし、列の長さが不揃いであれば、最も長い列が行数の基準となり、それに合わせて他の列が底値でもってパディングされます。もし、行の長さがゼロであれば、行数（列の長さ）は不定値になりますので、デフォルトの値としてゼロとなります。
@@ -118,6 +124,10 @@ fromListToMatrix_helper_2 e y_list i
           if i == 0
             then y_list_el
             else fromListToMatrix_helper_2 e y_list_ (i - 1)
+
+{-| 或るリストを生のまま行列へ変換します。 -}
+fromListToMatrixRawly : Int -> Int -> List (List Int) -> Matrix
+fromListToMatrixRawly x y x_y_list = Matrix x y (fromListToArray x_y_list)
 
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。 -}
 expand : Matrix -> Nat -> Maybe Matrix
