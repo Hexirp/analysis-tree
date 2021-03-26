@@ -4,7 +4,7 @@ import Basics exposing (..)
 
 import List
 
-import BMS_4
+import BMS_4 exposing (..)
 
 import Expect exposing (Expectation)
 
