@@ -1,12 +1,16 @@
 module BMS_4
   exposing
     (
+      fromArrayToList,
+      fromListToArray,
       Nat,
       Matrix,
       fromMatrixToArray,
       fromArrayToMatrix,
+      fromArrayToMatrixRawly,
       fromMatrixToList,
       fromListToMatrix,
+      fromListToMatrixRawly,
       expand,
       Pindex,
       Patrix,
@@ -21,6 +25,14 @@ import List
 
 import Array exposing (Array)
 import Array.Extra.Folding as Array
+
+{-| 或る配列を或るリストへ変換します。 -}
+fromArrayToList : Array (Array Int) -> List (List Int)
+fromArrayToList array = Array.toList (Array.map Array.toList array)
+
+{-| 或るリストを或る配列へ変換します。 -}
+fromListToArray : List (List Int) -> Array (Array Int)
+fromListToArray list = Array.map Array.fromList (Array.fromList list)
 
 {-| これは自然数です。 -}
 type Nat = Nat Int
@@ -67,7 +79,11 @@ fromMatrixToList : Matrix -> List (List Int)
 fromMatrixToList matrix
   =
     case matrix of
-      Matrix x y array -> Array.toList (Array.map Array.toList array)
+      Matrix x y x_y_array -> fromArrayToList x_y_array
+
+{-| 或る配列を或る行列へ生のまま変換します。 -}
+fromArrayToMatrixRawly : Int -> Int -> Array (Array Int) -> Matrix
+fromArrayToMatrixRawly x y x_y_array = Matrix x y x_y_array
 
 {-| 或るリストを或る行列へと変換します。
 
@@ -108,6 +124,10 @@ fromListToMatrix_helper_2 e y_list i
           if i == 0
             then y_list_el
             else fromListToMatrix_helper_2 e y_list_ (i - 1)
+
+{-| 或るリストを生のまま行列へ変換します。 -}
+fromListToMatrixRawly : Int -> Int -> List (List Int) -> Matrix
+fromListToMatrixRawly x y x_y_list = Matrix x y (fromListToArray x_y_list)
 
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。 -}
 expand : Matrix -> Nat -> Maybe Matrix
