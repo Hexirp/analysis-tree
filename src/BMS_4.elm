@@ -48,8 +48,10 @@ fromListToMatrix_helper_1 : Int -> Int -> List Int -> Array Int
 fromListToMatrix_helper_1 y e y_list
   = Array.initialize y (fromListToMatrix_helper_2 e y_list)
 
+-- fromListToMatrix_helper_1 により i >= 0 である。
+-- list-extra 8.3.0 の getAt で実装することも出来るが、上記の条件を使って実装を単純にしている。
 fromListToMatrix_helper_2 : Int -> List Int -> Int -> Int
-fromListToMatrix_helper_2 e y_list i -- i > 0, from fromListToMatrix_helper_1.
+fromListToMatrix_helper_2 e y_list i
   =
     case y_list of
       [] -> e
