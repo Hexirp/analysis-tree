@@ -21,7 +21,7 @@ matrixAndArray
     describe "Matrix and Array"
       [
         fuzz
-          (Fuzz.array Fuzz.int)
+          (Fuzz.array (Fuzz.array Fuzz.int))
           "consisty with List"
           (\array
             ->
