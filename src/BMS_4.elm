@@ -3,6 +3,9 @@ module BMS_4
     (
       Nat,
       Matrix,
+      fromMatrixToArray,
+      fromArrayToMatrix,
+      fromMatrixToList,
       fromListToMatrix,
       expand,
       Pindex,
@@ -17,12 +20,54 @@ import Maybe
 import List
 
 import Array exposing (Array)
+import Array.Extra.Folding as Array
 
 {-| これは自然数です。 -}
 type Nat = Nat Int
 
 {-| これはバシク行列システムにおける行列です。 -}
 type Matrix = Matrix Int Int (Array (Array Int))
+
+{-| 或る行列を或る配列へ変換します。 -}
+fromMatrixToArray : Matrix -> Array (Array Int)
+fromMatrixToArray matrix
+  =
+    case matrix of
+      Matrix x y array -> array
+
+{-| 或る配列を或る行列へ変換します。
+
+其の配列が行列を正しく表していれば、そのようになります。もし、列の長さが不揃いであれば、最も長い列が行数の基準となり、それに合わせて他の列が底値でもってパディングされます。もし、行の長さがゼロであれば、行数（列の長さ）は不定値になりますので、デフォルトの値としてゼロとなります。
+
+底値は、其の配列に含まれる最小の値です。ゼロを使わないのは、其の配列が表現する行列のトポロジーを可能な限り保つためです。
+-}
+fromArrayToMatrix : Array (Array Int) -> Matrix
+fromArrayToMatrix x_y_array
+  =
+    let
+      x = Array.length x_y_array
+      y = Maybe.withDefault 0 (Array.maximum (Array.map Array.length x_y_array))
+      e
+        =
+          Maybe.withDefault 0
+            (Array.minimum
+              (Array.map
+                (\y_list -> Maybe.withDefault 0 (Array.minimum y_list))
+                x_y_array))
+      a = Array.map (fromArrayToMatrix_helper_1 y e) x_y_array
+    in
+      Matrix x y a
+
+fromArrayToMatrix_helper_1 : Int -> Int -> Array Int -> Array Int
+fromArrayToMatrix_helper_1 y e y_list
+  = Array.initialize y (\i -> Maybe.withDefault e (Array.get i y_list))
+
+{-| 或る行列を或るリストへと変換します。 -}
+fromMatrixToList : Matrix -> List (List Int)
+fromMatrixToList matrix
+  =
+    case matrix of
+      Matrix x y array -> Array.toList (Array.map Array.toList array)
 
 {-| 或るリストを或る行列へと変換します。
 
