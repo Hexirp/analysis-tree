@@ -21,7 +21,7 @@ import Array exposing (Array)
 {-| これは自然数です。 -}
 type Nat = Nat Int
 
-{-| これはバシク行列システムにおける行列。 -}
+{-| これはバシク行列システムにおける行列です。 -}
 type Matrix = Matrix Int Int (Array (Array Int))
 
 {-| 或るリストを或る行列へと変換します。
