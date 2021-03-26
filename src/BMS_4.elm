@@ -84,7 +84,10 @@ fromListToMatrix x_y_list
       e
         =
           Maybe.withDefault 0
-            (List.minimum (List.filterMap List.minimum x_y_list))
+            (List.minimum
+              (List.map
+                (\y_list -> Maybe.withDefault 0 (List.minimum y_list))
+                x_y_list))
       a = Array.fromList (List.map (fromListToMatrix_helper_1 y e) x_y_list)
     in
       Matrix x y a
