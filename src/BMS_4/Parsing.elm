@@ -16,9 +16,9 @@ module BMS_4.Parsing exposing (..)
   break = "\n" , ["\r"] | "\r";
   space = " " | "\t";
 
-## 構文木:
+## 構文木
 
-@docs Expression, Matrix, Matrix0, Matrix00, Matrix01, Row, Row0, Row00, Row01, NaturalNumber, Digit, NonZeroDigit, SpacesAndBreaks, Spaces, SpaceAndBreak, Break, Space
+@docs Expression, Matrix, Matrix0, Matrix00, Matrix01, Row, Row0, Row00, Row01, NaturalNumber, Digit, NonZeroDigit, SpacesAndBreaks, Spaces, SpaceAndBreak, Break, Space, Symbol_09, Symbol_0A, Symbol_0D, Symbol_0D0A, Symbol_20, Symbol_28, Symbol_29, Symbol_2C, Symbol_30, Symbol_31, Symbol_32, Symbol_33, Symbol_34, Symbol_35, Symbol_36, Symbol_37, Symbol_38, Symbol_39
 -}
 
 import Basics exposing (..)
@@ -80,3 +80,39 @@ type SpaceAndBreak = SpaceAndBreak_0 Space | SpaceAndBreak_1 Break
 type Break = Break_0 Symbol_0A | Break_1 Symbol_0D0A | Break_2 Symbol_0D
 
 type Space = Space_0 Symbol_20 | Space_1 Symbol_09
+
+type Symbol_09 = Symbol_09
+
+type Symbol_0A = Symbol_0A
+
+type Symbol_0D = Symbol_0D
+
+type Symbol_0D0A = Symbol_0D0A
+
+type Symbol_20 = Symbol_20
+
+type Symbol_28 = Symbol_28
+
+type Symbol_29 = Symbol_29
+
+type Symbol_2C = Symbol_2C
+
+type Symbol_30 = Symbol_30
+
+type Symbol_31 = Symbol_31
+
+type Symbol_32 = Symbol_32
+
+type Symbol_33 = Symbol_33
+
+type Symbol_34 = Symbol_34
+
+type Symbol_35 = Symbol_35
+
+type Symbol_36 = Symbol_36
+
+type Symbol_37 = Symbol_37
+
+type Symbol_38 = Symbol_38
+
+type Symbol_39 = Symbol_39
