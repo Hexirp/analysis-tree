@@ -27,6 +27,8 @@ import Maybe exposing (Maybe)
 
 import List
 
+import Parser exposing (Parser, succeed, (|=), oneOf, backtrackable, lazy)
+
 type Expression = Expression SpacesAndBreaks Matrix
 
 type Matrix = Matrix (Maybe Matrix0)
@@ -237,3 +239,138 @@ fromBreak _ = ()
 
 fromSpace : Space -> ()
 fromSpace _ = ()
+
+parseExpression : Parser Expression
+parseExpression = succeed Expression |= parseSpacesAndBreaks |= parseMatrix
+
+parseMatrix : Parser Matrix
+parseMatrix = succeed Matrix |= brackets parseMatrix0
+
+parseMatrix0 : Parser Matrix0
+parseMatrix0
+  =
+    succeed Matrix0
+      |= parseRow
+      |= braces parseMatrix00
+      |= brackets parseMatrix01
+
+parseMatrix00 : Parser Matrix00
+parseMatrix00 = succeed Matrix00 |= parseSpacesAndBreaks |= parseRow
+
+parseMatrix01 : Parser Matrix01
+parseMatrix01 = succeed Matrix01 |= parseSpacesAndBreaks
+
+parseRow : Parser Row
+parseRow
+  =
+    succeed Row
+      |= parseSymbol_28
+      |= parseSpaces
+      |= brackets parseRow0
+      |= parseSymbol_29
+
+parseRow0 : Parser Row0
+parseRow0
+  =
+    succeed Row0
+      |= parseNaturalNumber
+      |= parseSpaces
+      |= braces parseRow00
+      |= brackets parseRow01
+
+parseRow00 : Parser Row00
+parseRow00
+  =
+    succeed Row00
+      |= parseSymbol_2C
+      |= parseSpaces
+      |= parseNaturalNumber
+      |= parseSpaces
+
+parseRow01 : Parser Row01
+parseRow01 = succeed Row01 |= parseSymbol_2C |= parseSpaces
+
+parseNaturalNumber : Parser NaturalNumber
+parseNaturalNumber
+  =
+    oneOf
+      [
+        backtrackable (succeed NaturalNumber_0 |= parseSymbol_30),
+        succeed NaturalNumber_1 |= parseNonZeroDigit |= braces parseDigit
+      ]
+
+parseDigit : Parser Digit
+parseDigit
+  =
+    oneOf
+      [
+        backtrackable (succeed Digit_0 |= parseSymbol_30),
+        backtrackable (succeed Digit_1 |= parseSymbol_31),
+        backtrackable (succeed Digit_2 |= parseSymbol_32),
+        backtrackable (succeed Digit_3 |= parseSymbol_33),
+        backtrackable (succeed Digit_4 |= parseSymbol_34),
+        backtrackable (succeed Digit_5 |= parseSymbol_35),
+        backtrackable (succeed Digit_6 |= parseSymbol_36),
+        backtrackable (succeed Digit_7 |= parseSymbol_37),
+        backtrackable (succeed Digit_8 |= parseSymbol_38),
+        succeed Digit_9 |= parseSymbol_39
+      ]
+
+parseNonZeroDigit : Parser NonZeroDigit
+parseNonZeroDigit
+  =
+    oneOf
+      [
+        backtrackable (succeed NonZeroDigit_0 |= parseSymbol_31),
+        backtrackable (succeed NonZeroDigit_1 |= parseSymbol_32),
+        backtrackable (succeed NonZeroDigit_2 |= parseSymbol_33),
+        backtrackable (succeed NonZeroDigit_3 |= parseSymbol_34),
+        backtrackable (succeed NonZeroDigit_4 |= parseSymbol_35),
+        backtrackable (succeed NonZeroDigit_5 |= parseSymbol_36),
+        backtrackable (succeed NonZeroDigit_6 |= parseSymbol_37),
+        backtrackable (succeed NonZeroDigit_7 |= parseSymbol_38),
+        succeed NonZeroDigit_8 |= parseSymbol_39
+      ]
+
+parseSpacesAndBreaks : Parser SpacesAndBreaks
+parseSpacesAndBreaks = succeed SpacesAndBreaks |= braces parseSpaceAndBreak
+
+parseSpaces : Parser Spaces
+parseSpaces = succeed Spaces |= braces parseSpase
+
+parseSpaceAndBreak : Parser SpaceAndBreak
+parseSpaceAndBreak
+  =
+    oneOf
+      [
+        backtrackable (succeed SpaceAndBreak_0 |= parseSpace),
+        succeed SpaceAndBreak_1 parseBreak
+      ]
+
+parseBreak : Parser Break
+parseBreak
+  =
+    oneOf
+      [
+        backtrackable (succeed Break_1 |= parseSymbol_0D0A),
+        backtrackable (succeed Break_0 |= parseSymbol_0A),
+        succeed Break_2 |= parseSymbol_0D
+      ]
+
+parseSpace : Parser Space
+parseSpace
+  =
+    oneOf
+      [
+        backtrackable (succeed Space_0 |= parseSymbol_20),
+        succeed Space_1 |= parseSymbol_09
+      ]
+
+brackets : Parser a -> Parser (Maybe a)
+brackets x = oneOf [backtrackable (succeed Just |= x), succeed Nothing]
+
+braces : Parser a -> Parser (List a)
+braces x
+  =
+    oneOf
+      [backtrackable (succeed (::) |= x |= lazy (\_ -> braces x)), succeed []]
