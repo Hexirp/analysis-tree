@@ -43,7 +43,7 @@ type Row0 = Row0 NaturalNumber Spaces (List Row00) (Maybe Row01)
 
 type Row00 = Row00 Symbol_2C Spaces NaturalNumber Spaces
 
-type Row01 = Row01 Symbol_2C
+type Row01 = Row01 Symbol_2C Spaces
 
 type NaturalNumber
   = NaturalNumber_0 Symbol_30 | NaturalNumber_1 NonZeroDigit (List Digit)
