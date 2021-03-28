@@ -25,6 +25,8 @@ import Basics exposing (..)
 
 import Maybe exposing (Maybe)
 
+import List
+
 type Expression = Expression SpacesAndBreaks Matrix
 
 type Matrix = Matrix (Maybe Matrix0)
@@ -116,3 +118,122 @@ type Symbol_37 = Symbol_37
 type Symbol_38 = Symbol_38
 
 type Symbol_39 = Symbol_39
+
+fromExpression : Expression -> List (List Int)
+fromExpression expression
+  =
+    case expression of
+      Expression _ matrix -> fromMatrix matrix
+
+fromMatrix : Matrix -> List (List Int)
+fromMatrix matrix
+  =
+    case matrix of
+      Matrix maybe_matrix0
+        ->
+          case maybe_matrix0 of
+            Nothing -> []
+            Just matrix0 -> fromMatrix0 matrix0
+
+fromMatrix0 : Matrix0 -> List (List Int)
+fromMatrix0 matrix0
+  =
+    case matrix0 of
+      Matrix0 row list_matrix00 _
+        -> fromRow row :: List.map fromMatrix00 list_matrix00
+
+fromMatrix00 : Matrix00 -> List Int
+fromMatrix00 matrix00
+  =
+    case matrix00 of
+      Matrix00 _ row -> fromRow row
+
+fromMatrix01 : Matrix01 -> ()
+fromMatrix01 _ = ()
+
+fromRow : Row -> List Int
+fromRow row
+  =
+    case row of
+      Row _ _ maybe_row0 _
+        ->
+          case maybe_row0 of
+            Nothing -> []
+            Just row0 -> fromRow0 row0
+
+fromRow0 : Row0 -> List Int
+fromRow0 row0
+  =
+    case row0 of
+      Row0 naturalNumber _ list_row00 _
+        ->
+          fromNaturalNumber naturalNumber
+            :: List.map fromRow00 list_row00
+
+fromRow00 : Row00 -> Int
+fromRow00 row00
+  =
+    case row00 of
+      Row00 _ _ naturalNumber _
+        -> fromNaturalNumber naturalNumber
+
+fromRow01 : Row01 -> ()
+fromRow01 _ = ()
+
+fromNaturalNumber : NaturalNumber -> Int
+fromNaturalNumber naturalNumber
+  =
+    case naturalNumber of
+      NaturalNumber_0 _ -> 0
+      NaturalNumber_1 nonZeroDigit list_digit
+        ->
+          fromNaturalNumber_helper
+            (fromNonZeroDigit nonZeroDigit)
+            (List.map fromDigit list_digit)
+
+fromNaturalNumber_helper : Int -> List Int -> Int
+fromNaturalNumber_helper x xs = List.foldl (\m n -> 10 * n + m) x xs
+
+fromDigit : Digit -> Int
+fromDigit digit
+  =
+    case digit of
+      Digit_0 _ -> 0
+      Digit_1 _ -> 1
+      Digit_2 _ -> 2
+      Digit_3 _ -> 3
+      Digit_4 _ -> 4
+      Digit_5 _ -> 5
+      Digit_6 _ -> 6
+      Digit_7 _ -> 7
+      Digit_8 _ -> 8
+      Digit_9 _ -> 9
+
+fromNonZeroDigit : NonZeroDigit -> Int
+fromNonZeroDigit nonZeroDigit
+  =
+    case nonZeroDigit of
+      NonZeroDigit_0 _ -> 1
+      NonZeroDigit_1 _ -> 2
+      NonZeroDigit_2 _ -> 3
+      NonZeroDigit_3 _ -> 4
+      NonZeroDigit_4 _ -> 5
+      NonZeroDigit_5 _ -> 6
+      NonZeroDigit_6 _ -> 7
+      NonZeroDigit_7 _ -> 8
+      NonZeroDigit_8 _ -> 9
+
+fromSpacesAndBreaks : SpacesAndBreaks -> ()
+fromSpacesAndBreaks _ = ()
+
+fromSpaces : Spaces -> ()
+fromSpaces _ = ()
+
+fromSpaceAndBreak : SpaceAndBreak -> ()
+fromSpaceAndBreak _ = ()
+
+fromBreak : Break -> ()
+fromBreak _ = ()
+
+fromSpace : Space -> ()
+fromSpace _ = ()
