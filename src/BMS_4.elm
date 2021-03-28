@@ -26,6 +26,8 @@ import List
 import Array exposing (Array)
 import Array.Extra.Folding as Array
 
+import BMS_4.Parsing as Parsing
+
 {-| 或る配列を或るリストへ変換します。 -}
 fromArrayToList : Array (Array Int) -> List (List Int)
 fromArrayToList array = Array.toList (Array.map Array.toList array)
