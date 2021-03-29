@@ -116,6 +116,35 @@ module BMS_4.Parsing
   space and break = space | break;
   break = "\n" , ["\r"] | "\r";
   space = " " | "\t";
+
+# 構文木
+
+@docs SyntaxTree, Expression, Matrix, Matrix0, Matrix00, Matrix01, Row, Row0, Row00, Row01, NaturalNumber, Digit, NonZeroDigit, SpacesAndBreaks, Spaces, SpaceAndBreak, Break, Space, Symbol_09, Symbol_0A, Symbol_0D, Symbol_0D0A, Symbol_20, Symbol_28, Symbol_29, Symbol_2C, Symbol_30, Symbol_31, Symbol_32, Symbol_33, Symbol_34, Symbol_35, Symbol_36, Symbol_37, Symbol_38, Symbol_39
+
+# 抽象構文木
+
+@docs Ast, Ast_Matrix, Ast_Sequence, Ast_NaturalNumber
+
+# 構文木から抽象構文木への変換
+
+@docs fromSyntaxTreeToAst, fromExpression, fromMatrix, fromMatrix0, fromMatrix00, fromMatrix01, fromRow, fromRow0, fromRow00, fromRow01, fromNaturalNumber, fromDigit, fromNonZeroDigit, fromSpacesAndBreaks, fromSpaces, fromSpaceAndBreak, fromBreak, fromSpace
+
+# 文字列から構文木への変換
+
+@docs parse, parseExpression, parseMatrix, parseMatrix0, parseMatrix00, parseMatrix01, parseRow, parseRow0, parseRow00, parseRow01, parseNaturalNumber, parseDigit, parseNonZeroDigit, parseSpacesAndBreaks, parseSpaces, parseSpaceAndBreak, parseBreak, parseSpace, parseSymbol_09, parseSymbol_0A, parseSymbol_0D, parseSymbol_0D0A, parseSymbol_20, parseSymbol_28, parseSymbol_29, parseSymbol_2C, parseSymbol_30, parseSymbol_31, parseSymbol_32, parseSymbol_33, parseSymbol_34, parseSymbol_35, parseSymbol_36, parseSymbol_37, parseSymbol_38, parseSymbol_39
+
+# 文字列から抽象構文木への変換
+
+@docs fromStringToAst
+
+# 抽象構文木から文字列への変換
+
+@docs fromAstToString
+
+# 汎用関数
+
+@docs brackets, braces
+
 -}
 
 import Parser
