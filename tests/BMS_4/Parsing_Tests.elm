@@ -1,4 +1,5 @@
-module BMS_4.Parsing_Tests exposing (test_parse, test_fromStringToAst)
+module BMS_4.Parsing_Tests
+  exposing (test_parse, test_fromStringToAst, test_fromAstToString)
 
 import Parser
 
