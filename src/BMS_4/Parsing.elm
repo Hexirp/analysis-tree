@@ -23,7 +23,8 @@ import Maybe exposing (Maybe)
 
 import List
 
-import Parser exposing (Parser, succeed, (|=), oneOf, backtrackable, lazy)
+import Parser
+  exposing (Parser, succeed, (|=), (|.), oneOf, backtrackable, lazy, symbol)
 
 type Expression = Expression SpacesAndBreaks Matrix
 
@@ -361,6 +362,60 @@ parseSpace
         backtrackable (succeed Space_0 |= parseSymbol_20),
         succeed Space_1 |= parseSymbol_09
       ]
+
+parseSymbol_09 : Parser Symbol_09
+parseSymbol_09 = succeed Symbol_09 |. symbol "\t"
+
+parseSymbol_0A : Parser Symbol_0A
+parseSymbol_0A = succeed Symbol_0A |. symbol "\n"
+
+parseSymbol_0D : Parser Symbol_0D
+parseSymbol_0D = succeed Symbol_0D |. symbol "\r"
+
+parseSymbol_0D0A : Parser Symbol_0D0A
+parseSymbol_0D0A = succeed Symbol_0D0A |. symbol "\r\n"
+
+parseSymbol_20 : Parser Symbol_20
+parseSymbol_20 = succeed Symbol_20 |. symbol " "
+
+parseSymbol_28 : Parser Symbol_28
+parseSymbol_28 = succeed Symbol_28 |. symbol "("
+
+parseSymbol_29 : Parser Symbol_29
+parseSymbol_29 = succeed Symbol_29 |. symbol ")"
+
+parseSymbol_2C : Parser Symbol_2C
+parseSymbol_2C = succeed Symbol_2C |. symbol ","
+
+parseSymbol_30 : Parser Symbol_30
+parseSymbol_30 = succeed Symbol_30 |. symbol "0"
+
+parseSymbol_31 : Parser Symbol_31
+parseSymbol_31 = succeed Symbol_31 |. symbol "1"
+
+parseSymbol_32 : Parser Symbol_32
+parseSymbol_32 = succeed Symbol_32 |. symbol "2"
+
+parseSymbol_33 : Parser Symbol_33
+parseSymbol_33 = succeed Symbol_33 |. symbol "3"
+
+parseSymbol_34 : Parser Symbol_34
+parseSymbol_34 = succeed Symbol_34 |. symbol "4"
+
+parseSymbol_35 : Parser Symbol_35
+parseSymbol_35 = succeed Symbol_35 |. symbol "5"
+
+parseSymbol_36 : Parser Symbol_36
+parseSymbol_36 = succeed Symbol_36 |. symbol "6"
+
+parseSymbol_37 : Parser Symbol_37
+parseSymbol_37 = succeed Symbol_37 |. symbol "7"
+
+parseSymbol_38 : Parser Symbol_38
+parseSymbol_38 = succeed Symbol_38 |. symbol "8"
+
+parseSymbol_39 : Parser Symbol_39
+parseSymbol_39 = succeed Symbol_39 |. symbol "9"
 
 brackets : Parser a -> Parser (Maybe a)
 brackets x = oneOf [backtrackable (succeed Just |= x), succeed Nothing]
