@@ -96,9 +96,7 @@ module BMS_4.Parsing
       parseSymbol_38,
       parseSymbol_39,
       fromStringToAst,
-      fromAstToString,
-      brackets,
-      braces
+      fromAstToString
     )
 
 {-| `BMS_4` でのパーサー部分だけを切り出したモジュールです。
@@ -141,14 +139,11 @@ module BMS_4.Parsing
 
 @docs fromAstToString
 
-# 汎用関数
-
-@docs brackets, braces
-
 -}
 
 import Parser
   exposing (Parser, succeed, (|=), (|.), oneOf, backtrackable, lazy, symbol)
+import Parser.Extra as Parser exposing (brackets, braces)
 
 -- 構文木
 
@@ -590,14 +585,3 @@ fromAstToString_helper list_int
         ->
           "(" ++ String.fromInt list_int_p
             ++ List.foldl (\x r -> String.fromInt x ++ "," ++ r) ")" list_int_s
-
--- 汎用関数
-
-brackets : Parser a -> Parser (Maybe a)
-brackets x = oneOf [succeed Just |= x, succeed Nothing]
-
-braces : Parser a -> Parser (List a)
-braces x
-  =
-    oneOf
-      [succeed (::) |= x |= lazy (\_ -> braces x), succeed []]
