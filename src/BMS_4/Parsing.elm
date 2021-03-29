@@ -446,15 +446,20 @@ fromStringToAst string
 
 -- 抽象構文木から文字列への変換
 
-print : Ast -> String
-print ast
+fromAstToString : Ast -> String
+fromAstToString ast
   =
-    List.foldl (++) "" (List.map print_helper ast)
+    List.foldl (++) "" (List.map fromAstToString_helper ast)
 
-print_helper : List Int -> String
-print_helper ast
+fromAstToString_helper : List Int -> String
+fromAstToString_helper list_int
   =
-    "(" ++ List.foldl (\x r -> String.fromInt x ++ "," ++ r) ")" ast
+    case list_int of
+      [] -> "()"
+      list_int_p :: list_int_s
+        ->
+          "(" ++ String.fromInt list_int_p
+            ++ List.foldl (\x r -> String.fromInt x ++ "," ++ r) ")" list_int_s
 
 -- 汎用関数
 
