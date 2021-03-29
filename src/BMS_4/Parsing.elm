@@ -440,7 +440,7 @@ parseNaturalNumber
   =
     oneOf
       [
-        backtrackable (succeed NaturalNumber_0 |= parseSymbol_30),
+        succeed NaturalNumber_0 |= parseSymbol_30,
         succeed NaturalNumber_1 |= parseNonZeroDigit |= braces parseDigit
       ]
 
@@ -449,15 +449,15 @@ parseDigit
   =
     oneOf
       [
-        backtrackable (succeed Digit_0 |= parseSymbol_30),
-        backtrackable (succeed Digit_1 |= parseSymbol_31),
-        backtrackable (succeed Digit_2 |= parseSymbol_32),
-        backtrackable (succeed Digit_3 |= parseSymbol_33),
-        backtrackable (succeed Digit_4 |= parseSymbol_34),
-        backtrackable (succeed Digit_5 |= parseSymbol_35),
-        backtrackable (succeed Digit_6 |= parseSymbol_36),
-        backtrackable (succeed Digit_7 |= parseSymbol_37),
-        backtrackable (succeed Digit_8 |= parseSymbol_38),
+        succeed Digit_0 |= parseSymbol_30,
+        succeed Digit_1 |= parseSymbol_31,
+        succeed Digit_2 |= parseSymbol_32,
+        succeed Digit_3 |= parseSymbol_33,
+        succeed Digit_4 |= parseSymbol_34,
+        succeed Digit_5 |= parseSymbol_35,
+        succeed Digit_6 |= parseSymbol_36,
+        succeed Digit_7 |= parseSymbol_37,
+        succeed Digit_8 |= parseSymbol_38,
         succeed Digit_9 |= parseSymbol_39
       ]
 
@@ -466,14 +466,14 @@ parseNonZeroDigit
   =
     oneOf
       [
-        backtrackable (succeed NonZeroDigit_0 |= parseSymbol_31),
-        backtrackable (succeed NonZeroDigit_1 |= parseSymbol_32),
-        backtrackable (succeed NonZeroDigit_2 |= parseSymbol_33),
-        backtrackable (succeed NonZeroDigit_3 |= parseSymbol_34),
-        backtrackable (succeed NonZeroDigit_4 |= parseSymbol_35),
-        backtrackable (succeed NonZeroDigit_5 |= parseSymbol_36),
-        backtrackable (succeed NonZeroDigit_6 |= parseSymbol_37),
-        backtrackable (succeed NonZeroDigit_7 |= parseSymbol_38),
+        succeed NonZeroDigit_0 |= parseSymbol_31,
+        succeed NonZeroDigit_1 |= parseSymbol_32,
+        succeed NonZeroDigit_2 |= parseSymbol_33,
+        succeed NonZeroDigit_3 |= parseSymbol_34,
+        succeed NonZeroDigit_4 |= parseSymbol_35,
+        succeed NonZeroDigit_5 |= parseSymbol_36,
+        succeed NonZeroDigit_6 |= parseSymbol_37,
+        succeed NonZeroDigit_7 |= parseSymbol_38,
         succeed NonZeroDigit_8 |= parseSymbol_39
       ]
 
@@ -488,7 +488,7 @@ parseSpaceAndBreak
   =
     oneOf
       [
-        backtrackable (succeed SpaceAndBreak_0 |= parseSpace),
+        succeed SpaceAndBreak_0 |= parseSpace,
         succeed SpaceAndBreak_1 |= parseBreak
       ]
 
@@ -497,8 +497,8 @@ parseBreak
   =
     oneOf
       [
-        backtrackable (succeed Break_1 |= parseSymbol_0D0A),
-        backtrackable (succeed Break_0 |= parseSymbol_0A),
+        succeed Break_1 |= parseSymbol_0D0A,
+        succeed Break_0 |= parseSymbol_0A,
         succeed Break_2 |= parseSymbol_0D
       ]
 
@@ -507,7 +507,7 @@ parseSpace
   =
     oneOf
       [
-        backtrackable (succeed Space_0 |= parseSymbol_20),
+        succeed Space_0 |= parseSymbol_20,
         succeed Space_1 |= parseSymbol_09
       ]
 
@@ -594,10 +594,10 @@ fromAstToString_helper list_int
 -- 汎用関数
 
 brackets : Parser a -> Parser (Maybe a)
-brackets x = oneOf [backtrackable (succeed Just |= x), succeed Nothing]
+brackets x = oneOf [succeed Just |= x, succeed Nothing]
 
 braces : Parser a -> Parser (List a)
 braces x
   =
     oneOf
-      [backtrackable (succeed (::) |= x |= lazy (\_ -> braces x)), succeed []]
+      [succeed (::) |= x |= lazy (\_ -> braces x), succeed []]
