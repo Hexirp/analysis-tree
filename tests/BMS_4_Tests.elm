@@ -1,9 +1,5 @@
 module BMS_4_Tests exposing (test_Matrix)
 
-import Basics exposing (..)
-
-import List
-
 import BMS_4 exposing (..)
 
 import Expect exposing (Expectation)
