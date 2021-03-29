@@ -340,7 +340,7 @@ parseSpaceAndBreak
     oneOf
       [
         backtrackable (succeed SpaceAndBreak_0 |= parseSpace),
-        succeed SpaceAndBreak_1 parseBreak
+        succeed SpaceAndBreak_1 |= parseBreak
       ]
 
 parseBreak : Parser Break
