@@ -15,15 +15,16 @@ module BMS_4.Parsing exposing (..)
   space and break = space | break;
   break = "\n" , ["\r"] | "\r";
   space = " " | "\t";
-
-## 構文木
-
-@docs Expression, Matrix, Matrix0, Matrix00, Matrix01, Row, Row0, Row00, Row01, NaturalNumber, Digit, NonZeroDigit, SpacesAndBreaks, Spaces, SpaceAndBreak, Break, Space, Symbol_09, Symbol_0A, Symbol_0D, Symbol_0D0A, Symbol_20, Symbol_28, Symbol_29, Symbol_2C, Symbol_30, Symbol_31, Symbol_32, Symbol_33, Symbol_34, Symbol_35, Symbol_36, Symbol_37, Symbol_38, Symbol_39
 -}
 
 import Basics exposing (..)
 
 import Maybe exposing (Maybe)
+
+import List
+
+import Parser
+  exposing (Parser, succeed, (|=), (|.), oneOf, backtrackable, lazy, symbol)
 
 type Expression = Expression SpacesAndBreaks Matrix
 
@@ -41,7 +42,7 @@ type Row0 = Row0 NaturalNumber Spaces (List Row00) (Maybe Row01)
 
 type Row00 = Row00 Symbol_2C Spaces NaturalNumber Spaces
 
-type Row01 = Row01 Symbol_2C
+type Row01 = Row01 Symbol_2C Spaces
 
 type NaturalNumber
   = NaturalNumber_0 Symbol_30 | NaturalNumber_1 NonZeroDigit (List Digit)
@@ -116,3 +117,328 @@ type Symbol_37 = Symbol_37
 type Symbol_38 = Symbol_38
 
 type Symbol_39 = Symbol_39
+
+fromExpression : Expression -> List (List Int)
+fromExpression expression
+  =
+    case expression of
+      Expression _ matrix -> fromMatrix matrix
+
+fromMatrix : Matrix -> List (List Int)
+fromMatrix matrix
+  =
+    case matrix of
+      Matrix maybe_matrix0
+        ->
+          case maybe_matrix0 of
+            Nothing -> []
+            Just matrix0 -> fromMatrix0 matrix0
+
+fromMatrix0 : Matrix0 -> List (List Int)
+fromMatrix0 matrix0
+  =
+    case matrix0 of
+      Matrix0 row list_matrix00 _
+        -> fromRow row :: List.map fromMatrix00 list_matrix00
+
+fromMatrix00 : Matrix00 -> List Int
+fromMatrix00 matrix00
+  =
+    case matrix00 of
+      Matrix00 _ row -> fromRow row
+
+fromMatrix01 : Matrix01 -> ()
+fromMatrix01 _ = ()
+
+fromRow : Row -> List Int
+fromRow row
+  =
+    case row of
+      Row _ _ maybe_row0 _
+        ->
+          case maybe_row0 of
+            Nothing -> []
+            Just row0 -> fromRow0 row0
+
+fromRow0 : Row0 -> List Int
+fromRow0 row0
+  =
+    case row0 of
+      Row0 naturalNumber _ list_row00 _
+        ->
+          fromNaturalNumber naturalNumber
+            :: List.map fromRow00 list_row00
+
+fromRow00 : Row00 -> Int
+fromRow00 row00
+  =
+    case row00 of
+      Row00 _ _ naturalNumber _
+        -> fromNaturalNumber naturalNumber
+
+fromRow01 : Row01 -> ()
+fromRow01 _ = ()
+
+fromNaturalNumber : NaturalNumber -> Int
+fromNaturalNumber naturalNumber
+  =
+    case naturalNumber of
+      NaturalNumber_0 _ -> 0
+      NaturalNumber_1 nonZeroDigit list_digit
+        ->
+          fromNaturalNumber_helper
+            (fromNonZeroDigit nonZeroDigit)
+            (List.map fromDigit list_digit)
+
+fromNaturalNumber_helper : Int -> List Int -> Int
+fromNaturalNumber_helper x xs = List.foldl (\m n -> 10 * n + m) x xs
+
+fromDigit : Digit -> Int
+fromDigit digit
+  =
+    case digit of
+      Digit_0 _ -> 0
+      Digit_1 _ -> 1
+      Digit_2 _ -> 2
+      Digit_3 _ -> 3
+      Digit_4 _ -> 4
+      Digit_5 _ -> 5
+      Digit_6 _ -> 6
+      Digit_7 _ -> 7
+      Digit_8 _ -> 8
+      Digit_9 _ -> 9
+
+fromNonZeroDigit : NonZeroDigit -> Int
+fromNonZeroDigit nonZeroDigit
+  =
+    case nonZeroDigit of
+      NonZeroDigit_0 _ -> 1
+      NonZeroDigit_1 _ -> 2
+      NonZeroDigit_2 _ -> 3
+      NonZeroDigit_3 _ -> 4
+      NonZeroDigit_4 _ -> 5
+      NonZeroDigit_5 _ -> 6
+      NonZeroDigit_6 _ -> 7
+      NonZeroDigit_7 _ -> 8
+      NonZeroDigit_8 _ -> 9
+
+fromSpacesAndBreaks : SpacesAndBreaks -> ()
+fromSpacesAndBreaks _ = ()
+
+fromSpaces : Spaces -> ()
+fromSpaces _ = ()
+
+fromSpaceAndBreak : SpaceAndBreak -> ()
+fromSpaceAndBreak _ = ()
+
+fromBreak : Break -> ()
+fromBreak _ = ()
+
+fromSpace : Space -> ()
+fromSpace _ = ()
+
+parseExpression : Parser Expression
+parseExpression = succeed Expression |= parseSpacesAndBreaks |= parseMatrix
+
+parseMatrix : Parser Matrix
+parseMatrix = succeed Matrix |= brackets parseMatrix0
+
+parseMatrix0 : Parser Matrix0
+parseMatrix0
+  =
+    succeed Matrix0
+      |= parseRow
+      |= braces parseMatrix00
+      |= brackets parseMatrix01
+
+parseMatrix00 : Parser Matrix00
+parseMatrix00 = succeed Matrix00 |= parseSpacesAndBreaks |= parseRow
+
+parseMatrix01 : Parser Matrix01
+parseMatrix01 = succeed Matrix01 |= parseSpacesAndBreaks
+
+parseRow : Parser Row
+parseRow
+  =
+    succeed Row
+      |= parseSymbol_28
+      |= parseSpaces
+      |= brackets parseRow0
+      |= parseSymbol_29
+
+parseRow0 : Parser Row0
+parseRow0
+  =
+    succeed Row0
+      |= parseNaturalNumber
+      |= parseSpaces
+      |= braces parseRow00
+      |= brackets parseRow01
+
+parseRow00 : Parser Row00
+parseRow00
+  =
+    succeed Row00
+      |= parseSymbol_2C
+      |= parseSpaces
+      |= parseNaturalNumber
+      |= parseSpaces
+
+parseRow01 : Parser Row01
+parseRow01 = succeed Row01 |= parseSymbol_2C |= parseSpaces
+
+parseNaturalNumber : Parser NaturalNumber
+parseNaturalNumber
+  =
+    oneOf
+      [
+        backtrackable (succeed NaturalNumber_0 |= parseSymbol_30),
+        succeed NaturalNumber_1 |= parseNonZeroDigit |= braces parseDigit
+      ]
+
+parseDigit : Parser Digit
+parseDigit
+  =
+    oneOf
+      [
+        backtrackable (succeed Digit_0 |= parseSymbol_30),
+        backtrackable (succeed Digit_1 |= parseSymbol_31),
+        backtrackable (succeed Digit_2 |= parseSymbol_32),
+        backtrackable (succeed Digit_3 |= parseSymbol_33),
+        backtrackable (succeed Digit_4 |= parseSymbol_34),
+        backtrackable (succeed Digit_5 |= parseSymbol_35),
+        backtrackable (succeed Digit_6 |= parseSymbol_36),
+        backtrackable (succeed Digit_7 |= parseSymbol_37),
+        backtrackable (succeed Digit_8 |= parseSymbol_38),
+        succeed Digit_9 |= parseSymbol_39
+      ]
+
+parseNonZeroDigit : Parser NonZeroDigit
+parseNonZeroDigit
+  =
+    oneOf
+      [
+        backtrackable (succeed NonZeroDigit_0 |= parseSymbol_31),
+        backtrackable (succeed NonZeroDigit_1 |= parseSymbol_32),
+        backtrackable (succeed NonZeroDigit_2 |= parseSymbol_33),
+        backtrackable (succeed NonZeroDigit_3 |= parseSymbol_34),
+        backtrackable (succeed NonZeroDigit_4 |= parseSymbol_35),
+        backtrackable (succeed NonZeroDigit_5 |= parseSymbol_36),
+        backtrackable (succeed NonZeroDigit_6 |= parseSymbol_37),
+        backtrackable (succeed NonZeroDigit_7 |= parseSymbol_38),
+        succeed NonZeroDigit_8 |= parseSymbol_39
+      ]
+
+parseSpacesAndBreaks : Parser SpacesAndBreaks
+parseSpacesAndBreaks = succeed SpacesAndBreaks |= braces parseSpaceAndBreak
+
+parseSpaces : Parser Spaces
+parseSpaces = succeed Spaces |= braces parseSpace
+
+parseSpaceAndBreak : Parser SpaceAndBreak
+parseSpaceAndBreak
+  =
+    oneOf
+      [
+        backtrackable (succeed SpaceAndBreak_0 |= parseSpace),
+        succeed SpaceAndBreak_1 |= parseBreak
+      ]
+
+parseBreak : Parser Break
+parseBreak
+  =
+    oneOf
+      [
+        backtrackable (succeed Break_1 |= parseSymbol_0D0A),
+        backtrackable (succeed Break_0 |= parseSymbol_0A),
+        succeed Break_2 |= parseSymbol_0D
+      ]
+
+parseSpace : Parser Space
+parseSpace
+  =
+    oneOf
+      [
+        backtrackable (succeed Space_0 |= parseSymbol_20),
+        succeed Space_1 |= parseSymbol_09
+      ]
+
+parseSymbol_09 : Parser Symbol_09
+parseSymbol_09 = succeed Symbol_09 |. symbol "\t"
+
+parseSymbol_0A : Parser Symbol_0A
+parseSymbol_0A = succeed Symbol_0A |. symbol "\n"
+
+parseSymbol_0D : Parser Symbol_0D
+parseSymbol_0D = succeed Symbol_0D |. symbol "\r"
+
+parseSymbol_0D0A : Parser Symbol_0D0A
+parseSymbol_0D0A = succeed Symbol_0D0A |. symbol "\r\n"
+
+parseSymbol_20 : Parser Symbol_20
+parseSymbol_20 = succeed Symbol_20 |. symbol " "
+
+parseSymbol_28 : Parser Symbol_28
+parseSymbol_28 = succeed Symbol_28 |. symbol "("
+
+parseSymbol_29 : Parser Symbol_29
+parseSymbol_29 = succeed Symbol_29 |. symbol ")"
+
+parseSymbol_2C : Parser Symbol_2C
+parseSymbol_2C = succeed Symbol_2C |. symbol ","
+
+parseSymbol_30 : Parser Symbol_30
+parseSymbol_30 = succeed Symbol_30 |. symbol "0"
+
+parseSymbol_31 : Parser Symbol_31
+parseSymbol_31 = succeed Symbol_31 |. symbol "1"
+
+parseSymbol_32 : Parser Symbol_32
+parseSymbol_32 = succeed Symbol_32 |. symbol "2"
+
+parseSymbol_33 : Parser Symbol_33
+parseSymbol_33 = succeed Symbol_33 |. symbol "3"
+
+parseSymbol_34 : Parser Symbol_34
+parseSymbol_34 = succeed Symbol_34 |. symbol "4"
+
+parseSymbol_35 : Parser Symbol_35
+parseSymbol_35 = succeed Symbol_35 |. symbol "5"
+
+parseSymbol_36 : Parser Symbol_36
+parseSymbol_36 = succeed Symbol_36 |. symbol "6"
+
+parseSymbol_37 : Parser Symbol_37
+parseSymbol_37 = succeed Symbol_37 |. symbol "7"
+
+parseSymbol_38 : Parser Symbol_38
+parseSymbol_38 = succeed Symbol_38 |. symbol "8"
+
+parseSymbol_39 : Parser Symbol_39
+parseSymbol_39 = succeed Symbol_39 |. symbol "9"
+
+parse : String -> Maybe (List (List Int))
+parse string
+  =
+    case Parser.run (parseExpression |. Parser.end) string of
+      Ok expression -> Just (fromExpression expression)
+      Err _ -> Nothing
+
+print : List (List Int) -> String
+print ast
+  =
+    List.foldl (++) "" (List.map print_helper ast)
+
+print_helper : List Int -> String
+print_helper ast
+  =
+    "(" ++ List.foldl (\x r -> String.fromInt x ++ "," ++ r) ")" ast
+
+brackets : Parser a -> Parser (Maybe a)
+brackets x = oneOf [backtrackable (succeed Just |= x), succeed Nothing]
+
+braces : Parser a -> Parser (List a)
+braces x
+  =
+    oneOf
+      [backtrackable (succeed (::) |= x |= lazy (\_ -> braces x)), succeed []]
