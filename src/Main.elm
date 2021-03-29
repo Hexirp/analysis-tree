@@ -1,7 +1,5 @@
 module Main exposing (Model, Message, initialize, view, update, main)
 
-import Basics exposing (..)
-
 import BMS_4
 
 import Html exposing (Html, div, input, button, text)

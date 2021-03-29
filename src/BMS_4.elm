@@ -17,12 +17,6 @@ module BMS_4
       fromMatrixToPatrix
     )
 
-import Basics exposing (..)
-
-import Maybe
-
-import List
-
 import Array exposing (Array)
 import Array.Extra.Folding as Array
 

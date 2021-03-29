@@ -17,12 +17,6 @@ module BMS_4.Parsing exposing (..)
   space = " " | "\t";
 -}
 
-import Basics exposing (..)
-
-import Maybe exposing (Maybe)
-
-import List
-
 import Parser
   exposing (Parser, succeed, (|=), (|.), oneOf, backtrackable, lazy, symbol)
 

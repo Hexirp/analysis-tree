@@ -2,10 +2,6 @@ module Array.Extra.Folding exposing (maximum, minimum)
 
 {-| 配列についての便利な折り畳み系の関数たちです。 -}
 
-import Basics exposing (..)
-
-import Maybe exposing (Maybe)
-
 import Array exposing (..)
 
 {-| 非空の配列から最大元を見つけます。 -}
