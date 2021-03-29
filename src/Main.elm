@@ -1,6 +1,7 @@
 module Main exposing (Model, Message, initialize, view, update, main)
 
 import BMS_4
+import BMS_4.Parsing
 
 import Html exposing (Html, div, input, button, text)
 import Html.Attributes exposing (class, placeholder, value)
@@ -39,7 +40,14 @@ view model
               [ class "input-clear-element", onClick Clear ]
               [ text "Clear" ]
           ],
-        div [ class "output-element" ] [ text "This is not implemented." ]
+        div
+          [ class "output-element" ]
+          [
+            text
+              (case BMS_4.Parsing.fromStringToAst model.content of
+                Just ast -> BMS_4.Parsing.fromAstToString (BMS_4.fromMatrixToList (BMS_4.fromListToMatrix ast))
+                Nothing -> "Parse Error!")
+          ]
       ]
 
 update : Message -> Model -> Model
