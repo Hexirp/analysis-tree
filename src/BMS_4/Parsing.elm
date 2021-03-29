@@ -16,7 +16,7 @@ module BMS_4.Parsing
       NonZeroDigit (..),
       SpacesAndBreaks (..),
       Spaces (..),
-      SpaceAndBreak (..),
+      SpaceOrBreak (..),
       Break (..),
       Space (..),
       Symbol_09 (..),
@@ -56,7 +56,7 @@ module BMS_4.Parsing
       fromNonZeroDigit,
       fromSpacesAndBreaks,
       fromSpaces,
-      fromSpaceAndBreak,
+      fromSpaceOrBreak,
       fromBreak,
       fromSpace,
       parse,
@@ -74,7 +74,7 @@ module BMS_4.Parsing
       parseNonZeroDigit,
       parseSpacesAndBreaks,
       parseSpaces,
-      parseSpaceAndBreak,
+      parseSpaceOrBreak,
       parseBreak,
       parseSpace,
       parseSymbol_09,
@@ -111,15 +111,15 @@ module BMS_4.Parsing
   natural number = "0" | non-zero digit , { digit };
   non-zero digit = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
   digit ="0" |  "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-  spaces and breaks = { space and break };
+  spaces and breaks = { space or break };
   spaces = { space };
-  space and break = space | break;
+  space or break = space | break;
   break = "\n" , ["\r"] | "\r";
   space = " " | "\t";
 
 # 構文木
 
-@docs SyntaxTree, Expression, Matrix, Matrix0, Matrix00, Matrix01, Row, Row0, Row00, Row01, NaturalNumber, Digit, NonZeroDigit, SpacesAndBreaks, Spaces, SpaceAndBreak, Break, Space, Symbol_09, Symbol_0A, Symbol_0D, Symbol_0D0A, Symbol_20, Symbol_28, Symbol_29, Symbol_2C, Symbol_30, Symbol_31, Symbol_32, Symbol_33, Symbol_34, Symbol_35, Symbol_36, Symbol_37, Symbol_38, Symbol_39
+@docs SyntaxTree, Expression, Matrix, Matrix0, Matrix00, Matrix01, Row, Row0, Row00, Row01, NaturalNumber, Digit, NonZeroDigit, SpacesAndBreaks, Spaces, SpaceOrBreak, Break, Space, Symbol_09, Symbol_0A, Symbol_0D, Symbol_0D0A, Symbol_20, Symbol_28, Symbol_29, Symbol_2C, Symbol_30, Symbol_31, Symbol_32, Symbol_33, Symbol_34, Symbol_35, Symbol_36, Symbol_37, Symbol_38, Symbol_39
 
 # 抽象構文木
 
@@ -127,11 +127,11 @@ module BMS_4.Parsing
 
 # 構文木から抽象構文木への変換
 
-@docs fromSyntaxTreeToAst, fromExpression, fromMatrix, fromMatrix0, fromMatrix00, fromMatrix01, fromRow, fromRow0, fromRow00, fromRow01, fromNaturalNumber, fromDigit, fromNonZeroDigit, fromSpacesAndBreaks, fromSpaces, fromSpaceAndBreak, fromBreak, fromSpace
+@docs fromSyntaxTreeToAst, fromExpression, fromMatrix, fromMatrix0, fromMatrix00, fromMatrix01, fromRow, fromRow0, fromRow00, fromRow01, fromNaturalNumber, fromDigit, fromNonZeroDigit, fromSpacesAndBreaks, fromSpaces, fromSpaceOrBreak, fromBreak, fromSpace
 
 # 文字列から構文木への変換
 
-@docs parse, parseExpression, parseMatrix, parseMatrix0, parseMatrix00, parseMatrix01, parseRow, parseRow0, parseRow00, parseRow01, parseNaturalNumber, parseDigit, parseNonZeroDigit, parseSpacesAndBreaks, parseSpaces, parseSpaceAndBreak, parseBreak, parseSpace, parseSymbol_09, parseSymbol_0A, parseSymbol_0D, parseSymbol_0D0A, parseSymbol_20, parseSymbol_28, parseSymbol_29, parseSymbol_2C, parseSymbol_30, parseSymbol_31, parseSymbol_32, parseSymbol_33, parseSymbol_34, parseSymbol_35, parseSymbol_36, parseSymbol_37, parseSymbol_38, parseSymbol_39
+@docs parse, parseExpression, parseMatrix, parseMatrix0, parseMatrix00, parseMatrix01, parseRow, parseRow0, parseRow00, parseRow01, parseNaturalNumber, parseDigit, parseNonZeroDigit, parseSpacesAndBreaks, parseSpaces, parseSpaceOrBreak, parseBreak, parseSpace, parseSymbol_09, parseSymbol_0A, parseSymbol_0D, parseSymbol_0D0A, parseSymbol_20, parseSymbol_28, parseSymbol_29, parseSymbol_2C, parseSymbol_30, parseSymbol_31, parseSymbol_32, parseSymbol_33, parseSymbol_34, parseSymbol_35, parseSymbol_36, parseSymbol_37, parseSymbol_38, parseSymbol_39
 
 # 文字列から抽象構文木への変換
 
@@ -200,11 +200,11 @@ type NonZeroDigit
       | NonZeroDigit_7 Symbol_38
       | NonZeroDigit_8 Symbol_39
 
-type SpacesAndBreaks = SpacesAndBreaks (List SpaceAndBreak)
+type SpacesAndBreaks = SpacesAndBreaks (List SpaceOrBreak)
 
 type Spaces = Spaces (List Space)
 
-type SpaceAndBreak = SpaceAndBreak_0 Space | SpaceAndBreak_1 Break
+type SpaceOrBreak = SpaceOrBreak_0 Space | SpaceOrBreak_1 Break
 
 type Break = Break_0 Symbol_0A | Break_1 Symbol_0D0A | Break_2 Symbol_0D
 
@@ -371,8 +371,8 @@ fromSpacesAndBreaks _ = ()
 fromSpaces : Spaces -> ()
 fromSpaces _ = ()
 
-fromSpaceAndBreak : SpaceAndBreak -> ()
-fromSpaceAndBreak _ = ()
+fromSpaceOrBreak : SpaceOrBreak -> ()
+fromSpaceOrBreak _ = ()
 
 fromBreak : Break -> ()
 fromBreak _ = ()
@@ -478,18 +478,18 @@ parseNonZeroDigit
       ]
 
 parseSpacesAndBreaks : Parser SpacesAndBreaks
-parseSpacesAndBreaks = succeed SpacesAndBreaks |= braces parseSpaceAndBreak
+parseSpacesAndBreaks = succeed SpacesAndBreaks |= braces parseSpaceOrBreak
 
 parseSpaces : Parser Spaces
 parseSpaces = succeed Spaces |= braces parseSpace
 
-parseSpaceAndBreak : Parser SpaceAndBreak
-parseSpaceAndBreak
+parseSpaceOrBreak : Parser SpaceOrBreak
+parseSpaceOrBreak
   =
     oneOf
       [
-        succeed SpaceAndBreak_0 |= parseSpace,
-        succeed SpaceAndBreak_1 |= parseBreak
+        succeed SpaceOrBreak_0 |= parseSpace,
+        succeed SpaceOrBreak_1 |= parseBreak
       ]
 
 parseBreak : Parser Break
