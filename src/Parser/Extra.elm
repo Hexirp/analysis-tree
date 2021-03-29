@@ -15,7 +15,7 @@ import Parser exposing (..)
 EBNF における `[ ... ]` です。
 -}
 brackets : Parser a -> Parser (Maybe a)
-brackets x = oneOf [succeed Just |= x, succeed Nothing]
+brackets x = oneOf [backtrackable (succeed Just |= x), succeed Nothing]
 
 {-| 省略可能かつ繰り返し可能な部分を表すパーサーです。
 
@@ -25,4 +25,4 @@ braces : Parser a -> Parser (List a)
 braces x
   =
     oneOf
-      [succeed (::) |= x |= lazy (\_ -> braces x), succeed []]
+      [backtrackable (succeed (::) |= x |= lazy (\_ -> braces x)), succeed []]
