@@ -70,16 +70,16 @@ fromArrayToMatrix_helper_1 : Int -> Int -> Array Int -> Array Int
 fromArrayToMatrix_helper_1 y e y_list
   = Array.initialize y (\i -> Maybe.withDefault e (Array.get i y_list))
 
+{-| 或る配列を或る行列へ生のまま変換します。 -}
+fromArrayToMatrixRawly : Int -> Int -> Array (Array Int) -> Matrix
+fromArrayToMatrixRawly x y x_y_array = Matrix x y x_y_array
+
 {-| 或る行列を或るリストへと変換します。 -}
 fromMatrixToList : Matrix -> List (List Int)
 fromMatrixToList matrix
   =
     case matrix of
       Matrix x y x_y_array -> fromArrayToList x_y_array
-
-{-| 或る配列を或る行列へ生のまま変換します。 -}
-fromArrayToMatrixRawly : Int -> Int -> Array (Array Int) -> Matrix
-fromArrayToMatrixRawly x y x_y_array = Matrix x y x_y_array
 
 {-| 或るリストを或る行列へと変換します。
 
