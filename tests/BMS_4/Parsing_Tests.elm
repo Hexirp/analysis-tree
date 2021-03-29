@@ -1,5 +1,7 @@
 module BMS_4.Parsing_Tests exposing (test_parse, test_fromStringToAst)
 
+import Parser
+
 import BMS_4.Parsing exposing (..)
 
 import Expect exposing (Expectation)
