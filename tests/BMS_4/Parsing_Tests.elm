@@ -26,13 +26,7 @@ test_parse
           (\_
             ->
               Expect.ok
-                (Parser.run
-                  parse
-                  """
-                  (0, 0, 0)
-                  (1, 1, 1)
-                  (2, 2, 0)
-                  """))
+                (Parser.run parse "(0, 0, 0)\n(1, 1, 1)\n(2, 2, 0)\n"))
       ]
 
 test_fromStringToAst : Test
