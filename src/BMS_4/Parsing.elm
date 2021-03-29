@@ -20,6 +20,10 @@ module BMS_4.Parsing exposing (..)
 import Parser
   exposing (Parser, succeed, (|=), (|.), oneOf, backtrackable, lazy, symbol)
 
+-- 構文木
+
+type alias SyntaxTree = Expression
+
 type Expression = Expression SpacesAndBreaks Matrix
 
 type Matrix = Matrix (Maybe Matrix0)
@@ -112,13 +116,28 @@ type Symbol_38 = Symbol_38
 
 type Symbol_39 = Symbol_39
 
-fromExpression : Expression -> List (List Int)
+-- 抽象構文木
+
+type alias Ast = Ast_Matrix
+
+type alias Ast_Matrix = List Ast_Sequence
+
+type alias Ast_Sequence = List Ast_NaturalNumber
+
+type alias Ast_NaturalNumber = Int
+
+-- 構文木から抽象構文木への変換
+
+fromSyntaxTreeToAst : SyntaxTree -> Ast
+fromSyntaxTreeToAst = fromExpression
+
+fromExpression : Expression -> Ast_Matrix
 fromExpression expression
   =
     case expression of
       Expression _ matrix -> fromMatrix matrix
 
-fromMatrix : Matrix -> List (List Int)
+fromMatrix : Matrix -> Ast_Matrix
 fromMatrix matrix
   =
     case matrix of
@@ -128,14 +147,14 @@ fromMatrix matrix
             Nothing -> []
             Just matrix0 -> fromMatrix0 matrix0
 
-fromMatrix0 : Matrix0 -> List (List Int)
+fromMatrix0 : Matrix0 -> Ast_Matrix
 fromMatrix0 matrix0
   =
     case matrix0 of
       Matrix0 row list_matrix00 _
         -> fromRow row :: List.map fromMatrix00 list_matrix00
 
-fromMatrix00 : Matrix00 -> List Int
+fromMatrix00 : Matrix00 -> Ast_Sequence
 fromMatrix00 matrix00
   =
     case matrix00 of
@@ -144,7 +163,7 @@ fromMatrix00 matrix00
 fromMatrix01 : Matrix01 -> ()
 fromMatrix01 _ = ()
 
-fromRow : Row -> List Int
+fromRow : Row -> Ast_Sequence
 fromRow row
   =
     case row of
@@ -154,7 +173,7 @@ fromRow row
             Nothing -> []
             Just row0 -> fromRow0 row0
 
-fromRow0 : Row0 -> List Int
+fromRow0 : Row0 -> Ast_Sequence
 fromRow0 row0
   =
     case row0 of
@@ -163,7 +182,7 @@ fromRow0 row0
           fromNaturalNumber naturalNumber
             :: List.map fromRow00 list_row00
 
-fromRow00 : Row00 -> Int
+fromRow00 : Row00 -> Ast_NaturalNumber
 fromRow00 row00
   =
     case row00 of
@@ -173,7 +192,7 @@ fromRow00 row00
 fromRow01 : Row01 -> ()
 fromRow01 _ = ()
 
-fromNaturalNumber : NaturalNumber -> Int
+fromNaturalNumber : NaturalNumber -> Ast_NaturalNumber
 fromNaturalNumber naturalNumber
   =
     case naturalNumber of
@@ -230,6 +249,11 @@ fromBreak _ = ()
 
 fromSpace : Space -> ()
 fromSpace _ = ()
+
+-- パーサー
+
+parse : Parser SyntaxTree
+parse = parseExpression |. Parser.end
 
 parseExpression : Parser Expression
 parseExpression = succeed Expression |= parseSpacesAndBreaks |= parseMatrix
@@ -411,14 +435,18 @@ parseSymbol_38 = succeed Symbol_38 |. symbol "8"
 parseSymbol_39 : Parser Symbol_39
 parseSymbol_39 = succeed Symbol_39 |. symbol "9"
 
-parse : String -> Maybe (List (List Int))
-parse string
+-- 文字列から抽象構文木への変換
+
+fromStringToAst : String -> Maybe Ast
+fromStringToAst string
   =
-    case Parser.run (parseExpression |. Parser.end) string of
-      Ok expression -> Just (fromExpression expression)
+    case Parser.run parse string of
+      Ok syntaxTree -> Just (fromSyntaxTreeToAst syntaxTree)
       Err _ -> Nothing
 
-print : List (List Int) -> String
+-- 抽象構文木から文字列への変換
+
+print : Ast -> String
 print ast
   =
     List.foldl (++) "" (List.map print_helper ast)
@@ -427,6 +455,8 @@ print_helper : List Int -> String
 print_helper ast
   =
     "(" ++ List.foldl (\x r -> String.fromInt x ++ "," ++ r) ")" ast
+
+-- 汎用関数
 
 brackets : Parser a -> Parser (Maybe a)
 brackets x = oneOf [backtrackable (succeed Just |= x), succeed Nothing]
