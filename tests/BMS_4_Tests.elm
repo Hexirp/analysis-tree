@@ -15,7 +15,8 @@ test_Matrix
 test_fromArrayToMatrix : Test
 test_fromArrayToMatrix
   =
-    describe "fromArrayToMatrix"
+    describe
+      "fromArrayToMatrix"
       [
         fuzz
           (Fuzz.array (Fuzz.array Fuzz.int))
@@ -30,7 +31,8 @@ test_fromArrayToMatrix
 test_fromListToMatrix : Test
 test_fromListToMatrix
   =
-    describe "fromListToMatrix"
+    describe
+      "fromListToMatrix"
       [
         test
           "normal case"
