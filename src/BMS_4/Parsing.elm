@@ -417,6 +417,13 @@ parseSymbol_38 = succeed Symbol_38 |. symbol "8"
 parseSymbol_39 : Parser Symbol_39
 parseSymbol_39 = succeed Symbol_39 |. symbol "9"
 
+parse : String -> Maybe (List (List Int))
+parse string
+  =
+    case Parser.run (parseExpression |. Parser.end) string of
+      Ok expression -> Just (fromExpression expression)
+      Err _ -> Nothing
+
 brackets : Parser a -> Parser (Maybe a)
 brackets x = oneOf [backtrackable (succeed Just |= x), succeed Nothing]
 
