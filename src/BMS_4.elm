@@ -33,8 +33,25 @@ fromListToArray list = Array.map Array.fromList (Array.fromList list)
 {-| これは自然数です。 -}
 type Nat = Nat Int
 
-{-| これはバシク行列システムにおける行列です。 -}
+{-| これはバシク行列システムにおける行列です。
+
+`Matrix` 型の値は `verifyMatrix` を満たしていなければなりません。
+-}
 type Matrix = Matrix Int Int (Array (Array Int))
+
+{-| 或る値が `Matrix` の規約を満たしているか検証します。 -}
+verifyMatrix : Matrix -> Bool
+verifyMatrix matrix
+  =
+    case matrix of
+      Matrix x y x_y_array
+        ->
+          List.all
+            (\a -> a)
+            [
+              Array.length x_y_array == x,
+              Array.all (\a -> Array.length a == y) x_y_array
+            ]
 
 {-| 或る行列を或る配列へ変換します。 -}
 fromMatrixToArray : Matrix -> Array (Array Int)
@@ -70,7 +87,10 @@ fromArrayToMatrix_helper_1 : Int -> Int -> Array Int -> Array Int
 fromArrayToMatrix_helper_1 y e y_list
   = Array.initialize y (\i -> Maybe.withDefault e (Array.get i y_list))
 
-{-| 或る配列を或る行列へ生のまま変換します。 -}
+{-| 或る配列を或る行列へ生のまま変換します。
+
+この関数は `Matrix` の規約を破ります。
+-}
 fromArrayToMatrixRawly : Int -> Int -> Array (Array Int) -> Matrix
 fromArrayToMatrixRawly x y x_y_array = Matrix x y x_y_array
 
@@ -121,7 +141,10 @@ fromListToMatrix_helper_2 e y_list i
             then y_list_el
             else fromListToMatrix_helper_2 e y_list_ (i - 1)
 
-{-| 或るリストを生のまま行列へ変換します。 -}
+{-| 或るリストを生のまま行列へ変換します。
+
+この関数は `Matrix` の規約を破ります。
+-}
 fromListToMatrixRawly : Int -> Int -> List (List Int) -> Matrix
 fromListToMatrixRawly x y x_y_list = Matrix x y (fromListToArray x_y_list)
 
