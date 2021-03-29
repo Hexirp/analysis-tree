@@ -332,7 +332,7 @@ parseSpacesAndBreaks : Parser SpacesAndBreaks
 parseSpacesAndBreaks = succeed SpacesAndBreaks |= braces parseSpaceAndBreak
 
 parseSpaces : Parser Spaces
-parseSpaces = succeed Spaces |= braces parseSpase
+parseSpaces = succeed Spaces |= braces parseSpace
 
 parseSpaceAndBreak : Parser SpaceAndBreak
 parseSpaceAndBreak
