@@ -55,3 +55,18 @@ test_fromStringToAst
                   """)
                 (Just [[0, 0, 0], [1, 1, 1], [2, 2, 0]]))
       ]
+
+test_fromAstToString : Test
+test_fromAstToString
+  =
+    describe
+      "fromAstToString"
+      [
+        test
+          "normal case"
+          (\_
+            ->
+              Expect.equal
+                (fromAstToString [[0, 0, 0], [1, 1, 1], [2, 2, 0]])
+                "(0,0,0)(1,1,1)(2,2,0)")
+      ]
