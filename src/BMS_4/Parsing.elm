@@ -15,10 +15,6 @@ module BMS_4.Parsing exposing (..)
   space and break = space | break;
   break = "\n" , ["\r"] | "\r";
   space = " " | "\t";
-
-## 構文木
-
-@docs Expression, Matrix, Matrix0, Matrix00, Matrix01, Row, Row0, Row00, Row01, NaturalNumber, Digit, NonZeroDigit, SpacesAndBreaks, Spaces, SpaceAndBreak, Break, Space, Symbol_09, Symbol_0A, Symbol_0D, Symbol_0D0A, Symbol_20, Symbol_28, Symbol_29, Symbol_2C, Symbol_30, Symbol_31, Symbol_32, Symbol_33, Symbol_34, Symbol_35, Symbol_36, Symbol_37, Symbol_38, Symbol_39
 -}
 
 import Basics exposing (..)
