@@ -31,6 +31,7 @@ test_parse
                   (1, 1, 1)
                   (2, 2, 0)
                   """))
+      ]
 
 test_fromStringToAst : Test
 test_fromStringToAst
