@@ -20,7 +20,7 @@ test_fromStringToAst
             ->
               Expect.equal
                 (fromStringToAst "(0,0,0)(1,1,1)(2,2,0)")
-                (Just [[0, 0, 0], [1, 1, 1], [2, 2, 0]])
+                (Just [[0, 0, 0], [1, 1, 1], [2, 2, 0]]))
         test
           "some spaces and some breaks"
           (\_
@@ -32,4 +32,4 @@ test_fromStringToAst
                   (1, 1, 1)
                   (2, 2, 0)
                   """)
-                (Just [[0, 0, 0], [1, 1, 1], [2, 2, 0]])
+                (Just [[0, 0, 0], [1, 1, 1], [2, 2, 0]]))
