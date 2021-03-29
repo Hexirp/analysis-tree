@@ -574,14 +574,17 @@ fromStringToAst string
 fromAstToString : Ast -> String
 fromAstToString ast
   =
-    List.foldl (++) "" (List.map fromAstToString_helper ast)
+    List.foldl (\y_list r -> r ++ fromAstToString_helper y_list) "" ast
 
 fromAstToString_helper : List Int -> String
-fromAstToString_helper list_int
+fromAstToString_helper y_list
   =
-    case list_int of
+    case y_list of
       [] -> "()"
-      list_int_p :: list_int_s
+      y_list_p :: y_list_s
         ->
-          "(" ++ String.fromInt list_int_p
-            ++ List.foldl (\x r -> String.fromInt x ++ "," ++ r) ")" list_int_s
+          List.foldl
+            (\n r -> r ++ "," ++ String.fromInt n)
+            ("(" ++ String.fromInt y_list_p)
+            y_list_s
+            ++ ")"
