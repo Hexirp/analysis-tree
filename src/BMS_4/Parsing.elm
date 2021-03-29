@@ -424,6 +424,16 @@ parse string
       Ok expression -> Just (fromExpression expression)
       Err _ -> Nothing
 
+print : List (List Int) -> String
+print ast
+  =
+    List.foldl (++) "" (List.map print_helper ast)
+
+print_helper : List Int -> String
+print_helper ast
+  =
+    "(" ++ List.foldl (\x r -> String.fromInt x ++ "," ++ r) ")" ast
+
 brackets : Parser a -> Parser (Maybe a)
 brackets x = oneOf [backtrackable (succeed Just |= x), succeed Nothing]
 
