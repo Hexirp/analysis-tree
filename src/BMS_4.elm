@@ -160,4 +160,101 @@ type Patrix = Patrix Int Int (Array (Array Pindex))
 
 {-| 或る行列をパトリックスへ変換します。 -}
 fromMatrixToPatrix : Matrix -> Patrix
-fromMatrixToPatrix x = fromMatrixToPatrix x
+fromMatrixToPatrix matrix
+  =
+    case matrix of
+      Matrix x y x_y_array
+        ->
+          Patrix x y (fromMatrixToPatrix_helper_1 x y x_y_array)
+
+fromMatrixToPatrix_helper_1
+  : Int -> Int -> Array (Array Int) -> Array (Array Pindex)
+fromMatrixToPatrix_helper_1 x y x_y_array
+  =
+    Array.initialize
+      x
+      (\x_
+        ->
+          Array.initialize
+            y
+            (\y_
+              ->
+                Maybe.withDefault
+                  Null
+                  (fromMatrixToPatrix_helper_2 x y x_y_array x_ y_)))
+
+fromMatrixToPatrix_helper_2
+  : Int -> Int -> Array (Array Int) -> Int -> Int -> Maybe Pindex
+fromMatrixToPatrix_helper_2 x y x_y_int x_ y_
+  =
+    case Array.get x_ x_y_int of
+      Nothing
+        ->
+          if x_ < 0
+            then Just Null
+            else
+              if x <= x_
+                then Just Null
+                else Nothing
+      Just y_int
+        ->
+          case Array.get y_ y_int of
+            Nothing ->
+              if y_ < 0
+                then
+                  case compare x_ 0 of
+                    LT -> Nothing
+                    EQ -> Just Null
+                    GT
+                      ->
+                        if x <= x_
+                          then Nothing
+                          else Just (Pindex (x_ - 1))
+                else
+                  if Array.length y_int <= y_
+                    then Just Null
+                    else Nothing
+            Just int
+              ->
+                let
+                  f p
+                    =
+                      case Array.get p x_y_int of
+                        Nothing
+                          ->
+                            if p == 0 - 1
+                              then Just Null
+                              else Nothing
+                        Just y_int_
+                          ->
+                            case Array.get y_ y_int_ of
+                              Nothing
+                                ->
+                                  if y_ < 0
+                                    then Nothing
+                                    else
+                                      if Array.length y_int_ <= y_
+                                        then Just Null
+                                        else Nothing
+                              Just int_
+                                ->
+                                  if
+                                    True
+                                      && int_ < int
+                                      &&
+                                        fromMatrixToPatrix_helper_3
+                                          x
+                                          y
+                                          x_y_int
+                                          p
+                                          (y_ - 1)
+                                          x_
+                                    then Just (Pindex p)
+                                    else f (p - 1)
+                in
+                  f (x_ - 1)
+
+fromMatrixToPatrix_helper_3
+  : Int -> Int -> Array (Array Int) -> Int -> Int -> Int -> Bool
+fromMatrixToPatrix_helper_3 x y x_y_int p y_ x_
+  = fromMatrixToPatrix_helper_3 x y x_y_int p y_ x_
