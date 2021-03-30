@@ -86,8 +86,8 @@ test_fromListToMatrix
               Expect.equal (fromListToMatrix []) (fromListToMatrixRawly 0 0 []))
       ]
 
-test_Pindex : Test
-test_Pindex
+test_Patrix : Test
+test_Patrix
   = describe "Pindex" [ test_fromMatrixToPatrix ]
 
 test_fromMatrixToPatrix : Test
