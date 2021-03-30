@@ -108,13 +108,12 @@ test_fromMatrixToPatrix
                       [1, 1, 1],
                       [2, 2, 0]
                     ]))
-                (Just
-                  (fromListToPatrixRawly
-                    3
-                    3
-                    [
-                      [Null, Null, Null],
-                      [Pindex 0, Pindex 0, Pindex 0],
-                      [Pindex 1, Pindex 1, Null]
-                  ])))
+                (fromListToPatrixRawly
+                  3
+                  3
+                  [
+                    [Null, Null, Null],
+                    [Pindex 0, Pindex 0, Pindex 0],
+                    [Pindex 1, Pindex 1, Null]
+                  ]))
       ]
