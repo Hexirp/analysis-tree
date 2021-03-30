@@ -156,7 +156,7 @@ expand n x = expand n x
 type Pindex = Null | Pindex Int
 
 {-| これはパトリックスです。パトリックスはピンデックスの行列を意味します。 -}
-type Patrix = Potrix Int Int (Array (Array Pindex))
+type Patrix = Patrix Int Int (Array (Array Pindex))
 
 {-| 或る行列をパトリックスへ変換します。 -}
 fromMatrixToPatrix : Matrix -> Patrix
