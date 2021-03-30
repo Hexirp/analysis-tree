@@ -1,4 +1,4 @@
-module BMS_4_Tests exposing (test_Matrix)
+module BMS_4_Tests exposing (test_Matrix, test_Patrix)
 
 import BMS_4 exposing (..)
 
@@ -84,4 +84,36 @@ test_fromListToMatrix
           (\_
             ->
               Expect.equal (fromListToMatrix []) (fromListToMatrixRawly 0 0 []))
+      ]
+
+test_Pindex : Test
+test_Pindex
+  = describe "Pindex" [ test_fromMatrixToPatrix ]
+
+test_fromMatrixToPatrix : Test
+test_fromMatrixToPatrix
+  =
+    describe
+      "fromMatrixToPatrix"
+      [
+        test
+          "normal case"
+          (\_
+            ->
+              Expect.equal
+                (fromMatrixToPatrix
+                  (fromListToMatrix
+                    [
+                      [0, 0, 0],
+                      [1, 1, 1],
+                      [2, 2, 0]
+                    ]))
+                (fromListToPatrixRawly
+                  3
+                  3
+                  [
+                    [Null, Null, Null],
+                    [Pindex 0, Pindex 0, Pindex 0],
+                    [Pindex 1, Pindex 1, Null]
+                  ]))
       ]
