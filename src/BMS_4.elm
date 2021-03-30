@@ -12,7 +12,7 @@ module BMS_4
       fromListToMatrix,
       fromListToMatrixRawly,
       expand,
-      Pindex,
+      Pindex (..),
       Patrix,
       fromMatrixToPatrix
     )
