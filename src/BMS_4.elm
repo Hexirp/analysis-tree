@@ -7,14 +7,14 @@ module BMS_4
       Matrix,
       fromMatrixToArray,
       fromArrayToMatrix,
-      fromArrayToMatrixRawly,
       fromMatrixToList,
       fromListToMatrix,
-      fromListToMatrixRawly,
       expand,
       Pindex (..),
       Patrix,
-      fromMatrixToPatrix
+      fromMatrixToPatrix,
+      fromListToMatrixRawly,
+      fromListToPatrixRawly
     )
 
 import Array exposing (Array)
@@ -23,11 +23,11 @@ import Array.Extra.Folding as Array
 import BMS_4.Parsing as Parsing
 
 {-| 或る配列を或るリストへ変換します。 -}
-fromArrayToList : Array (Array Int) -> List (List Int)
+fromArrayToList : Array (Array a) -> List (List a)
 fromArrayToList array = Array.toList (Array.map Array.toList array)
 
 {-| 或るリストを或る配列へ変換します。 -}
-fromListToArray : List (List Int) -> Array (Array Int)
+fromListToArray : List (List a) -> Array (Array a)
 fromListToArray list = Array.map Array.fromList (Array.fromList list)
 
 {-| これは自然数です。 -}
@@ -87,13 +87,6 @@ fromArrayToMatrix_helper_1 : Int -> Int -> Array Int -> Array Int
 fromArrayToMatrix_helper_1 y e y_list
   = Array.initialize y (\i -> Maybe.withDefault e (Array.get i y_list))
 
-{-| 或る配列を或る行列へ生のまま変換します。
-
-この関数は `Matrix` の規約を破ります。
--}
-fromArrayToMatrixRawly : Int -> Int -> Array (Array Int) -> Matrix
-fromArrayToMatrixRawly x y x_y_array = Matrix x y x_y_array
-
 {-| 或る行列を或るリストへと変換します。 -}
 fromMatrixToList : Matrix -> List (List Int)
 fromMatrixToList matrix
@@ -140,13 +133,6 @@ fromListToMatrix_helper_2 e y_list i
           if i == 0
             then y_list_el
             else fromListToMatrix_helper_2 e y_list_ (i - 1)
-
-{-| 或るリストを生のまま行列へ変換します。
-
-この関数は `Matrix` の規約を破ります。
--}
-fromListToMatrixRawly : Int -> Int -> List (List Int) -> Matrix
-fromListToMatrixRawly x y x_y_list = Matrix x y (fromListToArray x_y_list)
 
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。 -}
 expand : Matrix -> Nat -> Maybe Matrix
@@ -255,3 +241,17 @@ fromMatrixToPatrix_helper_4 x_y_int x y
             case fromMatrixToPatrix_helper_4 x_y_int x_ y of
               Nothing -> Nothing
               Just is_ancestor -> Just (\x__ -> x_ == x__ || is_ancestor x__)
+
+{-| 或るリストを生のまま行列へ変換します。
+
+この関数は `Matrix` の規約を破る値を返す可能性があります。
+-}
+fromListToMatrixRawly : Int -> Int -> List (List Int) -> Matrix
+fromListToMatrixRawly x y x_y_int = Matrix x y (fromListToArray x_y_int)
+
+{-| 或るリストを生のままパトリックスへ変換します。
+
+この関数は `Patrix` の規約を破る値を返す可能性があります。
+-}
+fromListToPatrixRawly : Int -> Int -> List (List Pindex) -> Patrix
+fromListToPatrixRawly x y x_y_pindex = Patrix x y (fromListToArray x_y_pindex)
