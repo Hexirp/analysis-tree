@@ -233,15 +233,25 @@ fromMatrixToPatrix_helper_3 x_y_int x y int p
                   else Nothing
             Just int_
               ->
-                if
-                  True
-                    && int_ < int
-                    && fromMatrixToPatrix_helper_4 x_y_int p (y - 1) x
-                  then Just (Pindex p)
-                  else
-                    fromMatrixToPatrix_helper_3 x_y_int x y int (p - 1)
+                case fromMatrixToPatrix_helper_4 x_y_int x (y - 1) of
+                  Nothing -> Nothing
+                  Just is_ancestor
+                    ->
+                      if int_ < int && is_ancestor p
+                        then Just (Pindex p)
+                        else
+                          fromMatrixToPatrix_helper_3 x_y_int x y int (p - 1)
 
 fromMatrixToPatrix_helper_4
-  : Array (Array Int) -> Int -> Int -> Int -> Bool
-fromMatrixToPatrix_helper_4 x_y_int x y x_
-  = fromMatrixToPatrix_helper_4 x_y_int x y x_
+  : Array (Array Int) -> Int -> Int -> Maybe (Int -> Bool)
+fromMatrixToPatrix_helper_4 x_y_int x y
+  =
+    case fromMatrixToPatrix_helper_2 x_y_int x y of
+      Nothing -> Nothing
+      Just xp -> case xp of
+        Null -> Just (\x__ -> x == x__)
+        Pindex x_
+          ->
+            case fromMatrixToPatrix_helper_4 x_y_int x_ y of
+              Nothing -> Nothing
+              Just is_ancestor -> Just (\x__ -> x_ == x__ || is_ancestor x__)
