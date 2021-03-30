@@ -190,30 +190,26 @@ fromMatrixToPatrix_helper_2 x_y_int x y
     case Array.get x x_y_int of
       Nothing
         ->
-          if x < 0
-            then Just Null
-            else
-              if Array.length x_y_int <= x
-                then Just Null
-                else Nothing
+          if 0 <= x && x < Array.length x_y_int
+            then Nothing
+            else Just Null
       Just y_int
         ->
           case Array.get y y_int of
             Nothing ->
-              if y < 0
+              if 0 <= y
                 then
-                  case compare x 0 of
-                    LT -> Nothing
-                    EQ -> Just Null
-                    GT
-                      ->
-                        if Array.length x_y_int <= x
-                          then Nothing
-                          else Just (Pindex (x - 1))
+                  if y < Array.length y_int
+                    then Nothing
+                    else Just Null
                 else
-                  if Array.length y_int <= y
-                    then Just Null
-                    else Nothing
+                  if 0 <= x && x < Array.length x_y_int
+                    then
+                      if x == 0
+                        then Just Null
+                        else Just (Pindex (x - 1))
+                    else
+                      Nothing
             Just int
               -> fromMatrixToPatrix_helper_3 x_y_int x y int (x - 1)
 
@@ -224,7 +220,7 @@ fromMatrixToPatrix_helper_3 x_y_int x y int p
     case Array.get p x_y_int of
       Nothing
         ->
-          if p == 0 - 1
+          if x == 0
             then Just Null
             else Nothing
       Just y_int
@@ -232,12 +228,9 @@ fromMatrixToPatrix_helper_3 x_y_int x y int p
           case Array.get y y_int of
             Nothing
               ->
-                if y < 0
-                  then Nothing
-                  else
-                    if Array.length y_int <= y
-                      then Just Null
-                      else Nothing
+                if 0 <= y && y < Array.length y_int
+                  then Just Null
+                  else Nothing
             Just int_
               ->
                 if
