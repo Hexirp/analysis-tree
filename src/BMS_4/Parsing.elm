@@ -583,8 +583,10 @@ fromAstToString_helper y_list
       [] -> "()"
       y_list_p :: y_list_s
         ->
-          List.foldl
-            (\n r -> r ++ "," ++ String.fromInt n)
-            ("(" ++ String.fromInt y_list_p)
-            y_list_s
+          ""
+            ++
+              List.foldl
+                (\n r -> r ++ "," ++ String.fromInt n)
+                ("(" ++ String.fromInt y_list_p)
+                y_list_s
             ++ ")"
