@@ -215,46 +215,40 @@ fromMatrixToPatrix_helper_2 x y x_y_int x_ y_
                     then Just Null
                     else Nothing
             Just int
-              ->
-                let
-                  f p
-                    =
-                      case Array.get p x_y_int of
-                        Nothing
-                          ->
-                            if p == 0 - 1
-                              then Just Null
-                              else Nothing
-                        Just y_int_
-                          ->
-                            case Array.get y_ y_int_ of
-                              Nothing
-                                ->
-                                  if y_ < 0
-                                    then Nothing
-                                    else
-                                      if Array.length y_int_ <= y_
-                                        then Just Null
-                                        else Nothing
-                              Just int_
-                                ->
-                                  if
-                                    True
-                                      && int_ < int
-                                      &&
-                                        fromMatrixToPatrix_helper_3
-                                          x
-                                          y
-                                          x_y_int
-                                          p
-                                          (y_ - 1)
-                                          x_
-                                    then Just (Pindex p)
-                                    else f (p - 1)
-                in
-                  f (x_ - 1)
+              -> fromMatrixToPatrix_helper_3 x y x_y_int x_ y_ int (x_ - 1)
 
 fromMatrixToPatrix_helper_3
+  : Int -> Int -> Array (Array Int) -> Int -> Int -> Int -> Int -> Maybe Pindex
+fromMatrixToPatrix_helper_3 x y x_y_int x_ y_ int p
+  =
+    case Array.get p x_y_int of
+      Nothing
+        ->
+          if p == 0 - 1
+            then Just Null
+            else Nothing
+      Just y_int_
+        ->
+          case Array.get y_ y_int_ of
+            Nothing
+              ->
+                if y_ < 0
+                  then Nothing
+                  else
+                    if Array.length y_int_ <= y_
+                      then Just Null
+                      else Nothing
+            Just int_
+              ->
+                if
+                  True
+                    && int_ < int
+                    && fromMatrixToPatrix_helper_4 x y x_y_int p (y_ - 1) x_
+                  then Just (Pindex p)
+                  else
+                    fromMatrixToPatrix_helper_3 x y x_y_int x_ y_ int (p - 1)
+
+fromMatrixToPatrix_helper_4
   : Int -> Int -> Array (Array Int) -> Int -> Int -> Int -> Bool
-fromMatrixToPatrix_helper_3 x y x_y_int p y_ x_
-  = fromMatrixToPatrix_helper_3 x y x_y_int p y_ x_
+fromMatrixToPatrix_helper_4 x y x_y_int x_ y_ x__
+  = fromMatrixToPatrix_helper_4 x y x_y_int x_ y_ x__
