@@ -1,8 +1,6 @@
 module BMS_4
   exposing
     (
-      Case,
-      sequence,
       fromArrayToList,
       fromListToArray,
       Nat,
@@ -20,36 +18,14 @@ module BMS_4
       fromListToPatrixRawly
     )
 
+import Case exposing (Case (..))
+
 import Array exposing (Array)
 import Array.Extra.Folding as Array
 
 import BMS_4.Parsing as Parsing
 
 import Debug
-
-{-| 失敗しないことが期待されるが、型の上では失敗する可能性を排除できない値です。
-
-たとえば、次のような場合に使います。
-
-  case Array.get 1 [0,1,2] of
-    Nothing -> ImpossibleCase
-    Just int -> PossibleCase int
--}
-type Case a = ImpossibleCase | PossibleCase a
-
-sequence : Array (Case a) -> Case (Array a)
-sequence array_case_x
-  =
-    Array.foldl
-      (\case_x case_r -> case case_x of
-        ImpossibleCase -> ImpossibleCase
-        PossibleCase x
-          ->
-            case case_r of
-              ImpossibleCase -> ImpossibleCase
-              PossibleCase r -> PossibleCase (Array.push x r))
-      (PossibleCase Array.empty)
-      array_case_x
 
 {-| 或る配列を或るリストへ変換します。 -}
 fromArrayToList : Array (Array a) -> List (List a)
@@ -181,9 +157,10 @@ fromMatrixToPatrix matrix
       Matrix x y x_y_int
         ->
           case
-            sequence
+            Case.traverseArray
+              (\case_x -> case_x)
               (Array.map
-                sequence
+                (Case.traverseArray (\case_x -> case_x))
                 (fromMatrixToPatrix_helper_1 x y x_y_int))
           of
             ImpossibleCase -> ImpossibleCase
