@@ -139,6 +139,6 @@ test_fromMatrixToPatrixWithCatching
                   (fromListToMatrix (Debug.log "x_y_int" x_y_int))
                   (\_ -> Debug.todo "impossible case"))
                 (fromMatrixToPatrixWithCatching
-                  (fromListToMatrix x_y_list)
+                  (fromListToMatrix x_y_int)
                   (Maybe.withDefault Null)))
       ]
