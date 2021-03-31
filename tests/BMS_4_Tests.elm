@@ -136,6 +136,15 @@ test_fromMatrixToPatrixWithCatching
     describe
       "fromMatrixToPatrixWithCatching"
       [
+        test
+          "descent sequence"
+          (\_
+            ->
+              Expect.equal
+                (fromMatrixToPatrixWithCatching
+                  (fromListToMatrix [[1], [0]])
+                  (Maybe.withDefault (Pindex -1))
+                (fromListToPatrixRawly 2 1 [[Null], [Null]])),
         fuzz
           (Fuzz.list (Fuzz.list Fuzz.int))
           "safety"
