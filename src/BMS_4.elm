@@ -121,7 +121,7 @@ fromListToMatrix_helper_1 : Int -> Int -> List Int -> Array Int
 fromListToMatrix_helper_1 y e y_list
   = Array.initialize y (fromListToMatrix_helper_2 e y_list)
 
--- fromListToMatrix_helper_1 により i >= 0 である。
+-- fromListToMatrix_helper_1 により 0 <= i である。
 -- list-extra 8.3.0 の getAt で実装することも出来るが、上記の条件を使って実装を単純にしている。
 fromListToMatrix_helper_2 : Int -> List Int -> Int -> Int
 fromListToMatrix_helper_2 e y_list i
@@ -151,11 +151,19 @@ fromMatrixToPatrix matrix
     case matrix of
       Matrix x y x_y_array
         ->
-          Patrix x y (fromMatrixToPatrix_helper_1 x y x_y_array)
+          Patrix
+            x
+            y
+            (fromMatrixToPatrix_helper_1
+              x
+              y
+              x_y_array
+              (Maybe.withDefault Null))
 
+-- `catch` は、 `Maybe` を剥がす時に使う。
 fromMatrixToPatrix_helper_1
-  : Int -> Int -> Array (Array Int) -> Array (Array Pindex)
-fromMatrixToPatrix_helper_1 x y x_y_array
+  : Int -> Int -> Array (Array Int) -> (Maybe Pindex -> a) -> Array (Array a)
+fromMatrixToPatrix_helper_1 x y x_y_array catch
   =
     Array.initialize
       x
@@ -165,10 +173,12 @@ fromMatrixToPatrix_helper_1 x y x_y_array
             y
             (\y_
               ->
-                Maybe.withDefault
-                  Null
-                  (fromMatrixToPatrix_helper_2 x_y_array x_ y_)))
+                catch (fromMatrixToPatrix_helper_2 x_y_array x_ y_)))
 
+-- x と y に対応する Pindex の値を返す。
+-- x が範囲を外れた時は、 Null を返す。
+-- y が範囲を外れた時は、それが y < 0 であるとき、つまり上側だった時は、 x が 0, 1, 2, 3, ... であるとき、 Null, Pindex 0, Pindex 1, Pindex 2, ... という結果になる。それが Array.length y_int <= y であるとき、つまり下側だったときは、 Null を返す。
+-- Nothing は Array.get の結果が不整合だった時に返す。つまり、 Array 型の値の内容が計算の途中で変わることがない限り、 Nothing を返すことはない。
 fromMatrixToPatrix_helper_2
   : Array (Array Int) -> Int -> Int -> Maybe Pindex
 fromMatrixToPatrix_helper_2 x_y_int x y
@@ -199,6 +209,10 @@ fromMatrixToPatrix_helper_2 x_y_int x y
             Just int
               -> fromMatrixToPatrix_helper_3 x_y_int x y int (x - 1)
 
+-- x と y の親を探索する。
+-- p は関数の状態を保持する役割を持つ引数である。 fromMatrixToPatrix_helper_2 と再帰の構造より p < x である。
+-- y が範囲を外れた時は、それが y < 0 である、つまり上側だった時は、 fromMatrixToPatrix_helper_2 が示しているような 0 ← 1 ← 2 ← 3 ← ... の構造に従って親を判定する。それが、 Array.length y_int <= y である、つまり下側だった時は、そこは底値で埋め尽くされているという考え方に従って親を判定する。
+-- Nothing は Array.get の結果が不整合だった時に返す。つまり、 Array 型の値の内容が計算の途中で変わることがない限り、 Nothing を返すことはない。
 fromMatrixToPatrix_helper_3
   : Array (Array Int) -> Int -> Int -> Int -> Int -> Maybe Pindex
 fromMatrixToPatrix_helper_3 x_y_int x y int p
@@ -214,9 +228,15 @@ fromMatrixToPatrix_helper_3 x_y_int x y int p
           case Array.get y y_int of
             Nothing
               ->
-                if 0 <= y && y < Array.length y_int
-                  then Just Null
-                  else Nothing
+                if 0 <= y
+                  then
+                    if y < Array.length y_int
+                      then Nothing
+                      else Just (Pindex p)
+                  else
+                    if 0 <= p && p < x
+                      then Just (Pindex p)
+                      else Nothing
             Just int_
               ->
                 case fromMatrixToPatrix_helper_4 x_y_int x (y - 1) of
@@ -228,6 +248,8 @@ fromMatrixToPatrix_helper_3 x_y_int x y int p
                         else
                           fromMatrixToPatrix_helper_3 x_y_int x y int (p - 1)
 
+-- x と y の先祖の集合を計算する。集合は、その特性関数で表される。
+-- Nothing は Array.get の結果が不整合だった時に返す。つまり、 Array 型の値の内容が計算の途中で変わることがない限り、 Nothing を返すことはない。
 fromMatrixToPatrix_helper_4
   : Array (Array Int) -> Int -> Int -> Maybe (Int -> Bool)
 fromMatrixToPatrix_helper_4 x_y_int x y
