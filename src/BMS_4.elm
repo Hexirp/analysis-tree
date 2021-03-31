@@ -13,6 +13,7 @@ module BMS_4
       Pindex (..),
       Patrix,
       fromMatrixToPatrix,
+      fromMatrixToPatrixWithCatching,
       fromPatrixToMatrix,
       fromListToMatrixRawly,
       fromListToPatrixRawly
@@ -150,18 +151,19 @@ type Patrix = Patrix Int Int (Array (Array Pindex))
 {-| 或る行列をパトリックスへ変換します。 -}
 fromMatrixToPatrix : Matrix -> Patrix
 fromMatrixToPatrix matrix
+  = fromMatrixToPatrixWithCatching matrix (Maybe.withDefault Null)
+
+{-| 或る行列を或る例外処理を使ってパトリックスへ変換します。
+
+其の例外処理は、 `Array.get` の結果が不整合だった場合に、つまり配列の値が計算の途中で変わった時に返される `Nothing` を処理するものです。其の例外処理が呼ばれることは、すなわちコードにバグが存在することであり、よって其の例外処理としてどのようなものを使ってもよいです。
+-}
+fromMatrixToPatrixWithCatching : Matrix -> (Maybe Pindex -> Pindex) -> Patrix
+fromMatrixToPatrixWithCatching matrix catch
   =
     case matrix of
       Matrix x y x_y_array
         ->
-          Patrix
-            x
-            y
-            (fromMatrixToPatrix_helper_1
-              x
-              y
-              x_y_array
-              (Maybe.withDefault Null))
+          Patrix x y (fromMatrixToPatrix_helper_1 x y x_y_array catch)
 
 -- `catch` は、 `Maybe` を剥がす時に使う。
 fromMatrixToPatrix_helper_1
