@@ -120,7 +120,14 @@ test_fromMatrixToPatrix
                     [Null, Null, Null],
                     [Pindex 0, Pindex 0, Pindex 0],
                     [Pindex 1, Pindex 1, Null]
-                  ]))
+                  ])),
+        test
+          "descent sequence"
+          (\_
+            ->
+              Except.equal
+                (fromMatrixToPatrix (fromListToPatrix [[1], [0]]))
+                (fromListToPatrixRawly 2 1 [[Null], [Null]]))
       ]
 
 test_fromMatrixToPatrixWithCatching : Test
