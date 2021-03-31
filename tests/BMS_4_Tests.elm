@@ -1,5 +1,7 @@
 module BMS_4_Tests exposing (test_Matrix, test_Patrix)
 
+import Case exposing (Case (..))
+
 import BMS_4 exposing (..)
 
 import Expect exposing (Expectation)
@@ -7,8 +9,6 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer)
 
 import Test exposing (..)
-
-import Debug
 
 test_Matrix : Test
 test_Matrix
@@ -93,7 +93,9 @@ test_Patrix
   =
     describe
       "Pindex"
-      [ test_fromMatrixToPatrix, test_fromMatrixToPatrixWithCatching ]
+      [
+        test_fromMatrixToPatrix
+      ]
 
 test_fromMatrixToPatrix : Test
 test_fromMatrixToPatrix
@@ -113,52 +115,20 @@ test_fromMatrixToPatrix
                       [1, 1, 1],
                       [2, 2, 0]
                     ]))
-                (fromListToPatrixRawly
-                  3
-                  3
-                  [
-                    [Null, Null, Null],
-                    [Pindex 0, Pindex 0, Pindex 0],
-                    [Pindex 1, Pindex 1, Null]
-                  ])),
+                (PossibleCase
+                  (fromListToPatrixRawly
+                    3
+                    3
+                    [
+                      [Null, Null, Null],
+                      [Pindex 0, Pindex 0, Pindex 0],
+                      [Pindex 1, Pindex 1, Null]
+                    ]))),
         test
           "descent sequence"
           (\_
             ->
               Expect.equal
                 (fromMatrixToPatrix (fromListToMatrix [[1], [0]]))
-                (fromListToPatrixRawly 2 1 [[Null], [Null]]))
-      ]
-
-test_fromMatrixToPatrixWithCatching : Test
-test_fromMatrixToPatrixWithCatching
-  =
-    describe
-      "fromMatrixToPatrixWithCatching"
-      [
-        test
-          "descent sequence"
-          (\_
-            ->
-              Expect.equal
-                (fromMatrixToPatrixWithCatching
-                  (fromListToMatrix [[1], [0]])
-                  (Maybe.withDefault (Pindex -1)))
-                (fromListToPatrixRawly 2 1 [[Null], [Null]])),
-        fuzz
-          (Fuzz.list (Fuzz.list Fuzz.int))
-          "safety"
-          (\x_y_int
-            ->
-              Expect.equal
-                (fromMatrixToPatrixWithCatching
-                  (fromListToMatrix (Debug.log "x_y_int" x_y_int))
-                  (\maybe_pindex
-                    ->
-                      case maybe_pindex of
-                        Nothing -> Debug.todo "It is an impossible case!"
-                        Just pindex -> pindex))
-                (fromMatrixToPatrixWithCatching
-                  (fromListToMatrix x_y_int)
-                  (Maybe.withDefault Null)))
+                (PossibleCase (fromListToPatrixRawly 2 1 [[Null], [Null]])))
       ]
