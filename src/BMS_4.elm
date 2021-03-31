@@ -13,6 +13,7 @@ module BMS_4
       Pindex (..),
       Patrix,
       fromMatrixToPatrix,
+      fromPatrixToMatrix,
       fromListToMatrixRawly,
       fromListToPatrixRawly
     )
@@ -21,6 +22,8 @@ import Array exposing (Array)
 import Array.Extra.Folding as Array
 
 import BMS_4.Parsing as Parsing
+
+import Debug
 
 {-| 或る配列を或るリストへ変換します。 -}
 fromArrayToList : Array (Array a) -> List (List a)
@@ -263,6 +266,10 @@ fromMatrixToPatrix_helper_4 x_y_int x y
             case fromMatrixToPatrix_helper_4 x_y_int x_ y of
               Nothing -> Nothing
               Just is_ancestor -> Just (\x__ -> x_ == x__ || is_ancestor x__)
+
+{-| 或るパトリックスを或る行列に変換します。 -}
+fromPatrixToMatrix : Patrix -> Matrix
+fromPatrixToMatrix = Debug.todo "to do implement"
 
 {-| 或るリストを生のまま行列へ変換します。
 
