@@ -276,7 +276,7 @@ fromMatrixToPatrix_helper_4 x_y_int x y
             case fromMatrixToPatrix_helper_4 x_y_int x_ y of
               ImpossibleCase -> ImpossibleCase
               PossibleCase is_ancestor
-                -> PossibleCase (\x__ -> x_ == x__ || is_ancestor x__)
+                -> PossibleCase (\x__ -> x == x__ || is_ancestor x__)
 
 {-| 或るパトリックスを或る行列に変換します。 -}
 fromPatrixToMatrix : Patrix -> Matrix
