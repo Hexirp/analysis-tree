@@ -125,8 +125,8 @@ test_fromMatrixToPatrix
           "descent sequence"
           (\_
             ->
-              Except.equal
-                (fromMatrixToPatrix (fromListToPatrix [[1], [0]]))
+              Expect.equal
+                (fromMatrixToPatrix (fromListToMatrix [[1], [0]]))
                 (fromListToPatrixRawly 2 1 [[Null], [Null]]))
       ]
 
