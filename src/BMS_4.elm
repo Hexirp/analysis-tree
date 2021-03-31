@@ -231,15 +231,22 @@ fromMatrixToPatrix_helper_3 x_y_int x y int p
           case Array.get y y_int of
             Nothing
               ->
-                if 0 <= y
-                  then
-                    if y < Array.length y_int
-                      then Nothing
-                      else Just (Pindex p)
+                if 0 <= y && y < Array.length y_int
+                  then Nothing
                   else
-                    if 0 <= p && p < x
-                      then Just (Pindex p)
-                      else Nothing
+                    case fromMatrixToPatrix_helper_4 x_y_int x (y - 1) of
+                      Nothing -> Nothing
+                      Just is_ancestor
+                        ->
+                          if is_ancestor p
+                            then Just (Pindex p)
+                            else
+                              fromMatrixToPatrix_helper_3
+                                x_y_int
+                                x
+                                y
+                                int
+                                (p - 1)
             Just int_
               ->
                 case fromMatrixToPatrix_helper_4 x_y_int x (y - 1) of
