@@ -153,7 +153,11 @@ test_fromMatrixToPatrixWithCatching
               Expect.equal
                 (fromMatrixToPatrixWithCatching
                   (fromListToMatrix (Debug.log "x_y_int" x_y_int))
-                  (\_ -> Debug.todo "impossible case"))
+                  (\maybe_pindex
+                    ->
+                      case maybe_pindex of
+                        Nothing -> Debug.todo "It is an impossible case!"
+                        Just pindex -> pindex))
                 (fromMatrixToPatrixWithCatching
                   (fromListToMatrix x_y_int)
                   (Maybe.withDefault Null)))
