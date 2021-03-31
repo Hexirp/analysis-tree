@@ -134,11 +134,14 @@ test_fromMatrixToPatrixWithCatching
           "safety"
           (\x_y_list
             ->
-              Expect.equal
-                (fromMatrixToPatrixWithCatching
-                  (fromListToMatrix x_y_list)
-                  (\_ -> Debug.todo "impossible case"))
-                (fromMatrixToPatrixWithCatching
-                  (fromListToMatrix x_y_list)
-                  (\_ -> Debug.todo "impossible case")))
+              Debug.log
+                "x_y_list"
+                (Debug.toString x_y_list)
+                (Expect.equal
+                  (fromMatrixToPatrixWithCatching
+                    (fromListToMatrix x_y_list)
+                    (\_ -> Debug.todo "impossible case"))
+                  (fromMatrixToPatrixWithCatching
+                    (fromListToMatrix x_y_list)
+                    (\_ -> Debug.todo "impossible case"))))
       ]
