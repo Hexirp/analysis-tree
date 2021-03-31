@@ -132,16 +132,13 @@ test_fromMatrixToPatrixWithCatching
         fuzz
           (Fuzz.list (Fuzz.list Fuzz.int))
           "safety"
-          (\x_y_list
+          (\x_y_int
             ->
-              Debug.log
-                "x_y_list"
-                (Debug.toString x_y_list)
-                (Expect.equal
-                  (fromMatrixToPatrixWithCatching
-                    (fromListToMatrix x_y_list)
-                    (\_ -> Debug.todo "impossible case"))
-                  (fromMatrixToPatrixWithCatching
-                    (fromListToMatrix x_y_list)
-                    (\_ -> Debug.todo "impossible case"))))
+              Expect.equal
+                (fromMatrixToPatrixWithCatching
+                  (fromListToMatrix (Debug.log "x_y_int" x_y_int))
+                  (\_ -> Debug.todo "impossible case"))
+                (fromMatrixToPatrixWithCatching
+                  (fromListToMatrix x_y_list)
+                  (Maybe.withDefault Null)))
       ]
