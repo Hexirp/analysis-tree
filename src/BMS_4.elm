@@ -1,6 +1,8 @@
 module BMS_4
   exposing
     (
+      Case,
+      sequence,
       fromArrayToList,
       fromListToArray,
       Nat,
@@ -13,7 +15,6 @@ module BMS_4
       Pindex (..),
       Patrix,
       fromMatrixToPatrix,
-      fromMatrixToPatrixWithCatching,
       fromPatrixToMatrix,
       fromListToMatrixRawly,
       fromListToPatrixRawly
@@ -25,6 +26,30 @@ import Array.Extra.Folding as Array
 import BMS_4.Parsing as Parsing
 
 import Debug
+
+{-| 失敗しないことが期待されるが、型の上では失敗する可能性を排除できない値です。
+
+たとえば、次のような場合に使います。
+
+  case Array.get 1 [0,1,2] of
+    Nothing -> ImpossibleCase
+    Just int -> PossibleCase int
+-}
+type Case a = ImpossibleCase | PossibleCase a
+
+sequence : Array (Case a) -> Case (Array a)
+sequence array_case_x
+  =
+    Array.foldl
+      (\case_x case_r -> case case_x of
+        ImpossibleCase -> ImpossibleCase
+        PossibleCase x
+          ->
+            case case_r of
+              ImpossibleCase -> ImpossibleCase
+              PossibleCase r -> PossibleCase (Array.push x r))
+      (PossibleCase Array.empty)
+      array_case_x
 
 {-| 或る配列を或るリストへ変換します。 -}
 fromArrayToList : Array (Array a) -> List (List a)
@@ -149,26 +174,25 @@ type Pindex = Null | Pindex Int
 type Patrix = Patrix Int Int (Array (Array Pindex))
 
 {-| 或る行列をパトリックスへ変換します。 -}
-fromMatrixToPatrix : Matrix -> Patrix
+fromMatrixToPatrix : Matrix -> Case Patrix
 fromMatrixToPatrix matrix
-  = fromMatrixToPatrixWithCatching matrix (Maybe.withDefault Null)
-
-{-| 或る行列を或る例外処理を使ってパトリックスへ変換します。
-
-其の例外処理は、 `Array.get` の結果が不整合だった場合に、つまり配列の値が計算の途中で変わった時に返される `Nothing` を処理するものです。其の例外処理が呼ばれることは、すなわちコードにバグが存在することであり、よって其の例外処理としてどのようなものを使ってもよいです。
--}
-fromMatrixToPatrixWithCatching : Matrix -> (Maybe Pindex -> Pindex) -> Patrix
-fromMatrixToPatrixWithCatching matrix catch
   =
     case matrix of
-      Matrix x y x_y_array
+      Matrix x y x_y_int
         ->
-          Patrix x y (fromMatrixToPatrix_helper_1 x y x_y_array catch)
+          case
+            sequence
+              (Array.map
+                sequence
+                (fromMatrixToPatrix_helper_1 x y x_y_int))
+          of
+            ImpossibleCase -> ImpossibleCase
+            PossibleCase x_y_pindex -> PossibleCase (Patrix x y x_y_pindex)
 
 -- `catch` は、 `Maybe` を剥がす時に使う。
 fromMatrixToPatrix_helper_1
-  : Int -> Int -> Array (Array Int) -> (Maybe Pindex -> a) -> Array (Array a)
-fromMatrixToPatrix_helper_1 x y x_y_array catch
+  : Int -> Int -> Array (Array Int) -> Array (Array (Case Pindex))
+fromMatrixToPatrix_helper_1 x y x_y_int
   =
     Array.initialize
       x
@@ -178,22 +202,22 @@ fromMatrixToPatrix_helper_1 x y x_y_array catch
             y
             (\y_
               ->
-                catch (fromMatrixToPatrix_helper_2 x_y_array x_ y_)))
+                fromMatrixToPatrix_helper_2 x_y_int x_ y_))
 
 -- x と y に対応する Pindex の値を返す。
 -- x が範囲を外れた時は、 Null を返す。
 -- y が範囲を外れた時は、それが y < 0 であるとき、つまり上側だった時は、 x が 0, 1, 2, 3, ... であるとき、 Null, Pindex 0, Pindex 1, Pindex 2, ... という結果になる。それが Array.length y_int <= y であるとき、つまり下側だったときは、 Null を返す。
 -- Nothing は Array.get の結果が不整合だった時に返す。つまり、 Array 型の値の内容が計算の途中で変わることがない限り、 Nothing を返すことはない。
 fromMatrixToPatrix_helper_2
-  : Array (Array Int) -> Int -> Int -> Maybe Pindex
+  : Array (Array Int) -> Int -> Int -> Case Pindex
 fromMatrixToPatrix_helper_2 x_y_int x y
   =
     case Array.get x x_y_int of
       Nothing
         ->
           if 0 <= x && x < Array.length x_y_int
-            then Nothing
-            else Just Null
+            then ImpossibleCase
+            else PossibleCase Null
       Just y_int
         ->
           case Array.get y y_int of
@@ -201,16 +225,16 @@ fromMatrixToPatrix_helper_2 x_y_int x y
               if 0 <= y
                 then
                   if y < Array.length y_int
-                    then Nothing
-                    else Just Null
+                    then ImpossibleCase
+                    else PossibleCase Null
                 else
                   if 0 <= x && x < Array.length x_y_int
                     then
                       if x == 0
-                        then Just Null
-                        else Just (Pindex (x - 1))
+                        then PossibleCase Null
+                        else PossibleCase (Pindex (x - 1))
                     else
-                      Nothing
+                      ImpossibleCase
             Just int
               -> fromMatrixToPatrix_helper_3 x_y_int x y int (x - 1)
 
@@ -219,29 +243,29 @@ fromMatrixToPatrix_helper_2 x_y_int x y
 -- y が範囲を外れた時は、それが y < 0 である、つまり上側だった時は、 fromMatrixToPatrix_helper_2 が示しているような 0 ← 1 ← 2 ← 3 ← ... の構造に従って親を判定する。それが、 Array.length y_int <= y である、つまり下側だった時は、そこは底値で埋め尽くされているという考え方に従って親を判定する。
 -- Nothing は Array.get の結果が不整合だった時に返す。つまり、 Array 型の値の内容が計算の途中で変わることがない限り、 Nothing を返すことはない。
 fromMatrixToPatrix_helper_3
-  : Array (Array Int) -> Int -> Int -> Int -> Int -> Maybe Pindex
+  : Array (Array Int) -> Int -> Int -> Int -> Int -> Case Pindex
 fromMatrixToPatrix_helper_3 x_y_int x y int p
   =
     case Array.get p x_y_int of
       Nothing
         ->
           if x == 0
-            then Just Null
-            else Nothing
+            then PossibleCase Null
+            else ImpossibleCase
       Just y_int
         ->
           case Array.get y y_int of
             Nothing
               ->
                 if 0 <= y && y < Array.length y_int
-                  then Nothing
+                  then ImpossibleCase
                   else
                     case fromMatrixToPatrix_helper_4 x_y_int x (y - 1) of
-                      Nothing -> Nothing
-                      Just is_ancestor
+                      ImpossibleCase -> ImpossibleCase
+                      PossibleCase is_ancestor
                         ->
                           if is_ancestor p
-                            then Just (Pindex p)
+                            then PossibleCase (Pindex p)
                             else
                               fromMatrixToPatrix_helper_3
                                 x_y_int
@@ -252,29 +276,30 @@ fromMatrixToPatrix_helper_3 x_y_int x y int p
             Just int_
               ->
                 case fromMatrixToPatrix_helper_4 x_y_int x (y - 1) of
-                  Nothing -> Nothing
-                  Just is_ancestor
+                  ImpossibleCase -> ImpossibleCase
+                  PossibleCase is_ancestor
                     ->
                       if int_ < int && is_ancestor p
-                        then Just (Pindex p)
+                        then PossibleCase (Pindex p)
                         else
                           fromMatrixToPatrix_helper_3 x_y_int x y int (p - 1)
 
 -- x と y の先祖の集合を計算する。集合は、その特性関数で表される。
 -- Nothing は Array.get の結果が不整合だった時に返す。つまり、 Array 型の値の内容が計算の途中で変わることがない限り、 Nothing を返すことはない。
 fromMatrixToPatrix_helper_4
-  : Array (Array Int) -> Int -> Int -> Maybe (Int -> Bool)
+  : Array (Array Int) -> Int -> Int -> Case (Int -> Bool)
 fromMatrixToPatrix_helper_4 x_y_int x y
   =
     case fromMatrixToPatrix_helper_2 x_y_int x y of
-      Nothing -> Nothing
-      Just xp -> case xp of
-        Null -> Just (\x__ -> x == x__)
+      ImpossibleCase -> ImpossibleCase
+      PossibleCase xp -> case xp of
+        Null -> PossibleCase (\x__ -> x == x__)
         Pindex x_
           ->
             case fromMatrixToPatrix_helper_4 x_y_int x_ y of
-              Nothing -> Nothing
-              Just is_ancestor -> Just (\x__ -> x_ == x__ || is_ancestor x__)
+              ImpossibleCase -> ImpossibleCase
+              PossibleCase is_ancestor
+                -> PossibleCase (\x__ -> x_ == x__ || is_ancestor x__)
 
 {-| 或るパトリックスを或る行列に変換します。 -}
 fromPatrixToMatrix : Patrix -> Matrix
