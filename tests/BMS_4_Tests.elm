@@ -8,6 +8,8 @@ import Fuzz exposing (Fuzzer)
 
 import Test exposing (..)
 
+import Debug
+
 test_Matrix : Test
 test_Matrix
   = describe "Matrix" [ test_fromArrayToMatrix, test_fromListToMatrix ]
@@ -88,7 +90,10 @@ test_fromListToMatrix
 
 test_Patrix : Test
 test_Patrix
-  = describe "Pindex" [ test_fromMatrixToPatrix ]
+  =
+    describe
+      "Pindex"
+      [ test_fromMatrixToPatrix, test_fromMatrixToPatrixWithCatching ]
 
 test_fromMatrixToPatrix : Test
 test_fromMatrixToPatrix
@@ -116,4 +121,24 @@ test_fromMatrixToPatrix
                     [Pindex 0, Pindex 0, Pindex 0],
                     [Pindex 1, Pindex 1, Null]
                   ]))
+      ]
+
+test_fromMatrixToPatrixWithCatching : Test
+test_fromMatrixToPatrixWithCatching
+  =
+    describe
+      "fromMatrixToPatrixWithCatching"
+      [
+        fuzz
+          (Fuzz.list (Fuzz.list Fuzz.int))
+          "safety"
+          (\x_y_list
+            ->
+              Expect.equal
+                (fromMatrixToPatrixWithCatching
+                  (fromListToMatrix x_y_list)
+                  (\_ -> Debug.todo "impossible case"))
+                (fromMatrixToPatrixWithCatching
+                  (fromListToMatrix x_y_list)
+                  (\_ -> Debug.todo "impossible case")))
       ]
