@@ -25,8 +25,6 @@ import Array.Extra.Folding as Array
 
 import BMS_4.Parsing as Parsing
 
-import Debug
-
 {-| 或る配列を或るリストへ変換します。 -}
 fromArrayToList : Array (Array a) -> List (List a)
 fromArrayToList array = Array.toList (Array.map Array.toList array)
@@ -292,8 +290,67 @@ fromMatrixToPatrix_helper_4 x_y_int x y
                 -> PossibleCase (\x__ -> x == x__ || is_ancestor x__)
 
 {-| 或るパトリックスを或る行列に変換します。 -}
-fromPatrixToMatrix : Patrix -> Matrix
-fromPatrixToMatrix = Debug.todo "to do implement"
+fromPatrixToMatrix : Patrix -> Case Matrix
+fromPatrixToMatrix patrix
+  =
+    case patrix of
+      Patrix x y x_y_pindex
+        ->
+          case
+            Case.traverseArray
+              (\case_x -> case_x)
+              (Array.map
+                (Case.traverseArray
+                  (\case_x -> case_x))
+                (fromPatrixToMatrix_helper_1 x y x_y_pindex))
+          of
+            ImpossibleCase -> ImpossibleCase
+            PossibleCase x_y_int -> PossibleCase (Matrix x y x_y_int)
+
+fromPatrixToMatrix_helper_1
+  : Int -> Int -> Array (Array Pindex) -> Array (Array (Case Int))
+fromPatrixToMatrix_helper_1 x y x_y_pindex
+  =
+    Array.initialize
+      x
+      (\x_
+        ->
+          Array.initialize
+            y
+            (\y_
+              ->
+                fromPatrixToMatrix_helper_2 x_y_pindex x_ y_))
+
+fromPatrixToMatrix_helper_2
+  : Array (Array Pindex) -> Int -> Int -> Case Int
+fromPatrixToMatrix_helper_2 x_y_pindex x y
+  =
+    case Array.get x x_y_pindex of
+      Nothing
+        ->
+          if 0 <= x && x < Array.length x_y_pindex
+            then ImpossibleCase
+            else PossibleCase 0
+      Just y_pindex
+        ->
+          case Array.get y y_pindex of
+            Nothing
+              ->
+                if 0 <= y && y < Array.length y_pindex
+                  then ImpossibleCase
+                  else PossibleCase 0
+            Just pindex
+              ->
+                case pindex of
+                  Null -> PossibleCase 0
+                  Pindex p
+                    ->
+                      if p < x
+                        then
+                          case fromPatrixToMatrix_helper_2 x_y_pindex p y of
+                            ImpossibleCase -> ImpossibleCase
+                            PossibleCase int -> PossibleCase (int + 1)
+                        else PossibleCase 0
 
 {-| 或るリストを生のまま行列へ変換します。
 
