@@ -49,12 +49,9 @@ verifyMatrix matrix
     case matrix of
       Matrix x y x_y_int
         ->
-          List.all
-            (\a -> a)
-            [
-              Array.length x_y_int == x,
-              Array.all (\a -> Array.length a == y) x_y_int
-            ]
+          True
+            && Array.length x_y_int == x
+            && Array.all (\a -> Array.length a == y) x_y_int
 
 {-| 或る行列を或る配列へ変換します。 -}
 fromMatrixToArray : Matrix -> Array (Array Int)
