@@ -40,7 +40,7 @@ type Nat = Nat Int
 
 {-| これはバシク行列システムにおける行列です。
 
-`Matrix` 型の値は `verifyMatrix` を満たしていなければなりません。
+`Matrix` 型の値は `verifyMatrix` を満たしていなければなりません。すなわち、 `Matrix x y x_y_int` は、その行の長さが `x` であり、その列の長さが `y` でなければなりません。
 -}
 type Matrix = Matrix Int Int (Array (Array Int))
 
@@ -155,7 +155,10 @@ expand n x = expand n x
 {-| これはピンデックスです。ピンデックスは或る行列の要素へのポインターを意味します。 -}
 type Pindex = Null | Pindex Int
 
-{-| これはパトリックスです。パトリックスはピンデックスの行列を意味します。 -}
+{-| これはパトリックスです。パトリックスはピンデックスの行列を意味します。
+
+`Patrix x y x_y_pindex` は、その行の長さが `x` であり、その列の長さが `y` であり、それぞれの行が正しい木構造を構成していて、上部の行の木構造に下部の行の木構造が埋め込み可能でなければなりません。
+-}
 type Patrix = Patrix Int Int (Array (Array Pindex))
 
 {-| 或る行列をパトリックスへ変換します。 -}
