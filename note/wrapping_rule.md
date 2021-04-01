@@ -37,9 +37,9 @@ Elm のプログラムは、多分木であるというように考えます。
 なし
 </td>
 <td>
-```
+<pre><code>
 import Alpha_Module as A_Module exposing (A_Definition, B_Definition)
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -50,10 +50,10 @@ import Alpha_Module as A_Module exposing (A_Definition, B_Definition)
 あり
 </td>
 <td>
-```
+<pre><code>
 import Alpha_Module as A_Module
   exposing (A_Definition, B_Definition)
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -64,11 +64,11 @@ import Alpha_Module as A_Module
 あり
 </td>
 <td>
-```
+<pre><code>
 import Alpha_Module
   as A_Module
   exposing (A_Definition, B_Definition)
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -79,12 +79,12 @@ import Alpha_Module
 あり
 </td>
 <td>
-```
+<pre><code>
 import
   Alpha_Module
   as A_Module
   exposing (A_Definition, B_Definition)
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -113,9 +113,9 @@ import
 なし
 </td>
 <td>
-```
+<pre><code>
 as A_Module
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -126,10 +126,10 @@ as A_Module
 あり
 </td>
 <td>
-```
+<pre><code>
 as
   A_Module
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -158,9 +158,9 @@ as
 なし
 </td>
 <td>
-```
+<pre><code>
 exposing (A_Definition, B_Definition)
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -171,10 +171,10 @@ exposing (A_Definition, B_Definition)
 あり
 </td>
 <td>
-```
+<pre><code>
 exposing
   (A_Definition, B_Definition)
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -203,9 +203,9 @@ exposing
 なし
 </td>
 <td>
-```
+<pre><code>
 alpha_value : Alpha_Type
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -216,10 +216,10 @@ alpha_value : Alpha_Type
 あり
 </td>
 <td>
-```
+<pre><code>
 alpha_value
   : Alpha_Type
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -230,11 +230,11 @@ alpha_value
 あり
 </td>
 <td>
-```
+<pre><code>
 alpha_value
   :
     Alpha_Type
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -263,9 +263,9 @@ alpha_value
 なし
 </td>
 <td>
-```
+<pre><code>
 alpha_value = alpha_definition
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -276,10 +276,10 @@ alpha_value = alpha_definition
 あり
 </td>
 <td>
-```
+<pre><code>
 alpha_value
   = alpha_definition
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -290,11 +290,11 @@ alpha_value
 あり
 </td>
 <td>
-```
+<pre><code>
 alpha_value
   =
     alpha_definition
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -323,9 +323,9 @@ alpha_value
 なし
 </td>
 <td>
-```
+<pre><code>
 function alpha beta gamma
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -336,12 +336,12 @@ function alpha beta gamma
 あり
 </td>
 <td>
-```
+<pre><code>
 function
   alpha
   beta
   gamma
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -370,9 +370,9 @@ function
 なし
 </td>
 <td>
-```
+<pre><code>
 \\x -> expression
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -383,10 +383,10 @@ function
 あり
 </td>
 <td>
-```
+<pre><code>
 \\x
   -> expression
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -397,11 +397,11 @@ function
 あり
 </td>
 <td>
-```
+<pre><code>
 \\x
   ->
     expression
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -430,11 +430,11 @@ function
 あり
 </td>
 <td>
-```
+<pre><code>
 case x of
   alpha_pattern -> alpha_expression
   beta_pattern -> beta_expression
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -445,13 +445,13 @@ case x of
 あり
 </td>
 <td>
-```
+<pre><code>
 case
   x
 of
   alpha_pattern -> alpha_expression
   beta_pattern -> beta_expression
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -480,9 +480,9 @@ of
 なし
 </td>
 <td>
-```
+<pre><code>
 x -> expression
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -493,10 +493,10 @@ x -> expression
 あり
 </td>
 <td>
-```
+<pre><code>
 x
   -> expression
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -507,11 +507,11 @@ x
 あり
 </td>
 <td>
-```
+<pre><code>
 x
   ->
     expression
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -540,9 +540,9 @@ x
 なし
 </td>
 <td>
-```
+<pre><code>
 if x then alpha_expression else beta_expression
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -553,11 +553,11 @@ if x then alpha_expression else beta_expression
 あり
 </td>
 <td>
-```
+<pre><code>
 if x
   then alpha_expression
   else beta_expression
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -568,12 +568,12 @@ if x
 あり
 </td>
 <td>
-```
+<pre><code>
 if
   x
   then alpha_expression
   else beta_expression
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -602,9 +602,9 @@ if
 なし
 </td>
 <td>
-```
+<pre><code>
 then alpha_expression
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -615,10 +615,10 @@ then alpha_expression
 あり
 </td>
 <td>
-```
+<pre><code>
 then
   alpha_expression
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -647,9 +647,9 @@ then
 なし
 </td>
 <td>
-```
+<pre><code>
 else beta_expression
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -660,10 +660,10 @@ else beta_expression
 あり
 </td>
 <td>
-```
+<pre><code>
 else
   beta_expression
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -692,13 +692,13 @@ else
 あり
 </td>
 <td>
-```
+<pre><code>
 let
   alpha_declaration
   beta_declaration
 in
   expression
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -727,9 +727,9 @@ in
 なし
 </td>
 <td>
-```
+<pre><code>
 alpha + beta
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -740,10 +740,10 @@ alpha + beta
 あり
 </td>
 <td>
-```
+<pre><code>
 alpha
   + beta
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -754,11 +754,11 @@ alpha
 あり
 </td>
 <td>
-```
+<pre><code>
 alpha
   +
     beta
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -787,9 +787,9 @@ alpha
 なし
 </td>
 <td>
-```
+<pre><code>
 [x, y, z]
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -800,13 +800,13 @@ alpha
 あり
 </td>
 <td>
-```
+<pre><code>
 [
   x,
   y,
   z
 ]
-```
+</code></pre>
 </td>
 </tr>
 </table>
@@ -835,9 +835,9 @@ alpha
 なし
 </td>
 <td>
-```
+<pre><code>
 (x, y, z)
-```
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -848,13 +848,13 @@ alpha
 あり
 </td>
 <td>
-```
+<pre><code>
 (
   x,
   y,
   z
 )
-```
+</code></pre>
 </td>
 </tr>
 </table>
