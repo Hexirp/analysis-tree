@@ -49,13 +49,13 @@ verifyMatrix : Matrix -> Bool
 verifyMatrix matrix
   =
     case matrix of
-      Matrix x y x_y_array
+      Matrix x y x_y_int
         ->
           List.all
             (\a -> a)
             [
-              Array.length x_y_array == x,
-              Array.all (\a -> Array.length a == y) x_y_array
+              Array.length x_y_int == x,
+              Array.all (\a -> Array.length a == y) x_y_int
             ]
 
 {-| 或る行列を或る配列へ変換します。 -}
@@ -63,7 +63,7 @@ fromMatrixToArray : Matrix -> Array (Array Int)
 fromMatrixToArray matrix
   =
     case matrix of
-      Matrix x y array -> array
+      Matrix x y x_y_int -> x_y_int
 
 {-| 或る配列を或る行列へ変換します。
 
@@ -72,32 +72,35 @@ fromMatrixToArray matrix
 底値は、其の配列に含まれる最小の値です。ゼロを使わないのは、其の配列が表現する行列のトポロジーを可能な限り保つためです。
 -}
 fromArrayToMatrix : Array (Array Int) -> Matrix
-fromArrayToMatrix x_y_array
+fromArrayToMatrix x_y_int
   =
     let
-      x = Array.length x_y_array
-      y = Maybe.withDefault 0 (Array.maximum (Array.map Array.length x_y_array))
+      x = Array.length x_y_int
+      y = Maybe.withDefault 0 (Array.maximum (Array.map Array.length x_y_int))
       e
         =
           Maybe.withDefault 0
             (Array.minimum
               (Array.map
-                (\y_list -> Maybe.withDefault 0 (Array.minimum y_list))
-                x_y_array))
-      a = Array.map (fromArrayToMatrix_helper_1 y e) x_y_array
+                (\y_int
+                  ->
+                    Maybe.withDefault
+                      0
+                      (Array.minimum y_int))
+                x_y_int))
     in
-      Matrix x y a
+      Matrix x y (Array.map (fromArrayToMatrix_helper_1 y e) x_y_int)
 
 fromArrayToMatrix_helper_1 : Int -> Int -> Array Int -> Array Int
-fromArrayToMatrix_helper_1 y e y_list
-  = Array.initialize y (\i -> Maybe.withDefault e (Array.get i y_list))
+fromArrayToMatrix_helper_1 y e y_int
+  = Array.initialize y (\i -> Maybe.withDefault e (Array.get i y_int))
 
 {-| 或る行列を或るリストへと変換します。 -}
 fromMatrixToList : Matrix -> List (List Int)
 fromMatrixToList matrix
   =
     case matrix of
-      Matrix x y x_y_array -> fromArrayToList x_y_array
+      Matrix x y x_y_int -> fromArrayToList x_y_int
 
 {-| 或るリストを或る行列へと変換します。
 
@@ -106,38 +109,44 @@ fromMatrixToList matrix
 底値は、其のリストに含まれる最小の値です。ゼロを使わないのは、其のリストが表現する行列のトポロジーを可能な限り保つためです。
 -}
 fromListToMatrix : List (List Int) -> Matrix
-fromListToMatrix x_y_list
+fromListToMatrix x_y_int
   =
     let
-      x = List.length x_y_list
-      y = Maybe.withDefault 0 (List.maximum (List.map List.length x_y_list))
+      x = List.length x_y_int
+      y = Maybe.withDefault 0 (List.maximum (List.map List.length x_y_int))
       e
         =
           Maybe.withDefault 0
             (List.minimum
               (List.map
-                (\y_list -> Maybe.withDefault 0 (List.minimum y_list))
-                x_y_list))
-      a = Array.fromList (List.map (fromListToMatrix_helper_1 y e) x_y_list)
+                (\y_int
+                  ->
+                    Maybe.withDefault
+                      0
+                      (List.minimum y_int))
+                x_y_int))
     in
-      Matrix x y a
+      Matrix
+        x
+        y
+        (Array.fromList (List.map (fromListToMatrix_helper_1 y e) x_y_int))
 
 fromListToMatrix_helper_1 : Int -> Int -> List Int -> Array Int
-fromListToMatrix_helper_1 y e y_list
-  = Array.initialize y (fromListToMatrix_helper_2 e y_list)
+fromListToMatrix_helper_1 y e y_int
+  = Array.initialize y (fromListToMatrix_helper_2 e y_int)
 
 -- fromListToMatrix_helper_1 により 0 <= i である。
 -- list-extra 8.3.0 の getAt で実装することも出来るが、上記の条件を使って実装を単純にしている。
 fromListToMatrix_helper_2 : Int -> List Int -> Int -> Int
-fromListToMatrix_helper_2 e y_list i
+fromListToMatrix_helper_2 e y_int i
   =
-    case y_list of
+    case y_int of
       [] -> e
-      y_list_el :: y_list_
+      int :: y_int_
         ->
           if i == 0
-            then y_list_el
-            else fromListToMatrix_helper_2 e y_list_ (i - 1)
+            then int
+            else fromListToMatrix_helper_2 e y_int_ (i - 1)
 
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。 -}
 expand : Matrix -> Nat -> Maybe Matrix
@@ -160,7 +169,8 @@ fromMatrixToPatrix matrix
             Case.traverseArray
               (\case_x -> case_x)
               (Array.map
-                (Case.traverseArray (\case_x -> case_x))
+                (Case.traverseArray
+                  (\case_x -> case_x))
                 (fromMatrixToPatrix_helper_1 x y x_y_int))
           of
             ImpossibleCase -> ImpossibleCase
