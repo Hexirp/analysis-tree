@@ -316,7 +316,7 @@ Elm のプログラムは、多分木であるというように考えます。
 
 ## ラムダ式
 
-`\\x -> expression` です。
+`\x -> expression` です。
 
 <table>
 <tr>
@@ -338,7 +338,7 @@ Elm のプログラムは、多分木であるというように考えます。
 なし
 </td>
 <td>
-<pre><code>\\x -> expression</code></pre>
+<pre><code>\x -> expression</code></pre>
 </td>
 </tr>
 <tr>
@@ -349,7 +349,7 @@ Elm のプログラムは、多分木であるというように考えます。
 あり
 </td>
 <td>
-<pre><code>\\x
+<pre><code>\x
   -> expression</code></pre>
 </td>
 </tr>
@@ -361,7 +361,7 @@ Elm のプログラムは、多分木であるというように考えます。
 あり
 </td>
 <td>
-<pre><code>\\x
+<pre><code>\x
   ->
     expression</code></pre>
 </td>
@@ -370,7 +370,7 @@ Elm のプログラムは、多分木であるというように考えます。
 
 ## case 式
 
-`case x of\\n  alpha_pattern -> alpha_expression\\n  beta_pattern -> beta_expression` です。
+`case x of\n  alpha_pattern -> alpha_expression\n  beta_pattern -> beta_expression` です。
 
 <table>
 <tr>
@@ -608,7 +608,7 @@ of
 
 ## let 式
 
-`let\\n  alpha_declaration\\n  beta_declaration\\nin\\n  expression` です。
+`let\n  alpha_declaration\n  beta_declaration\nin\n  expression` です。
 
 <table>
 <tr>
