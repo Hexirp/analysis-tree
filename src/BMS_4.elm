@@ -4,6 +4,7 @@ module BMS_4
       fromArrayToList,
       fromListToArray,
       Nat,
+      RawMatrix,
       Matrix,
       fromMatrixToArray,
       fromArrayToMatrix,
@@ -36,11 +37,17 @@ fromListToArray list = Array.map Array.fromList (Array.fromList list)
 {-| これは自然数です。 -}
 type Nat = Nat Int
 
+{-| これはバシク行列システムの行列を表す生の型です。
+
+この型を直接扱うことは規約を破ることに繋がるため、このモジュールが提供する関数だけを使って扱ってください。
+-}
+type alias RawMatrix = Array (Array Int)
+
 {-| これはバシク行列システムにおける行列です。
 
 `Matrix` 型の値は `verifyMatrix` を満たしていなければなりません。すなわち、 `Matrix x y x_y_int` は、その行の長さが `x` であり、その列の長さが `y` でなければなりません。
 -}
-type Matrix = Matrix Int Int (Array (Array Int))
+type Matrix = Matrix Int Int RawMatrix
 
 {-| 或る値が `Matrix` 型の規約を満たしているか検証します。 -}
 verifyMatrix : Matrix -> Bool
