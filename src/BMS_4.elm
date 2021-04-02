@@ -42,7 +42,7 @@ type Nat = Nat Int
 -}
 type Matrix = Matrix Int Int (Array (Array Int))
 
-{-| 或る値が `Matrix` の規約を満たしているか検証します。 -}
+{-| 或る値が `Matrix` 型の規約を満たしているか検証します。 -}
 verifyMatrix : Matrix -> Bool
 verifyMatrix matrix
   =
