@@ -12,9 +12,13 @@ module BMS_4
       fromListToMatrix,
       expand,
       Pindex (..),
+      RawPatrix,
       Patrix,
-      fromMatrixToPatrix,
-      fromPatrixToMatrix,
+      calcPatrixFromMatrix,
+      calcParentOnPatrixFromRawMatrix,
+      calcAncestorSetOnPatrixFromRawMatrix,
+      calcMatrixFromPatrix,
+      calcElementOnMatrixFromPatrix,
       fromListToMatrixRawly,
       fromListToPatrixRawly
     )
@@ -157,15 +161,21 @@ expand n x = expand n x
 {-| これはピンデックスです。ピンデックスは或る行列の要素へのポインターを意味します。 -}
 type Pindex = Null | Pindex Int
 
+{-| これはパトリックスを表す生の型です。
+
+この型を直接扱うことは規約を破ることに繋がるため、このモジュールが提供する関数だけを使って扱ってください。
+-}
+type alias RawPatrix = Array (Array Pindex)
+
 {-| これはパトリックスです。パトリックスはピンデックスの行列を意味します。
 
 `Patrix x y x_y_pindex` は、その行の長さが `x` であり、その列の長さが `y` であり、それぞれの行が正しい木構造を構成していて、上部の行の木構造に下部の行の木構造が埋め込み可能でなければなりません。
 -}
-type Patrix = Patrix Int Int (Array (Array Pindex))
+type Patrix = Patrix Int Int RawPatrix
 
 {-| 或る行列をパトリックスへ変換します。 -}
-fromMatrixToPatrix : Matrix -> Case Patrix
-fromMatrixToPatrix matrix
+calcPatrixFromMatrix : Matrix -> Case Patrix
+calcPatrixFromMatrix matrix
   =
     case matrix of
       Matrix x y x_y_int
@@ -176,14 +186,14 @@ fromMatrixToPatrix matrix
               (Array.map
                 (Case.traverseArray
                   (\case_x -> case_x))
-                (fromMatrixToPatrix_helper_1 x y x_y_int))
+                (calcPatrixFromMatrix_helper_1 x y x_y_int))
           of
             ImpossibleCase -> ImpossibleCase
             PossibleCase x_y_pindex -> PossibleCase (Patrix x y x_y_pindex)
 
-fromMatrixToPatrix_helper_1
+calcPatrixFromMatrix_helper_1
   : Int -> Int -> Array (Array Int) -> Array (Array (Case Pindex))
-fromMatrixToPatrix_helper_1 x y x_y_int
+calcPatrixFromMatrix_helper_1 x y x_y_int
   =
     Array.initialize
       x
@@ -193,14 +203,15 @@ fromMatrixToPatrix_helper_1 x y x_y_int
             y
             (\y_
               ->
-                fromMatrixToPatrix_helper_2 x_y_int x_ y_))
+                calcParentOnPatrixFromRawMatrix x_y_int x_ y_))
 
--- x と y に対応する Pindex の値を返す。
--- x が範囲を外れた時は、 Null を返す。
--- y が範囲を外れた時は、それが y < 0 であるとき、つまり上側だった時は、 x が 0, 1, 2, 3, ... であるとき、 Null, Pindex 0, Pindex 1, Pindex 2, ... という結果になる。それが Array.length y_int <= y であるとき、つまり下側だったときは、 Null を返す。
-fromMatrixToPatrix_helper_2
-  : Array (Array Int) -> Int -> Int -> Case Pindex
-fromMatrixToPatrix_helper_2 x_y_int x y
+{-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の親を表す或る `Pindex` を計算し、それを返します。
+
+`x` が範囲を外れている時は、 `Null` を返します。 `x` が範囲を外れていなくて `y` が `0` 未満である時は、 `x` が `0` であるならば `Null` となり、そうでないならば `Pindex (x - 1)` となります。 `x` が範囲の中にあって `y` が `x` が指す列の長さ以上である時は、 `Null` になります。
+-}
+calcParentOnPatrixFromRawMatrix
+  : RawMatrix -> Int -> Int -> Case Pindex
+calcParentOnPatrixFromRawMatrix x_y_int x y
   =
     case Array.get x x_y_int of
       Nothing
@@ -226,15 +237,22 @@ fromMatrixToPatrix_helper_2 x_y_int x y
                     else
                       ImpossibleCase
             Just int
-              -> fromMatrixToPatrix_helper_3 x_y_int x y y_int int (x - 1)
+              ->
+                calcParentOnPatrixFromRawMatrix_helper_1
+                  x_y_int
+                  x
+                  y
+                  y_int
+                  int
+                  (x - 1)
 
 -- x と y の親を探索する。
 -- p が範囲を外れた時は、 p < x かつ x は範囲を外れていないという事実より、 p < 0 であり、ここまで探索の手が伸びるということは、 x の y での親はないということである。
--- p がずれたことにより y が範囲を外れた時は、それが y < 0 である、つまり上側だった時は、 fromMatrixToPatrix_helper_2 が示しているような 0 ← 1 ← 2 ← 3 ← ... の構造に従って親を判定する。それが、 Array.length y_int <= y である、つまり下側だった時は、そこは底値で埋め尽くされているという考え方に従って親を判定する。これらは、結果的に同じ処理となる。
--- p は関数の状態を保持する役割を持つ引数である。 fromMatrixToPatrix_helper_2 と再帰の構造より p < x である。
-fromMatrixToPatrix_helper_3
-  : Array (Array Int) -> Int -> Int -> Array Int -> Int -> Int -> Case Pindex
-fromMatrixToPatrix_helper_3 x_y_int x y y_int int p
+-- p がずれたことにより y が範囲を外れた時は、それが y < 0 である、つまり上側だった時は、 calcParentOnPatrixFromRawMatrix が示しているような 0 ← 1 ← 2 ← 3 ← ... の構造に従って親を判定する。それが、 Array.length y_int <= y である、つまり下側だった時は、そこは底値で埋め尽くされているという考え方に従って親を判定する。これらは、結果的に同じ処理となる。
+-- p は関数の状態を保持する役割を持つ引数である。 calcParentOnPatrixFromRawMatrix と再帰の構造より p < x である。
+calcParentOnPatrixFromRawMatrix_helper_1
+  : RawMatrix -> Int -> Int -> Array Int -> Int -> Int -> Case Pindex
+calcParentOnPatrixFromRawMatrix_helper_1 x_y_int x y y_int int p
   =
     case Array.get p x_y_int of
       Nothing -> PossibleCase Null
@@ -246,14 +264,16 @@ fromMatrixToPatrix_helper_3 x_y_int x y y_int int p
                 if 0 <= y && y < Array.length y_int
                   then ImpossibleCase
                   else
-                    case fromMatrixToPatrix_helper_4 x_y_int x (y - 1) of
+                    case
+                      calcAncestorSetOnPatrixFromRawMatrix x_y_int x (y - 1)
+                    of
                       ImpossibleCase -> ImpossibleCase
                       PossibleCase is_ancestor
                         ->
                           if is_ancestor p
                             then PossibleCase (Pindex p)
                             else
-                              fromMatrixToPatrix_helper_3
+                              calcParentOnPatrixFromRawMatrix_helper_1
                                 x_y_int
                                 x
                                 y
@@ -262,14 +282,14 @@ fromMatrixToPatrix_helper_3 x_y_int x y y_int int p
                                 (p - 1)
             Just int_
               ->
-                case fromMatrixToPatrix_helper_4 x_y_int x (y - 1) of
+                case calcAncestorSetOnPatrixFromRawMatrix x_y_int x (y - 1) of
                   ImpossibleCase -> ImpossibleCase
                   PossibleCase is_ancestor
                     ->
                       if int_ < int && is_ancestor p
                         then PossibleCase (Pindex p)
                         else
-                          fromMatrixToPatrix_helper_3
+                          calcParentOnPatrixFromRawMatrix_helper_1
                             x_y_int
                             x
                             y
@@ -277,25 +297,25 @@ fromMatrixToPatrix_helper_3 x_y_int x y y_int int p
                             int
                             (p - 1)
 
--- x と y の先祖の集合を計算する。集合は、その特性関数で表される。
-fromMatrixToPatrix_helper_4
-  : Array (Array Int) -> Int -> Int -> Case (Int -> Bool)
-fromMatrixToPatrix_helper_4 x_y_int x y
+{-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の先祖を表す或る集合 (`Int -> Bool`) を計算し、それを返します。 -}
+calcAncestorSetOnPatrixFromRawMatrix
+  : RawMatrix -> Int -> Int -> Case (Int -> Bool)
+calcAncestorSetOnPatrixFromRawMatrix x_y_int x y
   =
-    case fromMatrixToPatrix_helper_2 x_y_int x y of
+    case calcParentOnPatrixFromRawMatrix x_y_int x y of
       ImpossibleCase -> ImpossibleCase
       PossibleCase xp -> case xp of
         Null -> PossibleCase (\x__ -> x == x__)
         Pindex x_
           ->
-            case fromMatrixToPatrix_helper_4 x_y_int x_ y of
+            case calcAncestorSetOnPatrixFromRawMatrix x_y_int x_ y of
               ImpossibleCase -> ImpossibleCase
               PossibleCase is_ancestor
                 -> PossibleCase (\x__ -> x == x__ || is_ancestor x__)
 
 {-| 或るパトリックスを或る行列に変換します。 -}
-fromPatrixToMatrix : Patrix -> Case Matrix
-fromPatrixToMatrix patrix
+calcMatrixFromPatrix : Patrix -> Case Matrix
+calcMatrixFromPatrix patrix
   =
     case patrix of
       Patrix x y x_y_pindex
@@ -306,14 +326,14 @@ fromPatrixToMatrix patrix
               (Array.map
                 (Case.traverseArray
                   (\case_x -> case_x))
-                (fromPatrixToMatrix_helper_1 x y x_y_pindex))
+                (calcMatrixFromPatrix_helper_1 x y x_y_pindex))
           of
             ImpossibleCase -> ImpossibleCase
             PossibleCase x_y_int -> PossibleCase (Matrix x y x_y_int)
 
-fromPatrixToMatrix_helper_1
+calcMatrixFromPatrix_helper_1
   : Int -> Int -> Array (Array Pindex) -> Array (Array (Case Int))
-fromPatrixToMatrix_helper_1 x y x_y_pindex
+calcMatrixFromPatrix_helper_1 x y x_y_pindex
   =
     Array.initialize
       x
@@ -323,11 +343,15 @@ fromPatrixToMatrix_helper_1 x y x_y_pindex
             y
             (\y_
               ->
-                fromPatrixToMatrix_helper_2 x_y_pindex x_ y_))
+                calcElementOnMatrixFromPatrix x_y_pindex x_ y_))
 
-fromPatrixToMatrix_helper_2
-  : Array (Array Pindex) -> Int -> Int -> Case Int
-fromPatrixToMatrix_helper_2 x_y_pindex x y
+{-| 或る `RawPatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、其の `RawPatrix` に対応する行列の、その要素に対応する要素を表す、或る `Int` を計算し、それを返します。
+
+`x` が範囲を外れている時は、 `0` を返します。 `x` が範囲を外れていなくて `y` が範囲を外れている時は、 `0` を返します。
+-}
+calcElementOnMatrixFromPatrix
+  : RawPatrix -> Int -> Int -> Case Int
+calcElementOnMatrixFromPatrix x_y_pindex x y
   =
     case Array.get x x_y_pindex of
       Nothing
@@ -351,7 +375,7 @@ fromPatrixToMatrix_helper_2 x_y_pindex x y
                     ->
                       if p < x
                         then
-                          case fromPatrixToMatrix_helper_2 x_y_pindex p y of
+                          case calcElementOnMatrixFromPatrix x_y_pindex p y of
                             ImpossibleCase -> ImpossibleCase
                             PossibleCase int -> PossibleCase (int + 1)
                         else PossibleCase 0
