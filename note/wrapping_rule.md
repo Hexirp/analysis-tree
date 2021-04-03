@@ -273,7 +273,7 @@ Elm のプログラムは、多分木であるというように考えます。
 
 ## 関数の適用の式
 
-`function alpha beta gamma` です。
+`function alpha` です。
 
 <table>
 <tr>
@@ -295,7 +295,7 @@ Elm のプログラムは、多分木であるというように考えます。
 なし
 </td>
 <td>
-<pre><code>function alpha beta gamma</code></pre>
+<pre><code>function alpha</code></pre>
 </td>
 </tr>
 <tr>
@@ -307,9 +307,7 @@ Elm のプログラムは、多分木であるというように考えます。
 </td>
 <td>
 <pre><code>function
-  alpha
-  beta
-  gamma</code></pre>
+  alpha</code></pre>
 </td>
 </tr>
 </table>
