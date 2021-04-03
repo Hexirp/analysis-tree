@@ -94,21 +94,21 @@ test_Patrix
     describe
       "Pindex"
       [
-        test_fromMatrixToPatrix
+        test_calcPatrixFromMatrix
       ]
 
-test_fromMatrixToPatrix : Test
-test_fromMatrixToPatrix
+test_calcPatrixFromMatrix : Test
+test_calcPatrixFromMatrix
   =
     describe
-      "fromMatrixToPatrix"
+      "calcPatrixFromMatrix"
       [
         test
           "normal case"
           (\_
             ->
               Expect.equal
-                (fromMatrixToPatrix
+                (calcPatrixFromMatrix
                   (fromListToMatrix
                     [
                       [0, 0, 0],
@@ -129,6 +129,6 @@ test_fromMatrixToPatrix
           (\_
             ->
               Expect.equal
-                (fromMatrixToPatrix (fromListToMatrix [[1], [0]]))
+                (calcPatrixFromMatrix (fromListToMatrix [[1], [0]]))
                 (PossibleCase (fromListToPatrixRawly 2 1 [[Null], [Null]])))
       ]
