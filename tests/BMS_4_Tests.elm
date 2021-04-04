@@ -1,4 +1,4 @@
-module BMS_4_Tests exposing (test_Matrix, test_Patrix)
+module BMS_4_Tests exposing (test_collection, test_Matrix, test_Patrix)
 
 import Case exposing (Case (..))
 
@@ -9,6 +9,39 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer)
 
 import Test exposing (describe, test, fuzz)
+
+test_collection : Test
+test_collection
+  =
+    describe "collection" [ test_fromArrayToList, test_fromListToArray ]
+
+test_fromArrayToList : Test
+  =
+    describe "fromArrayToList"
+      [
+        fuzz
+          (Fuzz.array (Fuzz.array Fuzz.int))
+          "consisty with fromListToArray"
+          <|
+            \x_y_int
+              ->
+                (x_y_int |> fromArrayToList |> fromListToArray)
+                  |> Expect.equal x_y_int
+      ]
+
+test_fromListToArray : Test
+  =
+    describe "fromListToArray"
+      [
+        fuzz
+          (Fuzz.list (Fuzz.list Fuzz.int))
+          "consisty with fromArrayToList"
+          <|
+            \x_y_int
+              ->
+                (x_y_int |> fromListToArray |> fromArrayToList)
+                  |> Expect.equal x_y_int
+      ]
 
 test_Matrix : Test
 test_Matrix
