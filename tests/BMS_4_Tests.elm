@@ -201,7 +201,7 @@ test_Patrix
       "Pindex"
       [
         test_calcPatrixFromMatrix,
-        Test.only test_calcParentOnPatrixFromRawMatrix,
+        test_calcParentOnPatrixFromRawMatrix,
         test_calcAncestorSetOnPatrixFromRawMatrix,
         test_calcMatrixFromPatrix,
         test_calcElementOnMatrixFromRawPatrix
