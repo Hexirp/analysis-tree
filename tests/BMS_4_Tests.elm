@@ -28,7 +28,7 @@ test_fromArrayToMatrix
                 fromArrayToMatrix x_y_int
                   |>
                     Expect.equal
-                      (fromListToMatrix (fromArrayToList x_y_int)))
+                      (fromListToMatrix (fromArrayToList x_y_int))
       ]
 
 test_fromListToMatrix : Test
