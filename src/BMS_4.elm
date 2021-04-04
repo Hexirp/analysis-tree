@@ -180,20 +180,21 @@ calcPatrixFromMatrix matrix
     case matrix of
       Matrix x y x_y_int
         ->
-          case
-            Case.traverseArray
-              (\case_x -> case_x)
-              (Array.map
-                (Case.traverseArray
-                  (\case_x -> case_x))
-                (calcPatrixFromMatrix_helper_1 x y x_y_int))
-          of
+          case calcPatrixFromMatrix_helper_1 x y x_y_int of
             ImpossibleCase -> ImpossibleCase
             PossibleCase x_y_pindex -> PossibleCase (Patrix x y x_y_pindex)
 
 calcPatrixFromMatrix_helper_1
-  : Int -> Int -> Array (Array Int) -> Array (Array (Case Pindex))
+  : Int -> Int -> RawMatrix -> Case RawPatrix
 calcPatrixFromMatrix_helper_1 x y x_y_int
+  =
+    Case.traverseArray (\case_x -> case_x)
+      (Array.map (Case.traverseArray (\case_x -> case_x))
+        (calcPatrixFromMatrix_helper_2 x y x_y_int))
+
+calcPatrixFromMatrix_helper_2
+  : Int -> Int -> RawMatrix -> Array (Array (Case Pindex))
+calcPatrixFromMatrix_helper_2 x y x_y_int
   =
     Array.initialize
       x
@@ -324,20 +325,21 @@ calcMatrixFromPatrix patrix
     case patrix of
       Patrix x y x_y_pindex
         ->
-          case
-            Case.traverseArray
-              (\case_x -> case_x)
-              (Array.map
-                (Case.traverseArray
-                  (\case_x -> case_x))
-                (calcMatrixFromPatrix_helper_1 x y x_y_pindex))
-          of
+          case calcMatrixFromPatrix_helper_1 x y x_y_pindex of
             ImpossibleCase -> ImpossibleCase
             PossibleCase x_y_int -> PossibleCase (Matrix x y x_y_int)
 
 calcMatrixFromPatrix_helper_1
-  : Int -> Int -> Array (Array Pindex) -> Array (Array (Case Int))
+  : Int -> Int -> RawPatrix -> Case RawMatrix
 calcMatrixFromPatrix_helper_1 x y x_y_pindex
+  =
+    Case.traverseArray (\case_x -> case_x)
+      (Array.map (Case.traverseArray (\case_x -> case_x))
+        (calcMatrixFromPatrix_helper_2 x y x_y_pindex))
+
+calcMatrixFromPatrix_helper_2
+  : Int -> Int -> RawPatrix -> Array (Array (Case Int))
+calcMatrixFromPatrix_helper_2 x y x_y_pindex
   =
     Array.initialize
       x
