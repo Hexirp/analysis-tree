@@ -16,6 +16,17 @@ expect_notImpossibleCase = Expect.notEqual ImpossibleCase
 fuzzer_matrix : Fuzzer Matrix
 fuzzer_matrix = Fuzz.map fromListToMatrix (Fuzz.list (Fuzz.list Fuzz.int))
 
+fuzzer_pindex : Fuzzer Pindex
+fuzzer_pindex =
+  let
+    fromMaybeToPindex maybe_x
+      =
+        case maybe_x of
+          Nothing -> Null
+          Just x -> Pindex x
+  in
+    Fuzz.map fromMaybeToPindex (Fuzz.maybe Fuzz.int)
+
 fuzzer_patrix : Fuzzer Patrix
 fuzzer_patrix = Fuzz.map calcPatrixFromMatrix fuzzer_matrix
 
@@ -192,7 +203,8 @@ test_Patrix
         test_calcPatrixFromMatrix,
         test_calcParentOnPatrixFromRawMatrix,
         test_calcAncestorSetOnPatrixFromRawMatrix,
-        test_calcMatrixFromPatrix
+        test_calcMatrixFromPatrix,
+        test_calcElementOnMatrixFromRawPatrix
       ]
 
 test_calcPatrixFromMatrix : Test
@@ -324,6 +336,24 @@ test_calcMatrixFromPatrix
             \patrix
               ->
                 calcMatrixFromPatrix patrix
+                  |>
+                    expect_notImpossibleCase
+      ]
+
+test_calcElementOnMatrixFromRawPatrix : Test
+test_calcElementOnMatrixFromRawPatrix
+  =
+    describe "calcElementOnMatrixFromRawPatrix"
+      [
+        fuzz3
+          (Fuzz.array (Fuzz.array fuzzer_pindex))
+          Fuzz.int
+          Fuzz.int
+          "follow the rule of the type `Case`"
+          <|
+            \x_y_pindex x y
+              ->
+                calcElementOnMatrixFromRawPatrix x_y_pindex x y
                   |>
                     expect_notImpossibleCase
       ]
