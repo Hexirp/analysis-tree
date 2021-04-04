@@ -278,7 +278,7 @@ test_calcPatrixFromMatrix
                           [[Null], [Null], [Null], [Pindex 2], [Null]]))
       ,
         fuzz
-          fuzzer_Matrix
+          fuzzer_matrix
           "follow the rule of the type `Case`"
           <|
             \matrix
@@ -330,7 +330,7 @@ test_calcMatrixFromPatrix
     describe "calcMatrixFromPatrix"
       [
         fuzz
-          fuzzer_Patrix
+          fuzzer_patrix
           "follow the rule of the type `Case`"
           <|
             \patrix
