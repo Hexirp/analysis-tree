@@ -17,8 +17,7 @@ test_Matrix
 test_fromArrayToMatrix : Test
 test_fromArrayToMatrix
   =
-    describe
-      "fromArrayToMatrix"
+    describe "fromArrayToMatrix"
       [
         fuzz
           (Fuzz.array (Fuzz.array Fuzz.int))
@@ -33,25 +32,21 @@ test_fromArrayToMatrix
 test_fromListToMatrix : Test
 test_fromListToMatrix
   =
-    describe
-      "fromListToMatrix"
+    describe "fromListToMatrix"
       [
-        test
-          "normal case"
+        test "normal case"
           (\_
             ->
               Expect.equal
                 (fromListToMatrix [[0, 0, 0], [1, 1, 1], [2, 2, 0]])
                 (fromListToMatrixRawly 3 3 [[0, 0, 0], [1, 1, 1], [2, 2, 0]])),
-        test
-          "discrete lengths of rows"
+        test "discrete lengths of rows"
           (\_
             ->
               Expect.equal
                 (fromListToMatrix [[0], [1, 1, 1], [2, 2]])
                 (fromListToMatrixRawly 3 3 [[0, 0, 0], [1, 1, 1], [2, 2, 0]])),
-        test
-          "discrete lengths of rows and the non-zero bottom value"
+        test "discrete lengths of rows and the non-zero bottom value"
           (\_
             ->
               Expect.equal
@@ -60,29 +55,25 @@ test_fromListToMatrix
                   3
                   3
                   [[-1, -1, -1], [0, 0, 0], [1, 1, -1]])),
-        test
-          "empty rows"
+        test "empty rows"
           (\_
             ->
               Expect.equal
                 (fromListToMatrix [[], [1, 1, 1]])
                 (fromListToMatrixRawly 2 3 [[0, 0, 0], [1, 1, 1]])),
-        test
-          "empty rows and the non-zero bottom value"
+        test "empty rows and the non-zero bottom value"
           (\_
             ->
               Expect.equal
                 (fromListToMatrix [[], [0, 0, -1]])
                 (fromListToMatrixRawly 2 3 [[-1, -1, -1], [0, 0, -1]])),
-        test
-          "all empty rows"
+        test "all empty rows"
           (\_
             ->
               Expect.equal
                 (fromListToMatrix [[], [], []])
                 (fromListToMatrixRawly 3 0 [[], [], []])),
-        test
-          "the empty colmun"
+        test "the empty colmun"
           (\_
             ->
               Expect.equal (fromListToMatrix []) (fromListToMatrixRawly 0 0 []))
@@ -90,21 +81,14 @@ test_fromListToMatrix
 
 test_Patrix : Test
 test_Patrix
-  =
-    describe
-      "Pindex"
-      [
-        test_calcPatrixFromMatrix
-      ]
+  = describe "Pindex" [ test_calcPatrixFromMatrix ]
 
 test_calcPatrixFromMatrix : Test
 test_calcPatrixFromMatrix
   =
-    describe
-      "calcPatrixFromMatrix"
+    describe "calcPatrixFromMatrix"
       [
-        test
-          "normal case"
+        test "normal case"
           (\_
             ->
               Expect.equal
@@ -124,8 +108,7 @@ test_calcPatrixFromMatrix
                       [Pindex 0, Pindex 0, Pindex 0],
                       [Pindex 1, Pindex 1, Null]
                     ]))),
-        test
-          "descent sequence"
+        test "descent sequence"
           (\_
             ->
               Expect.equal
