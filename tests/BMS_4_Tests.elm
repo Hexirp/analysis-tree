@@ -283,7 +283,7 @@ test_calcPatrixFromMatrix
           <|
             \matrix
               ->
-                calcPatrixFromMatrix (Debug.log matrix)
+                calcPatrixFromMatrix (Debug.log "matrix" matrix)
                   |>
                     expect_notImpossibleCase
       ]
