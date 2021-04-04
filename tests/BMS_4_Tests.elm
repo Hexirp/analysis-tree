@@ -276,10 +276,10 @@ test_calcPatrixFromMatrix
                     expect_notImpossibleCase
       ]
 
-test_calcParentOnPatrixFromMatrix : Test
-test_calcParentOnPatrixFromMatrix
+test_calcParentOnPatrixFromRawMatrix : Test
+test_calcParentOnPatrixFromRawMatrix
   =
-    describe "calcParentOnPatrixFromMatrix"
+    describe "calcParentOnPatrixFromRawMatrix"
       [
         fuzz3
           (Fuzz.array (Fuzz.array Fuzz.int))
@@ -294,10 +294,10 @@ test_calcParentOnPatrixFromMatrix
                     expect_notImpossibleCase
       ]
 
-test_calcAncestorSetOnPatrixFromMatrix : Test
-test_calcAncestorSetOnPatrixFromMatrix
+test_calcAncestorSetOnPatrixFromRawMatrix : Test
+test_calcAncestorSetOnPatrixFromRawMatrix
   =
-    describe "calcAncestorSetOnPatrixFromMatrix"
+    describe "calcAncestorSetOnPatrixFromRawMatrix"
       [
         fuzz3
           (Fuzz.array (Fuzz.array Fuzz.int))
