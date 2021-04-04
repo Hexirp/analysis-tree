@@ -343,7 +343,7 @@ calcMatrixFromPatrix_helper_1 x y x_y_pindex
             y
             (\y_
               ->
-                calcElementOnMatrixFromPatrix x_y_pindex x_ y_))
+                calcElementOnMatrixFromRawPatrix x_y_pindex x_ y_))
 
 {-| 或る `RawPatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、其の `RawPatrix` に対応する行列の、その要素に対応する要素を表す、或る `Int` を計算し、それを返します。
 
