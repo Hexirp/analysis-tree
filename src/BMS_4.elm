@@ -308,10 +308,14 @@ calcAncestorSetOnPatrixFromRawMatrix x_y_int x y
         Null -> PossibleCase (\x__ -> x == x__)
         Pindex x_
           ->
-            case calcAncestorSetOnPatrixFromRawMatrix x_y_int x_ y of
-              ImpossibleCase -> ImpossibleCase
-              PossibleCase is_ancestor
-                -> PossibleCase (\x__ -> x == x__ || is_ancestor x__)
+            if x_ < x
+              then
+                case calcAncestorSetOnPatrixFromRawMatrix x_y_int x_ y of
+                  ImpossibleCase -> ImpossibleCase
+                  PossibleCase is_ancestor
+                    -> PossibleCase (\x__ -> x == x__ || is_ancestor x__)
+              else
+                PossibleCase (\x__ -> x == x__)
 
 {-| 或るパトリックスを或る行列に変換します。 -}
 calcMatrixFromPatrix : Patrix -> Case Matrix
