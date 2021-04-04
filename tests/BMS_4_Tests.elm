@@ -16,6 +16,7 @@ test_collection
     describe "collection" [ test_fromArrayToList, test_fromListToArray ]
 
 test_fromArrayToList : Test
+test_fromArrayToList
   =
     describe "fromArrayToList"
       [
@@ -30,6 +31,7 @@ test_fromArrayToList : Test
       ]
 
 test_fromListToArray : Test
+test_fromListToArray
   =
     describe "fromListToArray"
       [
