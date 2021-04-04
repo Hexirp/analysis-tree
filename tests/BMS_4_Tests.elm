@@ -61,7 +61,7 @@ test_fromListToMatrix
                 fromListToMatrix [[-1],[0,0,0],[1,1]]
                   |>
                     Expect.equal
-                      (fromListToMatrixRawly 3 3 [[-1,-1,-1],[0,0,0],[1,1,-1]]
+                      (fromListToMatrixRawly 3 3 [[-1,-1,-1],[0,0,0],[1,1,-1]])
       ,
         test "empty rows"
           <|
@@ -70,7 +70,7 @@ test_fromListToMatrix
                 fromListToMatrix [[],[1,1,1]]
                   |>
                     Expect.equal
-                      (fromListToMatrixRawly 2 3 [[0,0,0],[1,1,1]]
+                      (fromListToMatrixRawly 2 3 [[0,0,0],[1,1,1]])
       ,
         test "empty rows and the non-zero bottom value"
           <|
@@ -79,7 +79,7 @@ test_fromListToMatrix
                 fromListToMatrix [[],[0,0,-1]]
                   |>
                     Expect.equal
-                      (fromListToMatrixRawly 2 3 [[-1,-1,-1],[0,0,-1]]
+                      (fromListToMatrixRawly 2 3 [[-1,-1,-1],[0,0,-1]])
       ,
         test "all empty rows"
           <|
