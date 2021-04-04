@@ -301,7 +301,7 @@ test_calcParentOnPatrixFromRawMatrix
           <|
             \x_y_int x y
               ->
-                calcParentOnPatrixFromMatrix x_y_int x y
+                calcParentOnPatrixFromRawMatrix x_y_int x y
                   |>
                     expect_notImpossibleCase
       ]
@@ -319,7 +319,7 @@ test_calcAncestorSetOnPatrixFromRawMatrix
           <|
             \x_y_int x y
               ->
-                calcAncestorSetOnPatrixFromMatrix x_y_int x y
+                calcAncestorSetOnPatrixFromRawMatrix x_y_int x y
                   |>
                     expect_notImpossibleCase
       ]
