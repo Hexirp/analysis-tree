@@ -10,6 +10,9 @@ import Fuzz exposing (Fuzzer)
 
 import Test exposing (Test, describe, test, fuzz)
 
+fuzzer_matrix : Fuzzer Matrix
+fuzzer_matrix = Fuzz.map fromListToMatrix (Fuzz.list (Fuzz.list Fuzz.int))
+
 test_collection : Test
 test_collection
   =
@@ -47,7 +50,32 @@ test_fromListToArray
 
 test_Matrix : Test
 test_Matrix
-  = describe "Matrix" [ test_fromArrayToMatrix, test_fromListToMatrix ]
+  =
+    describe "Matrix"
+      [
+        test_fromMatrixToArray,
+        test_fromArrayToMatrix,
+        test_MatrixToList,
+        test_fromListToMatrix
+      ]
+
+test_fromMatrixToArray : Test
+test_fromMatrixToArray
+  =
+    describe "fromMatrixToArray"
+      [
+        fuzz
+          fuzzer_matrix
+          "consisty with fromMatrixToList"
+          <|
+            \matrix
+              ->
+                (matrix |> fromMatrixToArray |> fromArrayToList)
+                  |>
+                    Expect.equal
+                      (fromMatrixToList matrix)
+      ]
+
 
 test_fromArrayToMatrix : Test
 test_fromArrayToMatrix
@@ -55,15 +83,15 @@ test_fromArrayToMatrix
     describe "fromArrayToMatrix"
       [
         fuzz
-          (Fuzz.array (Fuzz.array Fuzz.int))
+          (Fuzz.list (Fuzz.list Fuzz.int))
           "consisty with fromListToMatrix"
           <|
             \x_y_int
               ->
-                fromArrayToMatrix x_y_int
+                (x_y_int |> fromListToArray |> fromArrayToMatrix)
                   |>
                     Expect.equal
-                      (fromListToMatrix (fromArrayToList x_y_int))
+                      (fromListToMatrix x_y_int)
       ]
 
 test_fromListToMatrix : Test
@@ -133,6 +161,20 @@ test_fromListToMatrix
                   |>
                     Expect.equal
                       (fromListToMatrixRawly 0 0 [])
+      ]
+
+test_fromMatrixToList : Test
+test_fromMatrixToList
+  =
+    describe "fromMatrixToList"
+      [
+        test "normal case"
+          <|
+            \_
+              ->
+                fromMatrixToList (fromListToMatrix [[0,0],[1,1],[2,1]])
+                  |>
+                    Expect.equal [[0,0],[1,1],[2,1]]
       ]
 
 test_Patrix : Test
