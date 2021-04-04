@@ -8,7 +8,7 @@ import Expect exposing (Expectation)
 
 import Fuzz exposing (Fuzzer)
 
-import Test exposing (Test, describe, test, fuzz)
+import Test exposing (Test, describe, test, fuzz, fuzz2, fuzz3)
 
 expect_notImpossibleCase : Case a -> Expectation
 expect_notImpossibleCase = Expect.notEqual ImpossibleCase
