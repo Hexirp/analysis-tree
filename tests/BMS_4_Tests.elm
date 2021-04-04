@@ -197,7 +197,7 @@ test_fromMatrixToList
 test_Patrix : Test
 test_Patrix
   =
-    Test.only
+    only
       <|
         describe
           "Pindex"
