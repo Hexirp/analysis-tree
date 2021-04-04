@@ -277,15 +277,17 @@ test_calcPatrixFromMatrix
                           1
                           [[Null], [Null], [Null], [Pindex 2], [Null]]))
       ,
-        fuzz
-          fuzzer_matrix
-          "follow the rule of the type `Case`"
+        Test.skip
           <|
-            \matrix
-              ->
-                calcPatrixFromMatrix matrix
-                  |>
-                    expect_notImpossibleCase
+            fuzz
+              fuzzer_matrix
+              "follow the rule of the type `Case`"
+              <|
+                \matrix
+                  ->
+                    calcPatrixFromMatrix matrix
+                      |>
+                        expect_notImpossibleCase
       ]
 
 test_calcParentOnPatrixFromRawMatrix : Test
