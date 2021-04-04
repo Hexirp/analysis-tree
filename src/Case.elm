@@ -2,7 +2,7 @@ module Case exposing (Case (..), traverseArray)
 
 {-| 型の上では値が存在しない可能性があるが、実際には値が存在されると期待される型です。
 
-ある関数が `Case` 型の値を返す場合は、その関数は必ず `PossibleCase` に包まれた結果を返さなければなりません。全ての場合において、 `ImpossibleCase` を返してはなりません。
+ある関数が `Case` 型の値を返す場合は、その関数は必ず `PossibleCase` に包まれた結果を返さなければなりません。 `ImpossibleCase` を返してはなりません。
 
 # 型
 
