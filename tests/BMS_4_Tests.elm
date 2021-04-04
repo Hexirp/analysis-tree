@@ -8,7 +8,7 @@ import Expect exposing (Expectation)
 
 import Fuzz exposing (Fuzzer)
 
-import Test exposing (..)
+import Test exposing (describe, test, fuzz)
 
 test_Matrix : Test
 test_Matrix
