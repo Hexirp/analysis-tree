@@ -204,7 +204,7 @@ test_Patrix
         test_calcParentOnPatrixFromRawMatrix,
         test_calcAncestorSetOnPatrixFromRawMatrix,
         test_calcMatrixFromPatrix,
-        test_calcElementOnMatrixFromRawPatrix
+        Test.only test_calcElementOnMatrixFromRawPatrix
       ]
 
 test_calcPatrixFromMatrix : Test
