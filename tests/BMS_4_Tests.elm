@@ -197,15 +197,17 @@ test_fromMatrixToList
 test_Patrix : Test
 test_Patrix
   =
-    describe
-      "Pindex"
-      [
-        test_calcPatrixFromMatrix,
-        test_calcParentOnPatrixFromRawMatrix,
-        test_calcAncestorSetOnPatrixFromRawMatrix,
-        test_calcMatrixFromPatrix,
-        test_calcElementOnMatrixFromRawPatrix
-      ]
+    only
+      <|
+        describe
+          "Pindex"
+          [
+            test_calcPatrixFromMatrix,
+            test_calcParentOnPatrixFromRawMatrix,
+            test_calcAncestorSetOnPatrixFromRawMatrix,
+            test_calcMatrixFromPatrix,
+            test_calcElementOnMatrixFromRawPatrix
+          ]
 
 test_calcPatrixFromMatrix : Test
 test_calcPatrixFromMatrix
