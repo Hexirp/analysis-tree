@@ -193,9 +193,9 @@ test_calcPatrixFromMatrix
                 calcPatrixFromMatrix
                   (fromListToMatrix
                     [
-                      [0,0,0],
-                      [1,1,1],
-                      [2,2,0]
+                      [0, 0, 0],
+                      [1, 1, 1],
+                      [2, 2, 0]
                     ])
                   |>
                     Expect.equal
@@ -209,18 +209,45 @@ test_calcPatrixFromMatrix
                             [Pindex 1, Pindex 1, Null]
                           ]))
       ,
-        test "descent sequence"
+        test "crossing neck"
           <|
             \_
               ->
                 calcPatrixFromMatrix
                   (fromListToMatrix
-                    [[1],[0]])
+                    [
+                      [0, 0],
+                      [1, 1],
+                      [2, 0],
+                      [3, 1],
+                      [1, 1]
+                    ])
+                  |>
+                    Expect.equal
+                      (PossibleCase
+                        (fromListToPatrixRawly
+                          5
+                          2
+                          [
+                            [Null, Null],
+                            [Pindex 0, Pindex 0],
+                            [Pindex 1, Null],
+                            [Pindex 2, Pindex 2],
+                            [Pindex 0, Pindex 0]
+                          ]))
+      ,
+        test "non-ascending sequence"
+          <|
+            \_
+              ->
+                calcPatrixFromMatrix
+                  (fromListToMatrix
+                    [[2],[1],[0],[1],[0]])
                   |>
                     Expect.equal
                       (PossibleCase
                         (fromListToPatrixRawly
                           2
                           1
-                          [[Null], [Null]]))
+                          [[Null], [Null], [Null], [Pindex 2], [Null]]))
       ]
