@@ -31,7 +31,7 @@ isValid case_x
   =
     case case_x of
       ImpossibleCase -> False
-      PossibleCase -> True
+      PossibleCase _ -> True
 
 {-| 或る配列を或る `Case` 型を返す関数によってトラバースします。 -}
 traverseArray : (a -> Case b) -> Array a -> Case (Array b)
