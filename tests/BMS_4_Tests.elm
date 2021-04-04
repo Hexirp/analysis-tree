@@ -55,7 +55,7 @@ test_Matrix
       [
         test_fromMatrixToArray,
         test_fromArrayToMatrix,
-        test_MatrixToList,
+        test_fromMatrixToList,
         test_fromListToMatrix
       ]
 
