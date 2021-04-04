@@ -1,4 +1,4 @@
-module Case exposing (Case (..), traverseArray)
+module Case exposing (Case (..), isValid, traverseArray)
 
 {-| 型の上では値が存在しない可能性があるが、実際には値が存在されると期待される型です。
 
@@ -10,7 +10,7 @@ module Case exposing (Case (..), traverseArray)
 
 # 関数たち
 
-@docs traverseArray
+@docs isValid, traverseArray
 -}
 
 import Array exposing (Array)
