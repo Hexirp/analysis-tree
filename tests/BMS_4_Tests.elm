@@ -10,8 +10,14 @@ import Fuzz exposing (Fuzzer)
 
 import Test exposing (Test, describe, test, fuzz)
 
+expect_notImpossibleCase : Case a -> Expectation
+expect_notImpossibleCase = Expect.notEqual ImpossibleCase
+
 fuzzer_matrix : Fuzzer Matrix
 fuzzer_matrix = Fuzz.map fromListToMatrix (Fuzz.list (Fuzz.list Fuzz.int))
+
+fuzzer_patrix : Fuzzer Patrix
+fuzzer_patrix = Fuzz.map calcPatrixFromMatrix fuzzer_matrix
 
 test_collection : Test
 test_collection
@@ -179,7 +185,15 @@ test_fromMatrixToList
 
 test_Patrix : Test
 test_Patrix
-  = describe "Pindex" [ test_calcPatrixFromMatrix ]
+  =
+    describe
+      "Pindex"
+      [
+        test_calcPatrixFromMatrix,
+        test_calcParentOnPatrixFromRawMatrix,
+        test_calcAncestorSetOnPatrixFromRawMatrix,
+        test_calcMatrixFromPatrix
+      ]
 
 test_calcPatrixFromMatrix : Test
 test_calcPatrixFromMatrix
@@ -250,4 +264,66 @@ test_calcPatrixFromMatrix
                           5
                           1
                           [[Null], [Null], [Null], [Pindex 2], [Null]]))
+      ,
+        fuzz
+          fuzzer_Matrix
+          "follow the rule of the type `Case`"
+          <|
+            \matrix
+              ->
+                calcPatrixFromMatrix matrix
+                  |>
+                    expect_notImpossibleCase
+      ]
+
+test_calcParentOnPatrixFromMatrix : Test
+test_calcParentOnPatrixFromMatrix
+  =
+    describe "calcParentOnPatrixFromMatrix"
+      [
+        fuzz3
+          (Fuzz.array (Fuzz.array Fuzz.int))
+          Fuzz.int
+          Fuzz.int
+          "follow the rule of the type `Case`"
+          <|
+            \x_y_int x y
+              ->
+                calcParentOnPatrixFromMatrix x_y_int x y
+                  |>
+                    expect_notImpossibleCase
+      ]
+
+test_calcAncestorSetOnPatrixFromMatrix : Test
+test_calcAncestorSetOnPatrixFromMatrix
+  =
+    describe "calcAncestorSetOnPatrixFromMatrix"
+      [
+        fuzz3
+          (Fuzz.array (Fuzz.array Fuzz.int))
+          Fuzz.int
+          Fuzz.int
+          "follow the rule of the type `Case`"
+          <|
+            \x_y_int x y
+              ->
+                calcAncestorSetOnPatrixFromMatrix x_y_int x y
+                  |>
+                    expect_notImpossibleCase
+      ]
+
+test_calcMatrixFromPatrix : Test
+test_calcMatrixFromPatrix
+  =
+    describe "calcMatrixFromPatrix"
+      [
+        fuzz
+          fuzzer_Patrix
+          "follow the rule of the type `Case`"
+          <|
+            \patrix
+              ->
+                calcMatrixFromPatrix patrix
+                  |>
+                    expect_notImpossibleCase
       ]
