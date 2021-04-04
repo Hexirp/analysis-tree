@@ -202,7 +202,7 @@ test_Patrix
       [
         test_calcPatrixFromMatrix,
         test_calcParentOnPatrixFromRawMatrix,
-        test_calcAncestorSetOnPatrixFromRawMatrix,
+        Test.only test_calcAncestorSetOnPatrixFromRawMatrix,
         test_calcMatrixFromPatrix,
         test_calcElementOnMatrixFromRawPatrix
       ]
