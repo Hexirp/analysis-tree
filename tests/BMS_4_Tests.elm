@@ -27,8 +27,8 @@ fuzzer_pindex =
   in
     Fuzz.map fromMaybeToPindex (Fuzz.maybe Fuzz.int)
 
-fuzzer_patrix : Fuzzer Patrix
-fuzzer_patrix = Fuzz.map calcPatrixFromMatrix fuzzer_matrix
+fuzzer_case_patrix : Fuzzer (Case Patrix)
+fuzzer_case_patrix = Fuzz.map calcPatrixFromMatrix fuzzer_matrix
 
 test_collection : Test
 test_collection
@@ -330,12 +330,14 @@ test_calcMatrixFromPatrix
     describe "calcMatrixFromPatrix"
       [
         fuzz
-          fuzzer_patrix
+          fuzzer_case_patrix
           "follow the rule of the type `Case`"
           <|
-            \patrix
+            \case_patrix
               ->
-                calcMatrixFromPatrix patrix
+                (case case_patrix of
+                  ImpossibleCase -> ImpossibleCase
+                  PossibleCase patrix -> calcMatrixFromPatrix patrix)
                   |>
                     expect_notImpossibleCase
       ]
