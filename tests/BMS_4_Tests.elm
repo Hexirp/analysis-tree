@@ -247,7 +247,7 @@ test_calcPatrixFromMatrix
                     Expect.equal
                       (PossibleCase
                         (fromListToPatrixRawly
-                          2
+                          5
                           1
                           [[Null], [Null], [Null], [Pindex 2], [Null]]))
       ]
