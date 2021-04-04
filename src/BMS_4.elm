@@ -18,7 +18,7 @@ module BMS_4
       calcParentOnPatrixFromRawMatrix,
       calcAncestorSetOnPatrixFromRawMatrix,
       calcMatrixFromPatrix,
-      calcElementOnMatrixFromPatrix,
+      calcElementOnMatrixFromRawPatrix,
       fromListToMatrixRawly,
       fromListToPatrixRawly
     )
@@ -349,9 +349,9 @@ calcMatrixFromPatrix_helper_1 x y x_y_pindex
 
 `x` が範囲を外れている時は、 `0` を返します。 `x` が範囲を外れていなくて `y` が範囲を外れている時は、 `0` を返します。
 -}
-calcElementOnMatrixFromPatrix
+calcElementOnMatrixFromRawPatrix
   : RawPatrix -> Int -> Int -> Case Int
-calcElementOnMatrixFromPatrix x_y_pindex x y
+calcElementOnMatrixFromRawPatrix x_y_pindex x y
   =
     case Array.get x x_y_pindex of
       Nothing
@@ -375,7 +375,9 @@ calcElementOnMatrixFromPatrix x_y_pindex x y
                     ->
                       if p < x
                         then
-                          case calcElementOnMatrixFromPatrix x_y_pindex p y of
+                          case
+                            calcElementOnMatrixFromRawPatrix x_y_pindex p y
+                          of
                             ImpossibleCase -> ImpossibleCase
                             PossibleCase int -> PossibleCase (int + 1)
                         else PossibleCase 0
