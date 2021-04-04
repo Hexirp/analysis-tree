@@ -25,17 +25,27 @@ import Array exposing (Array)
 -}
 type Case a = ImpossibleCase | PossibleCase a
 
+{-| 或る `Case` 型の値が妥当であることを確かめます。 -}
+isValid : Case a -> Bool
+isValid case_x
+  =
+    case case_x of
+      ImpossibleCase -> False
+      PossibleCase -> True
+
 {-| 或る配列を或る `Case` 型を返す関数によってトラバースします。 -}
 traverseArray : (a -> Case b) -> Array a -> Case (Array b)
 traverseArray f array_x
   =
     Array.foldl
-      (\x case_r -> case f x of
-        ImpossibleCase -> ImpossibleCase
-        PossibleCase y
-          ->
-            case case_r of
-              ImpossibleCase -> ImpossibleCase
-              PossibleCase r -> PossibleCase (Array.push y r))
+      (\x case_r
+        ->
+          case f x of
+            ImpossibleCase -> ImpossibleCase
+            PossibleCase y
+              ->
+                case case_r of
+                  ImpossibleCase -> ImpossibleCase
+                  PossibleCase r -> PossibleCase (Array.push y r))
       (PossibleCase Array.empty)
       array_x
