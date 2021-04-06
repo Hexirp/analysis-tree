@@ -142,10 +142,10 @@ type Patrix = Patrix Int Int RawPatrix
 calcPatrixFromMatrix : Matrix -> Case Patrix
 calcPatrixFromMatrix matrix
   =
-    case matrix of
+    case Debug.log "calcPatrixFromMatrix" matrix of
       Matrix x y x_y_int
         ->
-          case calcPatrixFromMatrix_helper_1 x y x_y_int of
+          case Debug.log "calcPatrixFromMatrix" (calcPatrixFromMatrix_helper_1 x y x_y_int) of
             ImpossibleCase -> ImpossibleCase
             PossibleCase x_y_pindex -> PossibleCase (Patrix x y x_y_pindex)
 
