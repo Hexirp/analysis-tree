@@ -397,7 +397,14 @@ calcParentOnPatrixFromRawMatrixWithMemo_helper_1 x_y_int x y y_int int p memo
       Nothing
         ->
           PossibleCase
-            (Null, insertMemoCalcParentOnPatrixFromRawMatrix memo x y Null)
+            (
+              Null,
+              insertMemoCalcParentOnPatrixFromRawMatrix
+              memo
+              x
+              y
+              Null
+            )
       Just y_int_
         ->
           case Array.get y y_int_ of
