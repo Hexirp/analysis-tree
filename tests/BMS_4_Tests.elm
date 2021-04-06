@@ -350,7 +350,7 @@ test_calcParentOnPatrixFromRawMatrix
                       0
                       |>
                         Expect.equal
-                          (PossibleCase Null)
+                          (PossibleCase (Pindex 1))
       ,
         fuzz3
           fuzzer_RawMatrix
