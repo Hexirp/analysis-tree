@@ -403,7 +403,7 @@ calcParentOnPatrixFromRawMatrixWithMemo_helper_1 x_y_int x y y_int int p memo
           case Array.get y y_int_ of
             Nothing
               ->
-                if 0 <= y && y < Array.length y_int
+                if 0 <= y && y < Array.length y_int_
                   then ImpossibleCase
                   else
                     case
