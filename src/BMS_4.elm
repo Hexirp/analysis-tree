@@ -16,8 +16,16 @@ module BMS_4
       fromRawPatrixToList,
       Patrix (..),
       calcPatrixFromMatrix,
+      MemoCalcPatrixFromMatrix,
+      emptyMemoCalcPatrixFromMatrix,
+      getMemoCalcParentOnPatrixFromRawMatrix,
+      getMemoCalcAncestorSetOnPatrixFromRawMatrix,
+      insertMemoCalcParentOnPatrixFromRawMatrix,
+      insertMemoCalcAncestorSetOnPatrixFromRawMatrix,
       calcParentOnPatrixFromRawMatrix,
       calcAncestorSetOnPatrixFromRawMatrix,
+      calcParentOnPatrixFromRawMatrixWithMemo,
+      calcAncestorSetOnPatrixFromRawMatrixWithMemo,
       calcMatrixFromPatrix,
       calcElementOnMatrixFromRawPatrix
     )
@@ -144,180 +152,22 @@ type Patrix = Patrix Int Int RawPatrix
 calcPatrixFromMatrix : Matrix -> Case Patrix
 calcPatrixFromMatrix matrix
   =
-    let
-      _ = Debug.log "calcPatrixFromMatrix-matrix" matrix
-    in
-      case matrix of
-        Matrix x y x_y_int
-          ->
-            case calcPatrixFromMatrix_helper_1 x y x_y_int of
-              ImpossibleCase -> ImpossibleCase
-              PossibleCase x_y_pindex -> PossibleCase (Patrix x y x_y_pindex)
+    case matrix of
+      Matrix x y x_y_int
+        ->
+          case calcPatrixFromMatrix_helper_1 x y x_y_int of
+            ImpossibleCase -> ImpossibleCase
+            PossibleCase x_y_pindex -> PossibleCase (Patrix x y x_y_pindex)
 
-calcPatrixFromMatrix_helper_1
-  : Int -> Int -> RawMatrix -> Case RawPatrix
-calcPatrixFromMatrix_helper_1 x y x_y_int
-  =
-    let
-      _ = Debug.log "calcPatrixFromMatrix_helper_1-x" x
-      _ = Debug.log "calcPatrixFromMatrix_helper_1-y" y
-      _ = Debug.log "calcPatrixFromMatrix_helper_1-x_y_int" x_y_int
-    in
-      Case.traverseArray (\case_x -> case_x)
-        (Array.map (Case.traverseArray (\case_x -> case_x))
-          (calcPatrixFromMatrix_helper_2 x y x_y_int))
+{-| `calcPatrixFromMatrix` の内部計算のメモです。 -}
+type alias MemoCalcPatrixFromMatrix
+  = (Dict (Int, Int) Pindex, Dict (Int, Int) (Int -> Bool))
 
-calcPatrixFromMatrix_helper_2
-  : Int -> Int -> RawMatrix -> Array (Array (Case Pindex))
-calcPatrixFromMatrix_helper_2 x y x_y_int
-  =
-    let
-      _ = Debug.log "calcPatrixFromMatrix_helper_2-x" x
-      _ = Debug.log "calcPatrixFromMatrix_helper_2-y" y
-      _ = Debug.log "calcPatrixFromMatrix_helper_2-x_y_int" x_y_int
-    in
-      Array.initialize
-        x
-        (\x_
-          ->
-            Array.initialize
-              y
-              (\y_
-                ->
-                  calcParentOnPatrixFromRawMatrix x_y_int x_ y_))
+{-| 其の空の `MemoCalcPatrixFromMatrix` です。 -}
+emptyMemoCalcPatrixFromMatrix : MemoCalcPatrixFromMatrix
+emptyMemoCalcPatrixFromMatrix = (Dict.empty, Dict.empty)
 
-{-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の親を表す或る `Pindex` を計算し、それを返します。
-
-`x` が範囲を外れている時は、 `Null` を返します。 `x` が範囲を外れていなくて `y` が `0` 未満である時は、 `x` が `0` であるならば `Null` となり、そうでないならば `Pindex (x - 1)` となります。 `x` が範囲の中にあって `y` が `x` が指す列の長さ以上である時は、 `Null` になります。
--}
-calcParentOnPatrixFromRawMatrix
-  : RawMatrix -> Int -> Int -> Case Pindex
-calcParentOnPatrixFromRawMatrix x_y_int x y
-  =
-    let
-      _ = Debug.log "calcParentOnPatrixFromRawMatrix-x_y_int" x_y_int
-      _ = Debug.log "calcParentOnPatrixFromRawMatrix-x" x
-      _ = Debug.log "calcParentOnPatrixFromRawMatrix-y" y
-    in
-      case Array.get x x_y_int of
-        Nothing
-          ->
-            if 0 <= x && x < Array.length x_y_int
-              then ImpossibleCase
-              else PossibleCase Null
-        Just y_int
-          ->
-            case Array.get y y_int of
-              Nothing ->
-                if 0 <= y
-                  then
-                    if y < Array.length y_int
-                      then ImpossibleCase
-                      else PossibleCase Null
-                  else
-                    if 0 <= x && x < Array.length x_y_int
-                      then
-                        if x == 0
-                          then PossibleCase Null
-                          else PossibleCase (Pindex (x - 1))
-                      else
-                        ImpossibleCase
-              Just int
-                ->
-                  calcParentOnPatrixFromRawMatrix_helper_1
-                    x_y_int
-                    x
-                    y
-                    y_int
-                    int
-                    (x - 1)
-
--- x と y の親を探索する。
--- p が範囲を外れた時は、 p < x かつ x は範囲を外れていないという事実より、 p < 0 であり、ここまで探索の手が伸びるということは、 x の y での親はないということである。
--- p がずれたことにより y が範囲を外れた時は、それが y < 0 である、つまり上側だった時は、 calcParentOnPatrixFromRawMatrix が示しているような 0 ← 1 ← 2 ← 3 ← ... の構造に従って親を判定する。それが、 Array.length y_int <= y である、つまり下側だった時は、そこは底値で埋め尽くされているという考え方に従って親を判定する。これらは、結果的に同じ処理となる。
--- p は関数の状態を保持する役割を持つ引数である。 calcParentOnPatrixFromRawMatrix と再帰の構造より p < x である。
-calcParentOnPatrixFromRawMatrix_helper_1
-  : RawMatrix -> Int -> Int -> Array Int -> Int -> Int -> Case Pindex
-calcParentOnPatrixFromRawMatrix_helper_1 x_y_int x y y_int int p
-  =
-    let
-      _ = Debug.log "calcParentOnPatrixFromRawMatrix_helper_1-x_y_int" x_y_int
-      _ = Debug.log "calcParentOnPatrixFromRawMatrix_helper_1-x" x
-      _ = Debug.log "calcParentOnPatrixFromRawMatrix_helper_1-y" y
-      _ = Debug.log "calcParentOnPatrixFromRawMatrix_helper_1-y_int" y_int
-      _ = Debug.log "calcParentOnPatrixFromRawMatrix_helper_1-int" int
-      _ = Debug.log "calcParentOnPatrixFromRawMatrix_helper_1-p" p
-    in
-      case Array.get p x_y_int of
-        Nothing -> PossibleCase Null
-        Just y_int_
-          ->
-            case Array.get y y_int_ of
-              Nothing
-                ->
-                  if 0 <= y && y < Array.length y_int
-                    then ImpossibleCase
-                    else
-                      case
-                        calcAncestorSetOnPatrixFromRawMatrix x_y_int x (y - 1)
-                      of
-                        ImpossibleCase -> ImpossibleCase
-                        PossibleCase is_ancestor
-                          ->
-                            if is_ancestor p
-                              then PossibleCase (Pindex p)
-                              else
-                                calcParentOnPatrixFromRawMatrix_helper_1
-                                  x_y_int
-                                  x
-                                  y
-                                  y_int
-                                  int
-                                  (p - 1)
-              Just int_
-                ->
-                  case calcAncestorSetOnPatrixFromRawMatrix x_y_int x (y - 1) of
-                    ImpossibleCase -> ImpossibleCase
-                    PossibleCase is_ancestor
-                      ->
-                        if int_ < int && is_ancestor p
-                          then PossibleCase (Pindex p)
-                          else
-                            calcParentOnPatrixFromRawMatrix_helper_1
-                              x_y_int
-                              x
-                              y
-                              y_int
-                              int
-                              (p - 1)
-
-{-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の先祖を表す或る集合 (`Int -> Bool`) を計算し、それを返します。 -}
-calcAncestorSetOnPatrixFromRawMatrix
-  : RawMatrix -> Int -> Int -> Case (Int -> Bool)
-calcAncestorSetOnPatrixFromRawMatrix x_y_int x y
-  =
-    let
-      _ = Debug.log "calcAncestorSetOnPatrixFromRawMatrix-x_y_int" x_y_int
-      _ = Debug.log "calcAncestorSetOnPatrixFromRawMatrix-x" x
-      _ = Debug.log "calcAncestorSetOnPatrixFromRawMatrix-y" y
-    in
-      case calcParentOnPatrixFromRawMatrix x_y_int x y of
-        ImpossibleCase -> ImpossibleCase
-        PossibleCase xp -> case xp of
-          Null -> PossibleCase (\x__ -> x == x__)
-          Pindex x_
-            ->
-              if x_ < x
-                then
-                  case calcAncestorSetOnPatrixFromRawMatrix x_y_int x_ y of
-                    ImpossibleCase -> ImpossibleCase
-                    PossibleCase is_ancestor
-                      -> PossibleCase (\x__ -> x == x__ || is_ancestor x__)
-                else
-                  PossibleCase (\x__ -> x == x__)
-
-type alias MemoCalcPatrixFromMatrix = (Dict (Int, Int) Pindex, Dict (Int, Int) (Int -> Bool))
-
+{-| 或る `MemoCalcPatrixFromMatrix` から `calcParentOnPatrixFromRawMatrix` の結果を取り出します。 -}
 getMemoCalcParentOnPatrixFromRawMatrix
   : MemoCalcPatrixFromMatrix -> Int -> Int -> Maybe Pindex
 getMemoCalcParentOnPatrixFromRawMatrix memo x y
@@ -325,6 +175,7 @@ getMemoCalcParentOnPatrixFromRawMatrix memo x y
     case memo of
       (memo_1, memo_2) -> Dict.get (x, y) memo_1
 
+{-| 或る `MemoCalcPatrixFromMatrix` から `calcAncestorSetOnPatrixFromRawMatrix` の結果を取り出します。 -}
 getMemoCalcAncestorSetOnPatrixFromRawMatrix
   : MemoCalcPatrixFromMatrix -> Int -> Int -> Maybe (Int -> Bool)
 getMemoCalcAncestorSetOnPatrixFromRawMatrix memo x y
@@ -332,6 +183,7 @@ getMemoCalcAncestorSetOnPatrixFromRawMatrix memo x y
     case memo of
       (memo_1, memo_2) -> Dict.get (x, y) memo_2
 
+{-| 或る `MemoCalcPatrixFromMatrix` に `calcPatrixOnPatrixFromRawMatrix` の結果をメモします。 -}
 insertMemoCalcParentOnPatrixFromRawMatrix
   :
     MemoCalcPatrixFromMatrix
@@ -341,6 +193,7 @@ insertMemoCalcParentOnPatrixFromRawMatrix memo x y r
     case memo of
       (memo_1, memo_2) -> (Dict.insert (x, y) r memo_1, memo_2)
 
+{-| 或る `MemoCalcPatrixFromMatrix` に `calcAncestorSetOnPatrixFromRawMatrix` の結果をメモします。 -}
 insertMemoCalcAncestorSetOnPatrixFromRawMatrix
   :
     MemoCalcPatrixFromMatrix
@@ -349,6 +202,76 @@ insertMemoCalcAncestorSetOnPatrixFromRawMatrix memo x y r
   =
     case memo of
       (memo_1, memo_2) -> (memo_1, Dict.insert (x, y) r memo_2)
+
+calcPatrixFromMatrix_helper_1
+  : Int -> Int -> RawMatrix -> Case RawPatrix
+calcPatrixFromMatrix_helper_1 x y x_y_int
+  =
+    case
+      calcPatrixFromMatrix_helper_2
+        x
+        y
+        x_y_int
+        emptyMemoCalcPatrixFromMatrix
+    of
+      ImpossibleCase -> ImpossibleCase
+      PossibleCase (x_y_patrix, memo) -> PossibleCase x_y_patrix
+
+calcPatrixFromMatrix_helper_2
+  :
+    Int
+      ->
+        Int
+          ->
+            RawMatrix
+              ->
+                MemoCalcPatrixFromMatrix
+                  ->
+                    Case (Array (Array Pindex), MemoCalcPatrixFromMatrix)
+calcPatrixFromMatrix_helper_2 x y x_y_int
+  =
+    Case.initializeArrayWithCaseWithState
+      x
+      (\x_
+        ->
+          Case.initializeArrayWithCaseWithState
+            y
+            (\y_
+              ->
+                calcParentOnPatrixFromRawMatrixWithMemo x_y_int x_ y_))
+
+{-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の親を表す或る `Pindex` を計算し、それを返します。
+
+`x` が範囲を外れている時は、 `Null` を返します。 `x` が範囲を外れていなくて `y` が `0` 未満である時は、 `x` が `0` であるならば `Null` となり、そうでないならば `Pindex (x - 1)` となります。 `x` が範囲の中にあって `y` が `x` が指す列の長さ以上である時は、 `Null` になります。
+-}
+calcParentOnPatrixFromRawMatrix
+  : RawMatrix -> Int -> Int -> Case Pindex
+calcParentOnPatrixFromRawMatrix x_y_int x y
+  =
+    case
+      calcParentOnPatrixFromRawMatrixWithMemo
+        x_y_int
+        x
+        y
+        emptyMemoCalcPatrixFromMatrix
+    of
+      ImpossibleCase -> ImpossibleCase
+      PossibleCase (pindex, memo) -> PossibleCase pindex
+
+{-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の先祖を表す或る集合 (`Int -> Bool`) を計算し、それを返します。 -}
+calcAncestorSetOnPatrixFromRawMatrix
+  : RawMatrix -> Int -> Int -> Case (Int -> Bool)
+calcAncestorSetOnPatrixFromRawMatrix x_y_int x y
+  =
+    case
+      calcAncestorSetOnPatrixFromRawMatrixWithMemo
+        x_y_int
+        x
+        y
+        emptyMemoCalcPatrixFromMatrix
+    of
+      ImpossibleCase -> ImpossibleCase
+      PossibleCase (is_ancestor, memo) -> PossibleCase is_ancestor
 
 {-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の親を表す或る `Pindex` を計算し、それを返します。メモ化しています。
 
@@ -536,7 +459,7 @@ calcParentOnPatrixFromRawMatrixWithMemo_helper_1 x_y_int x y y_int int p memo
                             (p - 1)
                             memo_
 
-{-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の先祖を表す或る集合 (`Int -> Bool`) を計算し、それを返します。 -}
+{-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の先祖を表す或る集合 (`Int -> Bool`) を計算し、それを返します。メモ化しています。 -}
 calcAncestorSetOnPatrixFromRawMatrixWithMemo
   :
     RawMatrix

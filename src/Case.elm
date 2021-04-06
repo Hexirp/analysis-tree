@@ -1,4 +1,6 @@
-module Case exposing (Case (..), isValid, traverseArray)
+module Case
+  exposing
+    (Case (..), isValid, traverseArray, initializeArrayWithCaseWithState)
 
 {-| 型の上では値が存在しない可能性があるが、実際には値が存在されると期待される型です。
 
@@ -49,3 +51,32 @@ traverseArray f array_x
                   PossibleCase r -> PossibleCase (Array.push y r))
       (PossibleCase Array.empty)
       array_x
+
+{-| 或る配列を或る関数により生成します。 `initializeArrayWithCaseWithState int func state` は、その長さが `int` でインデックスが `i` の要素を `f i` である配列を返します。 `Case` と状態の作用が加わっています。 -}
+initializeArrayWithCaseWithState
+  :
+    Int
+      ->
+        (Int -> state -> Case (a, state))
+          -> state -> Case (Array a, state)
+initializeArrayWithCaseWithState int func state
+  =
+    let
+      helper n s
+        =
+          if int <= n
+            then PossibleCase ([], s)
+            else
+              case func n s of
+                ImpossibleCase -> ImpossibleCase
+                PossibleCase (xp, s_)
+                  ->
+                    case helper (n + 1) s_ of
+                      ImpossibleCase -> ImpossibleCase
+                      PossibleCase (xs, s__) -> PossibleCase (xp :: xs, s__)
+    in
+      case helper 0 state of
+        ImpossibleCase -> ImpossibleCase
+        PossibleCase (list, state_)
+          ->
+            PossibleCase (Array.fromList list, state_)
