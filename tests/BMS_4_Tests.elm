@@ -338,6 +338,18 @@ test_calcParentOnPatrixFromRawMatrix
   =
     describe "calcParentOnPatrixFromRawMatrix"
       [
+        test "almost empty matrix"
+          <|
+            \_
+              ->
+                calcParentOnPatrixFromRawMatrix
+                  (fromListToRawMatrix [[], [], [0]])
+                  2
+                  0
+                  |>
+                    Expect.equal
+                      (PossibleCase Null)
+      ,
         fuzz3
           fuzzer_RawMatrix
           Fuzz.int
@@ -356,6 +368,17 @@ test_calcAncestorSetOnPatrixFromRawMatrix
   =
     describe "calcAncestorSetOnPatrixFromRawMatrix"
       [
+        test "almost empty matrix"
+          <|
+            \_
+              ->
+                calcAncestorSetOnPatrixFromRawMatrix
+                  (fromListToRawMatrix [[], [], [0]])
+                  2
+                  0
+                  |>
+                    expect_notImpossibleCase
+      ,
         fuzz3
           fuzzer_RawMatrix
           Fuzz.int
