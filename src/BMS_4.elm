@@ -302,7 +302,11 @@ calcParentOnPatrixFromRawMatrixWithMemo x_y_int x y memo
                     PossibleCase
                       (
                         Null,
-                        insertMemoCalcParentOnPatrixFromRawMatrix memo x y Null
+                        insertMemoCalcParentOnPatrixFromRawMatrix
+                          memo
+                          x
+                          y
+                          Null
                       )
             Just y_int
               ->
