@@ -1,0 +1,202 @@
+[https://gitlab.com/Hexirp/analysis-tree analysis-tree] というウェブ・アプリケーションを作っています。私のためのメモを兼ねて、解説を書いていきたいと思います。
+
+== バシク行列システム バージョン 4 ==
+
+[[Special:Redirect/revision/33136|Koteitan さんによるバシク行列の数式的定義]]と、それを元にして私が書いた [https://github.com/Hexirp/googology/blob/81c2a3766b659c096c301ec2921717c497c3e466/2019/Bashicu.hs Bashicu.hs] を元にしています。
+
+<code>Matrix</code> 型を使って、行列を保存します。たとえば、 <code>(0,0,0)(1,1,1)(2,2,2)</code> は <code><nowiki>[[0,0,0],[1,1,1],[2,2,2]]</nowiki></code> により表され、さらに行の長さが <code>3</code> で列の長さが 3 なので、模式的には <code>(0,0,0)(1,1,1)(2,2,2)</code> という行列は <code><nowiki>Matrix 3 3 [[0,0,0],[1,1,1],[2,2,2]]</nowiki></code> により表されます。
+
+このような行列の値には、 <code>x</code> と <code>y</code> を使ってアクセスします。それは基本的に <code>a[x][y]</code> というやり方です。図にすると、以下のような配列です。
+
+<div style="display: flex; padding: 10px; border: medium solid #000000;">
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+0
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+0
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+0
+</div>
+</div>
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+1
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+1
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+1
+</div>
+</div>
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+2
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+2
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+0
+</div>
+</div>
+</div>
+
+<code>x[2]</code> とすると、 0 番目、 1 番目、 2 番目……以下のような配列が得られます。
+
+<div style="display: flex; flex-direction: column; padding: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+2
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+2
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+0
+</div>
+</div>
+
+さらに、 <code>x[2][2]</code> とすると、 0 番目、 1 番目、 2 番目……以下の値が得られます。
+
+<div style="height: 40px; width: 40px; border: medium solid #000000; text-align: center;">
+0
+</div>
+
+しかし、現実には、綺麗に行列になっている値ばっかりではありません。次のような配列はどのようにして行列にすればよいのでしょうか？
+
+<div style="display: flex; padding: 10px; border: medium solid #000000;">
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+0
+</div>
+</div>
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+1
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+1
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+1
+</div>
+</div>
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+2
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+2
+</div>
+</div>
+</div>
+
+単純に 0 で埋めれば大丈夫ですよね。でも、次の配列はどうでしょうか。
+
+<div style="display: flex; padding: 10px; border: medium solid #000000;">
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+-2
+</div>
+</div>
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+-1
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+-1
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+-1
+</div>
+</div>
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+0
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+0
+</div>
+</div>
+</div>
+
+この時は、 0 で埋めようとすると<em style="font-weight: bolder;">トポロジー</em>が崩れてしまいます。この配列は、一つ前の配列のそれぞれの要素から 2 を引いたものであることにお気づきでしょうか。このような時に、単純に 0 で埋めようとすると、形がおかしくなってしまいます。
+
+<div style="display: flex; padding: 10px; border: medium solid #000000;">
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+-2
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+-2
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+-2
+</div>
+</div>
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+-1
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+-1
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+-1
+</div>
+</div>
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+0
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+0
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+-2
+</div>
+</div>
+</div>
+
+つまり、このような結果になってほしいのです。そこで、<em style="font-weight: bolder;">底値</em>（ていち）という概念が必要になります。底値は、単純に言えば、配列の中で最も小さい要素です。殆どの場合は、これでも問題はありません。この底値で、足りない部分を埋めてやることで、トポロジーを保ったまま <code>Matrix</code> へと変換できます。
+
+<div style="display: flex; padding: 10px; border: medium solid #000000;">
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+</div>
+<div style="display: flex; flex-direction: column; padding: 10px; margin: 10px; border: medium solid #000000;">
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+1
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+1
+</div>
+<div style="height: 40px; width: 40px; margin: 10px; border: medium solid #000000; text-align: center;">
+1
+</div>
+</div>
+</div>
+
+ただし、例外はあります。ここでは <code>()(1,1,1)</code> という記述になっています。これは <code>(0,0,0)(1,1,1)</code> になって欲しいですよね。でも、その配列の最小元は <code>1</code> です。だから、単純に底値を使うと <code>(1,1,1)(1,1,1)</code> になってしまいます。これは不都合です。だから、 <code>()</code> というような空の列の最小の値は、仮として <code>0</code> と考えます。これにより、全体として上手く行きます。
+
+<code>fromMatrixToPatrix_helper_2</code> と <code>fromMatrixToPatrix_helper_3</code> と <code>fromMatrixToPatrix_helper_4</code> は、以下のような世界観で動いています。
+
+<pre>
+            x = -1  x = 0  x = 1     x = 2       x = 3
+                   |                           |
+y = -2  ..., Null, | Null, Pindex 0, Pindex 1, | Null, ...
+y = -1  ..., Null, | Null, Pindex 0, Pindex 1, | Null, ...
+       ------------+---------------------------+-----------
+y = 0   ..., Null, | Null, Pindex 0, Pindex 1, | Null, ...
+y = 1   ..., Null, | Null, Pindex 0, Pindex 1, | Null, ...
+y = 2   ..., Null, | Null, Pindex 0, Null,     | Null, ...
+       ------------+---------------------------+-----------
+y = 3   ..., Null, | Null, Null,     Null,     | Null, ...
+y = 4   ..., Null, | Null, Null,     Null,     | Null, ...
+</pre>
+
+これは、 Koteitan さんの、バシク行列システムの上側に 0, 1, 2, 3, 4, ... がずらっと並んでいるやつと同じです。
+
+[[カテゴリ:ブログ記事]]
+
