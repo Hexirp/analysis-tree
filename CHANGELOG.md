@@ -17,3 +17,7 @@ https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/1 により次の変更
 * `BMS_4.Parsing` モジュールを追加する。
 * `BMS_4` モジュールを追加する。
 * `Main` モジュールを追加する。
+
+## 0.0.0
+
+何もない状態である。
