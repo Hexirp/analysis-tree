@@ -45,7 +45,14 @@ view model
           [
             text
               (case BMS_4.Parsing.fromStringToAst model.content of
-                Just ast -> BMS_4.Parsing.fromAstToString (BMS_4.fromMatrixToList (BMS_4.fromListToMatrix ast))
+                Just ast
+                  ->
+                    ast
+                      |> BMS_4.fromListToRawMatrix
+                      |> BMS_4.fromRawMatrixToMatrix
+                      |> BMS_4.fromMatrixToRawMatrix
+                      |> BMS_4.fromRawMatrixToList
+                      |> BMS_4.Parsing.fromAstToString
                 Nothing -> "Parse Error!")
           ]
       ]

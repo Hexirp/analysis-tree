@@ -1,10 +1,14 @@
-module BMS_4_Tests exposing (test_collection, test_Matrix, test_Patrix)
+module BMS_4_Tests exposing (test_Matrix, test_Patrix)
 
 import Case exposing (Case (..))
 
 import BMS_4 exposing (..)
 
+import Random
+
 import Expect exposing (Expectation)
+
+import Shrink
 
 import Fuzz exposing (Fuzzer)
 
@@ -13,185 +17,226 @@ import Test exposing (Test, describe, test, fuzz, fuzz2, fuzz3)
 expect_notImpossibleCase : Case a -> Expectation
 expect_notImpossibleCase = Expect.notEqual ImpossibleCase
 
-fuzzer_matrix : Fuzzer Matrix
-fuzzer_matrix = Fuzz.map fromListToMatrix (Fuzz.list (Fuzz.list Fuzz.int))
+fuzzer_RawMatrix : Fuzzer RawMatrix
+fuzzer_RawMatrix = Fuzz.array (Fuzz.array Fuzz.int)
 
-fuzzer_pindex : Fuzzer Pindex
-fuzzer_pindex =
-  let
-    fromMaybeToPindex maybe_x
-      =
-        case maybe_x of
-          Nothing -> Null
-          Just x -> Pindex x
-  in
-    Fuzz.map fromMaybeToPindex (Fuzz.maybe Fuzz.int)
-
-fuzzer_case_patrix : Fuzzer (Case Patrix)
-fuzzer_case_patrix = Fuzz.map calcPatrixFromMatrix fuzzer_matrix
-
-test_collection : Test
-test_collection
+fuzzer_Matrix : Fuzzer Matrix
+fuzzer_Matrix
   =
-    describe "collection" [ test_fromArrayToList, test_fromListToArray ]
-
-test_fromArrayToList : Test
-test_fromArrayToList
-  =
-    describe "fromArrayToList"
-      [
-        fuzz
-          (Fuzz.array (Fuzz.array Fuzz.int))
-          "consisty with fromListToArray"
-          <|
-            \x_y_int
+    let
+      generator
+        =
+          Random.map3 Matrix
+            (Random.int -100 100)
+            (Random.int -100 100)
+            (Random.map fromListToRawMatrix
+              (Random.list 10
+                (Random.list 10
+                  (Random.int -100 100))))
+      shrinker matrix
+        =
+          case matrix of
+            Matrix x y x_y_int
               ->
-                (x_y_int |> fromArrayToList |> fromListToArray)
-                  |> Expect.equal x_y_int
-      ]
+                Shrink.map Matrix (Shrink.int <| x)
+                  |> Shrink.andMap (Shrink.int <| y)
+                  |>
+                    Shrink.andMap
+                      (Shrink.array (Shrink.array Shrink.int) <| x_y_int)
+    in
+      Fuzz.custom generator shrinker
 
-test_fromListToArray : Test
-test_fromListToArray
+fuzzer_Pindex : Fuzzer Pindex
+fuzzer_Pindex
   =
-    describe "fromListToArray"
-      [
-        fuzz
-          (Fuzz.list (Fuzz.list Fuzz.int))
-          "consisty with fromArrayToList"
-          <|
-            \x_y_int
+    let
+      generator
+        =
+          Random.weighted (1, True) [(10, False)]
+            |>
+              Random.andThen
+                (\bool
+                  ->
+                    if bool
+                      then Random.constant Null
+                      else Random.map Pindex (Random.int -100 100))
+      shrinker pindex
+        =
+          case pindex of
+            Null -> Shrink.noShrink Null
+            Pindex int -> Shrink.map Pindex (Shrink.int int)
+    in
+      Fuzz.custom generator shrinker
+
+fuzzer_RawPatrix : Fuzzer RawPatrix
+fuzzer_RawPatrix = Fuzz.array (Fuzz.array fuzzer_Pindex)
+
+fuzzer_Patrix : Fuzzer Patrix
+fuzzer_Patrix
+  =
+    let
+      generator_Pindex
+        =
+          Random.weighted (1, True) [(10, False)]
+            |>
+              Random.andThen
+                (\bool
+                  ->
+                    if bool
+                      then Random.constant Null
+                      else Random.map Pindex (Random.int -100 100))
+      shrinker_Pindex pindex
+        =
+          case pindex of
+            Null -> Shrink.noShrink Null
+            Pindex int -> Shrink.map Pindex (Shrink.int int)
+      generator
+        =
+          Random.map3 Patrix
+            (Random.int -100 100)
+            (Random.int -100 100)
+            (Random.map fromListToRawPatrix
+              (Random.list 10
+                (Random.list 10
+                  generator_Pindex)))
+      shrinker patrix
+        =
+          case patrix of
+            Patrix x y x_y_pindex
               ->
-                (x_y_int |> fromListToArray |> fromArrayToList)
-                  |> Expect.equal x_y_int
-      ]
+                Shrink.map Patrix (Shrink.int <| x)
+                  |> Shrink.andMap (Shrink.int <| y)
+                  |>
+                    Shrink.andMap
+                      (Shrink.array (Shrink.array shrinker_Pindex)
+                        <|
+                          x_y_pindex)
+    in
+      Fuzz.custom generator shrinker
 
 test_Matrix : Test
 test_Matrix
   =
     describe "Matrix"
       [
-        test_fromMatrixToArray,
-        test_fromArrayToMatrix,
-        test_fromMatrixToList,
-        test_fromListToMatrix
+        test_fromRawMatrixToMatrix,
+        test_fromMatrixToRawMatrix
       ]
 
-test_fromMatrixToArray : Test
-test_fromMatrixToArray
+test_fromRawMatrixToMatrix : Test
+test_fromRawMatrixToMatrix
   =
-    describe "fromMatrixToArray"
-      [
-        fuzz
-          fuzzer_matrix
-          "consisty with fromMatrixToList"
-          <|
-            \matrix
-              ->
-                (matrix |> fromMatrixToArray |> fromArrayToList)
-                  |>
-                    Expect.equal
-                      (fromMatrixToList matrix)
-      ]
-
-
-test_fromArrayToMatrix : Test
-test_fromArrayToMatrix
-  =
-    describe "fromArrayToMatrix"
-      [
-        fuzz
-          (Fuzz.list (Fuzz.list Fuzz.int))
-          "consisty with fromListToMatrix"
-          <|
-            \x_y_int
-              ->
-                (x_y_int |> fromListToArray |> fromArrayToMatrix)
-                  |>
-                    Expect.equal
-                      (fromListToMatrix x_y_int)
-      ]
-
-test_fromListToMatrix : Test
-test_fromListToMatrix
-  =
-    describe "fromListToMatrix"
+    describe "fromRawMatrixToMatrix"
       [
         test "normal case"
           <|
             \_
               ->
-                fromListToMatrix [[0,0,0],[1,1,1],[2,2,0]]
+                fromRawMatrixToMatrix
+                  (fromListToRawMatrix
+                    [[0,0,0],[1,1,1],[2,2,0]])
                   |>
                     Expect.equal
-                      (fromListToMatrixRawly 3 3 [[0,0,0],[1,1,1],[2,2,0]])
+                      (Matrix 3 3
+                        (fromListToRawMatrix
+                          [[0,0,0],[1,1,1],[2,2,0]]))
       ,
         test "discrete lengths of rows"
           <|
             \_
               ->
-                fromListToMatrix [[0],[1,1,1],[2,2]]
+                fromRawMatrixToMatrix
+                  (fromListToRawMatrix
+                    [[0],[1,1,1],[2,2]])
                   |>
                     Expect.equal
-                      (fromListToMatrixRawly 3 3 [[0,0,0],[1,1,1],[2,2,0]])
+                      (Matrix 3 3
+                        (fromListToRawMatrix
+                          [[0,0,0],[1,1,1],[2,2,0]]))
       ,
         test "discrete lengths of rows and the non-zero bottom value"
           <|
             \_
               ->
-                fromListToMatrix [[-1],[0,0,0],[1,1]]
+                fromRawMatrixToMatrix
+                  (fromListToRawMatrix
+                    [[-1],[0,0,0],[1,1]])
                   |>
                     Expect.equal
-                      (fromListToMatrixRawly 3 3 [[-1,-1,-1],[0,0,0],[1,1,-1]])
+                      (Matrix 3 3
+                        (fromListToRawMatrix
+                          [[-1,-1,-1],[0,0,0],[1,1,-1]]))
       ,
         test "empty rows"
           <|
             \_
               ->
-                fromListToMatrix [[],[1,1,1]]
+                fromRawMatrixToMatrix
+                  (fromListToRawMatrix
+                    [[],[1,1,1]])
                   |>
                     Expect.equal
-                      (fromListToMatrixRawly 2 3 [[0,0,0],[1,1,1]])
+                      (Matrix 2 3
+                        (fromListToRawMatrix
+                          [[0,0,0],[1,1,1]]))
       ,
         test "empty rows and the non-zero bottom value"
           <|
             \_
               ->
-                fromListToMatrix [[],[0,0,-1]]
+                fromRawMatrixToMatrix
+                  (fromListToRawMatrix
+                    [[],[0,0,-1]])
                   |>
                     Expect.equal
-                      (fromListToMatrixRawly 2 3 [[-1,-1,-1],[0,0,-1]])
+                      (Matrix 2 3
+                        (fromListToRawMatrix
+                          [[-1,-1,-1],[0,0,-1]]))
       ,
         test "all empty rows"
           <|
             \_
               ->
-                fromListToMatrix [[],[],[]]
+                fromRawMatrixToMatrix
+                  (fromListToRawMatrix
+                    [[],[],[]])
                   |>
                     Expect.equal
-                      (fromListToMatrixRawly 3 0 [[],[],[]])
+                      (Matrix 3 0
+                        (fromListToRawMatrix
+                          [[],[],[]]))
       ,
         test "the empty colmun"
           <|
             \_
               ->
-                fromListToMatrix []
+                fromRawMatrixToMatrix
+                  (fromListToRawMatrix
+                    [])
                   |>
                     Expect.equal
-                      (fromListToMatrixRawly 0 0 [])
+                      (Matrix 0 0
+                        (fromListToRawMatrix
+                          []))
       ]
 
-test_fromMatrixToList : Test
-test_fromMatrixToList
+test_fromMatrixToRawMatrix : Test
+test_fromMatrixToRawMatrix
   =
-    describe "fromMatrixToList"
+    describe "fromMatrixToRawMatrix"
       [
         test "normal case"
           <|
             \_
               ->
-                fromMatrixToList (fromListToMatrix [[0,0],[1,1],[2,1]])
+                fromMatrixToRawMatrix
+                  (fromRawMatrixToMatrix
+                    (fromListToRawMatrix
+                      [[0,0],[1,1],[2,1]]))
                   |>
-                    Expect.equal [[0,0],[1,1],[2,1]]
+                    Expect.equal
+                      (fromListToRawMatrix
+                        [[0,0],[1,1],[2,1]])
       ]
 
 test_Patrix : Test
@@ -217,68 +262,68 @@ test_calcPatrixFromMatrix
             \_
               ->
                 calcPatrixFromMatrix
-                  (fromListToMatrix
-                    [
-                      [0, 0, 0],
-                      [1, 1, 1],
-                      [2, 2, 0]
-                    ])
+                  (fromRawMatrixToMatrix
+                    (fromListToRawMatrix
+                      [
+                        [0, 0, 0],
+                        [1, 1, 1],
+                        [2, 2, 0]
+                      ]))
                   |>
                     Expect.equal
                       (PossibleCase
-                        (fromListToPatrixRawly
-                          3
-                          3
-                          [
-                            [Null, Null, Null],
-                            [Pindex 0, Pindex 0, Pindex 0],
-                            [Pindex 1, Pindex 1, Null]
-                          ]))
+                        (Patrix 3 3
+                          (fromListToRawPatrix
+                            [
+                              [Null, Null, Null],
+                              [Pindex 0, Pindex 0, Pindex 0],
+                              [Pindex 1, Pindex 1, Null]
+                            ])))
       ,
         test "crossing neck"
           <|
             \_
               ->
                 calcPatrixFromMatrix
-                  (fromListToMatrix
-                    [
-                      [0, 0],
-                      [1, 1],
-                      [2, 0],
-                      [3, 1],
-                      [1, 1]
-                    ])
+                  (fromRawMatrixToMatrix
+                    (fromListToRawMatrix
+                      [
+                        [0, 0],
+                        [1, 1],
+                        [2, 0],
+                        [3, 1],
+                        [1, 1]
+                      ]))
                   |>
                     Expect.equal
                       (PossibleCase
-                        (fromListToPatrixRawly
-                          5
-                          2
-                          [
-                            [Null, Null],
-                            [Pindex 0, Pindex 0],
-                            [Pindex 1, Null],
-                            [Pindex 2, Pindex 2],
-                            [Pindex 0, Pindex 0]
-                          ]))
+                        (Patrix 5 2
+                          (fromListToRawPatrix
+                            [
+                              [Null, Null],
+                              [Pindex 0, Pindex 0],
+                              [Pindex 1, Null],
+                              [Pindex 2, Pindex 2],
+                              [Pindex 0, Pindex 0]
+                            ])))
       ,
         test "non-ascending sequence"
           <|
             \_
               ->
                 calcPatrixFromMatrix
-                  (fromListToMatrix
-                    [[2],[1],[0],[1],[0]])
+                  (fromRawMatrixToMatrix
+                    (fromListToRawMatrix
+                      [[2],[1],[0],[1],[0]]))
                   |>
                     Expect.equal
                       (PossibleCase
-                        (fromListToPatrixRawly
-                          5
-                          1
-                          [[Null], [Null], [Null], [Pindex 2], [Null]]))
+                        (Patrix 5 1
+                          (fromListToRawPatrix
+                            [[Null], [Null], [Null], [Pindex 2], [Null]])))
       ,
         fuzz
-          fuzzer_matrix
+          fuzzer_Matrix
           "follow the rule of the type `Case`"
           <|
             \matrix
@@ -293,8 +338,20 @@ test_calcParentOnPatrixFromRawMatrix
   =
     describe "calcParentOnPatrixFromRawMatrix"
       [
+        test "almost empty matrix"
+          <|
+            \_
+              ->
+                calcParentOnPatrixFromRawMatrix
+                  (fromListToRawMatrix [[], [], [0]])
+                  2
+                  0
+                  |>
+                    Expect.equal
+                      (PossibleCase (Pindex 1))
+      ,
         fuzz3
-          (Fuzz.array (Fuzz.array Fuzz.int))
+          fuzzer_RawMatrix
           Fuzz.int
           Fuzz.int
           "follow the rule of the type `Case`"
@@ -311,8 +368,19 @@ test_calcAncestorSetOnPatrixFromRawMatrix
   =
     describe "calcAncestorSetOnPatrixFromRawMatrix"
       [
+        test "almost empty matrix"
+          <|
+            \_
+              ->
+                calcAncestorSetOnPatrixFromRawMatrix
+                  (fromListToRawMatrix [[], [], [0]])
+                  2
+                  0
+                  |>
+                    expect_notImpossibleCase
+      ,
         fuzz3
-          (Fuzz.array (Fuzz.array Fuzz.int))
+          fuzzer_RawMatrix
           Fuzz.int
           Fuzz.int
           "follow the rule of the type `Case`"
@@ -330,14 +398,12 @@ test_calcMatrixFromPatrix
     describe "calcMatrixFromPatrix"
       [
         fuzz
-          fuzzer_case_patrix
+          fuzzer_Patrix
           "follow the rule of the type `Case`"
           <|
-            \case_patrix
+            \patrix
               ->
-                (case case_patrix of
-                  ImpossibleCase -> ImpossibleCase
-                  PossibleCase patrix -> calcMatrixFromPatrix patrix)
+                calcMatrixFromPatrix patrix
                   |>
                     expect_notImpossibleCase
       ]
@@ -348,7 +414,7 @@ test_calcElementOnMatrixFromRawPatrix
     describe "calcElementOnMatrixFromRawPatrix"
       [
         fuzz3
-          (Fuzz.array (Fuzz.array fuzzer_pindex))
+          fuzzer_RawPatrix
           Fuzz.int
           Fuzz.int
           "follow the rule of the type `Case`"
