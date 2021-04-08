@@ -37,7 +37,8 @@ import Dict exposing (Dict)
 import Array exposing (Array)
 import Array.Extra.Folding as Array
 
-{-| これは自然数です。 -}
+{-| これは自然数です。
+-}
 type Nat = Nat Int
 
 {-| これはバシク行列システムの行列を表す生の型です。
@@ -46,11 +47,13 @@ type Nat = Nat Int
 -}
 type alias RawMatrix = Array (Array Int)
 
-{-| 或るリストを或る生の行列へ変換します。 -}
+{-| 或るリストを或る生の行列へ変換します。
+-}
 fromListToRawMatrix : List (List Int) -> RawMatrix
 fromListToRawMatrix list = Array.map Array.fromList (Array.fromList list)
 
-{-| 或る生の行列を或るリストへ変換します。 -}
+{-| 或る生の行列を或るリストへ変換します。
+-}
 fromRawMatrixToList : RawMatrix -> List (List Int)
 fromRawMatrixToList array = Array.toList (Array.map Array.toList array)
 
@@ -62,7 +65,8 @@ fromRawMatrixToList array = Array.toList (Array.map Array.toList array)
 -}
 type Matrix = Matrix Int Int RawMatrix
 
-{-| 或る値が `Matrix` 型の規約を満たしているか検証します。 -}
+{-| 或る値が `Matrix` 型の規約を満たしているか検証します。
+-}
 verifyMatrix : Matrix -> Bool
 verifyMatrix matrix
   =
@@ -110,18 +114,21 @@ fromArrayToMatrix_helper_1 : Int -> Int -> Array Int -> Array Int
 fromArrayToMatrix_helper_1 y e y_int
   = Array.initialize y (\i -> Maybe.withDefault e (Array.get i y_int))
 
-{-| 或る行列を或る生の行列へ変換します。 -}
+{-| 或る行列を或る生の行列へ変換します。
+-}
 fromMatrixToRawMatrix : Matrix -> RawMatrix
 fromMatrixToRawMatrix matrix
   =
     case matrix of
       Matrix x y x_y_int -> x_y_int
 
-{-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。 -}
+{-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
+-}
 expand : Matrix -> Nat -> Maybe Matrix
 expand n x = expand n x
 
-{-| これはピンデックスです。ピンデックスは或る行列の要素へのポインターを意味します。 -}
+{-| これはピンデックスです。ピンデックスは或る行列の要素へのポインターを意味します。
+-}
 type Pindex = Null | Pindex Int
 
 {-| これはパトリックスを表す生の型です。
@@ -130,11 +137,13 @@ type Pindex = Null | Pindex Int
 -}
 type alias RawPatrix = Array (Array Pindex)
 
-{-| 或るリストを或る生のパトリックスへ変換します。 -}
+{-| 或るリストを或る生のパトリックスへ変換します。
+-}
 fromListToRawPatrix : List (List Pindex) -> RawPatrix
 fromListToRawPatrix list = Array.map Array.fromList (Array.fromList list)
 
-{-| 或る生のパトリックスを或るリストへ変換します。 -}
+{-| 或る生のパトリックスを或るリストへ変換します。
+-}
 fromRawPatrixToList : RawPatrix -> List (List Pindex)
 fromRawPatrixToList array = Array.toList (Array.map Array.toList array)
 
@@ -146,7 +155,8 @@ fromRawPatrixToList array = Array.toList (Array.map Array.toList array)
 -}
 type Patrix = Patrix Int Int RawPatrix
 
-{-| 或る行列から或るパトリックスを計算します。 -}
+{-| 或る行列から或るパトリックスを計算します。
+-}
 calcPatrixFromMatrix : Matrix -> Case Patrix
 calcPatrixFromMatrix matrix
   =
@@ -157,15 +167,18 @@ calcPatrixFromMatrix matrix
             ImpossibleCase -> ImpossibleCase
             PossibleCase x_y_pindex -> PossibleCase (Patrix x y x_y_pindex)
 
-{-| `calcPatrixFromMatrix` の内部計算のメモです。 -}
+{-| `calcPatrixFromMatrix` の内部計算のメモです。
+-}
 type alias MemoCalcPatrixFromMatrix
   = (Dict (Int, Int) Pindex, Dict (Int, Int) (Int -> Bool))
 
-{-| 其の空の `MemoCalcPatrixFromMatrix` です。 -}
+{-| 其の空の `MemoCalcPatrixFromMatrix` です。
+-}
 emptyMemoCalcPatrixFromMatrix : MemoCalcPatrixFromMatrix
 emptyMemoCalcPatrixFromMatrix = (Dict.empty, Dict.empty)
 
-{-| 或る `MemoCalcPatrixFromMatrix` から `calcParentOnPatrixFromRawMatrix` の結果を取り出します。 -}
+{-| 或る `MemoCalcPatrixFromMatrix` から `calcParentOnPatrixFromRawMatrix` の結果を取り出します。
+-}
 getMemoCalcParentOnPatrixFromRawMatrix
   : MemoCalcPatrixFromMatrix -> Int -> Int -> Maybe Pindex
 getMemoCalcParentOnPatrixFromRawMatrix memo x y
@@ -173,7 +186,8 @@ getMemoCalcParentOnPatrixFromRawMatrix memo x y
     case memo of
       (memo_1, memo_2) -> Dict.get (x, y) memo_1
 
-{-| 或る `MemoCalcPatrixFromMatrix` から `calcAncestorSetOnPatrixFromRawMatrix` の結果を取り出します。 -}
+{-| 或る `MemoCalcPatrixFromMatrix` から `calcAncestorSetOnPatrixFromRawMatrix` の結果を取り出します。
+-}
 getMemoCalcAncestorSetOnPatrixFromRawMatrix
   : MemoCalcPatrixFromMatrix -> Int -> Int -> Maybe (Int -> Bool)
 getMemoCalcAncestorSetOnPatrixFromRawMatrix memo x y
@@ -181,7 +195,8 @@ getMemoCalcAncestorSetOnPatrixFromRawMatrix memo x y
     case memo of
       (memo_1, memo_2) -> Dict.get (x, y) memo_2
 
-{-| 或る `MemoCalcPatrixFromMatrix` に `calcPatrixOnPatrixFromRawMatrix` の結果をメモします。 -}
+{-| 或る `MemoCalcPatrixFromMatrix` に `calcPatrixOnPatrixFromRawMatrix` の結果をメモします。
+-}
 insertMemoCalcParentOnPatrixFromRawMatrix
   :
     MemoCalcPatrixFromMatrix
@@ -191,7 +206,8 @@ insertMemoCalcParentOnPatrixFromRawMatrix memo x y r
     case memo of
       (memo_1, memo_2) -> (Dict.insert (x, y) r memo_1, memo_2)
 
-{-| 或る `MemoCalcPatrixFromMatrix` に `calcAncestorSetOnPatrixFromRawMatrix` の結果をメモします。 -}
+{-| 或る `MemoCalcPatrixFromMatrix` に `calcAncestorSetOnPatrixFromRawMatrix` の結果をメモします。
+-}
 insertMemoCalcAncestorSetOnPatrixFromRawMatrix
   :
     MemoCalcPatrixFromMatrix
@@ -256,7 +272,8 @@ calcParentOnPatrixFromRawMatrix x_y_int x y
       ImpossibleCase -> ImpossibleCase
       PossibleCase (pindex, memo) -> PossibleCase pindex
 
-{-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の先祖を表す或る集合 (`Int -> Bool`) を計算し、それを返します。 -}
+{-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の先祖を表す或る集合 (`Int -> Bool`) を計算し、それを返します。
+-}
 calcAncestorSetOnPatrixFromRawMatrix
   : RawMatrix -> Int -> Int -> Case (Int -> Bool)
 calcAncestorSetOnPatrixFromRawMatrix x_y_int x y
@@ -468,7 +485,8 @@ calcParentOnPatrixFromRawMatrixWithMemo_helper_1 x_y_int x y y_int int p memo
                             (p - 1)
                             memo_
 
-{-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の先祖を表す或る集合 (`Int -> Bool`) を計算し、それを返します。メモ化しています。 -}
+{-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の先祖を表す或る集合 (`Int -> Bool`) を計算し、それを返します。メモ化しています。
+-}
 calcAncestorSetOnPatrixFromRawMatrixWithMemo
   :
     RawMatrix
@@ -534,7 +552,8 @@ calcAncestorSetOnPatrixFromRawMatrixWithMemo x_y_int x y memo
                         )
       Just is_ancestor -> PossibleCase (is_ancestor, memo)
 
-{-| 或るパトリックスから或る行列を計算します。 -}
+{-| 或るパトリックスから或る行列を計算します。
+-}
 calcMatrixFromPatrix : Patrix -> Case Matrix
 calcMatrixFromPatrix patrix
   =
