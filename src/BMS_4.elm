@@ -37,8 +37,6 @@ import Dict exposing (Dict)
 import Array exposing (Array)
 import Array.Extra.Folding as Array
 
-import BMS_4.Parsing as Parsing
-
 {-| これは自然数です。 -}
 type Nat = Nat Int
 
