@@ -3,17 +3,17 @@ module BMS_4
     (
       Nat (..),
       RawMatrix,
-      fromListToRawMatrix,
-      fromRawMatrixToList,
+      toRawMatrixFromList,
+      toListFromRawMatrix,
       Matrix (..),
       verifyMatrix,
-      fromMatrixToRawMatrix,
-      fromRawMatrixToMatrix,
+      toMatrixFromRawMatrix,
+      toRawMatrixFromMatrix,
       expand,
       Pindex (..),
       RawPatrix,
-      fromListToRawPatrix,
-      fromRawPatrixToList,
+      toRawPatrixFromList,
+      toListFromRawPatrix,
       Patrix (..),
       calcPatrixFromMatrix,
       MemoCalcPatrixFromMatrix,
@@ -49,13 +49,13 @@ type alias RawMatrix = Array (Array Int)
 
 {-| 或るリストを或る生の行列へ変換します。
 -}
-fromListToRawMatrix : List (List Int) -> RawMatrix
-fromListToRawMatrix list = Array.map Array.fromList (Array.fromList list)
+toRawMatrixFromList : List (List Int) -> RawMatrix
+toRawMatrixFromList list = Array.map Array.fromList (Array.fromList list)
 
 {-| 或る生の行列を或るリストへ変換します。
 -}
-fromRawMatrixToList : RawMatrix -> List (List Int)
-fromRawMatrixToList array = Array.toList (Array.map Array.toList array)
+toListFromRawMatrix : RawMatrix -> List (List Int)
+toListFromRawMatrix array = Array.toList (Array.map Array.toList array)
 
 {-| これはバシク行列システムにおける行列です。
 
@@ -83,8 +83,8 @@ verifyMatrix matrix
 
 底値は、其の生の行列に含まれる最小の値です。ゼロを使わないのは、其の生の行列が表現する行列のトポロジーを可能な限り保つためです。
 -}
-fromRawMatrixToMatrix : RawMatrix -> Matrix
-fromRawMatrixToMatrix x_y_int
+toMatrixFromRawMatrix : RawMatrix -> Matrix
+toMatrixFromRawMatrix x_y_int
   =
     let
       x = Array.length x_y_int
@@ -116,8 +116,8 @@ fromArrayToMatrix_helper_1 y e y_int
 
 {-| 或る行列を或る生の行列へ変換します。
 -}
-fromMatrixToRawMatrix : Matrix -> RawMatrix
-fromMatrixToRawMatrix matrix
+toRawMatrixFromMatrix : Matrix -> RawMatrix
+toRawMatrixFromMatrix matrix
   =
     case matrix of
       Matrix x y x_y_int -> x_y_int
@@ -139,13 +139,13 @@ type alias RawPatrix = Array (Array Pindex)
 
 {-| 或るリストを或る生のパトリックスへ変換します。
 -}
-fromListToRawPatrix : List (List Pindex) -> RawPatrix
-fromListToRawPatrix list = Array.map Array.fromList (Array.fromList list)
+toRawPatrixFromList : List (List Pindex) -> RawPatrix
+toRawPatrixFromList list = Array.map Array.fromList (Array.fromList list)
 
 {-| 或る生のパトリックスを或るリストへ変換します。
 -}
-fromRawPatrixToList : RawPatrix -> List (List Pindex)
-fromRawPatrixToList array = Array.toList (Array.map Array.toList array)
+toListFromRawPatrix : RawPatrix -> List (List Pindex)
+toListFromRawPatrix array = Array.toList (Array.map Array.toList array)
 
 {-| これはパトリックスです。パトリックスはピンデックスの行列を意味します。
 

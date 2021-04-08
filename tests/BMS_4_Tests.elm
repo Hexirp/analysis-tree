@@ -29,7 +29,7 @@ fuzzer_Matrix
           Random.map3 Matrix
             (Random.int -100 100)
             (Random.int -100 100)
-            (Random.map fromListToRawMatrix
+            (Random.map toRawMatrixFromList
               (Random.list 10
                 (Random.list 10
                   (Random.int -100 100))))
@@ -95,7 +95,7 @@ fuzzer_Patrix
           Random.map3 Patrix
             (Random.int -100 100)
             (Random.int -100 100)
-            (Random.map fromListToRawPatrix
+            (Random.map toRawPatrixFromList
               (Random.list 10
                 (Random.list 10
                   generator_Pindex)))
@@ -119,123 +119,123 @@ test_Matrix
   =
     describe "Matrix"
       [
-        test_fromRawMatrixToMatrix,
-        test_fromMatrixToRawMatrix
+        test_toMatrixFromRawMatrix,
+        test_toRawMatrixFromMatrix
       ]
 
-test_fromRawMatrixToMatrix : Test
-test_fromRawMatrixToMatrix
+test_toMatrixFromRawMatrix : Test
+test_toMatrixFromRawMatrix
   =
-    describe "fromRawMatrixToMatrix"
+    describe "toMatrixFromRawMatrix"
       [
         test "normal case"
           <|
             \_
               ->
-                fromRawMatrixToMatrix
-                  (fromListToRawMatrix
+                toMatrixFromRawMatrix
+                  (toRawMatrixFromList
                     [[0,0,0],[1,1,1],[2,2,0]])
                   |>
                     Expect.equal
                       (Matrix 3 3
-                        (fromListToRawMatrix
+                        (toRawMatrixFromList
                           [[0,0,0],[1,1,1],[2,2,0]]))
       ,
         test "discrete lengths of rows"
           <|
             \_
               ->
-                fromRawMatrixToMatrix
-                  (fromListToRawMatrix
+                toMatrixFromRawMatrix
+                  (toRawMatrixFromList
                     [[0],[1,1,1],[2,2]])
                   |>
                     Expect.equal
                       (Matrix 3 3
-                        (fromListToRawMatrix
+                        (toRawMatrixFromList
                           [[0,0,0],[1,1,1],[2,2,0]]))
       ,
         test "discrete lengths of rows and the non-zero bottom value"
           <|
             \_
               ->
-                fromRawMatrixToMatrix
-                  (fromListToRawMatrix
+                toMatrixFromRawMatrix
+                  (toRawMatrixFromList
                     [[-1],[0,0,0],[1,1]])
                   |>
                     Expect.equal
                       (Matrix 3 3
-                        (fromListToRawMatrix
+                        (toRawMatrixFromList
                           [[-1,-1,-1],[0,0,0],[1,1,-1]]))
       ,
         test "empty rows"
           <|
             \_
               ->
-                fromRawMatrixToMatrix
-                  (fromListToRawMatrix
+                toMatrixFromRawMatrix
+                  (toRawMatrixFromList
                     [[],[1,1,1]])
                   |>
                     Expect.equal
                       (Matrix 2 3
-                        (fromListToRawMatrix
+                        (toRawMatrixFromList
                           [[0,0,0],[1,1,1]]))
       ,
         test "empty rows and the non-zero bottom value"
           <|
             \_
               ->
-                fromRawMatrixToMatrix
-                  (fromListToRawMatrix
+                toMatrixFromRawMatrix
+                  (toRawMatrixFromList
                     [[],[0,0,-1]])
                   |>
                     Expect.equal
                       (Matrix 2 3
-                        (fromListToRawMatrix
+                        (toRawMatrixFromList
                           [[-1,-1,-1],[0,0,-1]]))
       ,
         test "all empty rows"
           <|
             \_
               ->
-                fromRawMatrixToMatrix
-                  (fromListToRawMatrix
+                toMatrixFromRawMatrix
+                  (toRawMatrixFromList
                     [[],[],[]])
                   |>
                     Expect.equal
                       (Matrix 3 0
-                        (fromListToRawMatrix
+                        (toRawMatrixFromList
                           [[],[],[]]))
       ,
         test "the empty colmun"
           <|
             \_
               ->
-                fromRawMatrixToMatrix
-                  (fromListToRawMatrix
+                toMatrixFromRawMatrix
+                  (toRawMatrixFromList
                     [])
                   |>
                     Expect.equal
                       (Matrix 0 0
-                        (fromListToRawMatrix
+                        (toRawMatrixFromList
                           []))
       ]
 
-test_fromMatrixToRawMatrix : Test
-test_fromMatrixToRawMatrix
+test_toRawMatrixFromMatrix : Test
+test_toRawMatrixFromMatrix
   =
-    describe "fromMatrixToRawMatrix"
+    describe "toRawMatrixFromMatrix"
       [
         test "normal case"
           <|
             \_
               ->
-                fromMatrixToRawMatrix
-                  (fromRawMatrixToMatrix
-                    (fromListToRawMatrix
+                toRawMatrixFromMatrix
+                  (toMatrixFromRawMatrix
+                    (toRawMatrixFromList
                       [[0,0],[1,1],[2,1]]))
                   |>
                     Expect.equal
-                      (fromListToRawMatrix
+                      (toRawMatrixFromList
                         [[0,0],[1,1],[2,1]])
       ]
 
@@ -262,8 +262,8 @@ test_calcPatrixFromMatrix
             \_
               ->
                 calcPatrixFromMatrix
-                  (fromRawMatrixToMatrix
-                    (fromListToRawMatrix
+                  (toMatrixFromRawMatrix
+                    (toRawMatrixFromList
                       [
                         [0, 0, 0],
                         [1, 1, 1],
@@ -273,7 +273,7 @@ test_calcPatrixFromMatrix
                     Expect.equal
                       (PossibleCase
                         (Patrix 3 3
-                          (fromListToRawPatrix
+                          (toRawPatrixFromList
                             [
                               [Null, Null, Null],
                               [Pindex 0, Pindex 0, Pindex 0],
@@ -285,8 +285,8 @@ test_calcPatrixFromMatrix
             \_
               ->
                 calcPatrixFromMatrix
-                  (fromRawMatrixToMatrix
-                    (fromListToRawMatrix
+                  (toMatrixFromRawMatrix
+                    (toRawMatrixFromList
                       [
                         [0, 0],
                         [1, 1],
@@ -298,7 +298,7 @@ test_calcPatrixFromMatrix
                     Expect.equal
                       (PossibleCase
                         (Patrix 5 2
-                          (fromListToRawPatrix
+                          (toRawPatrixFromList
                             [
                               [Null, Null],
                               [Pindex 0, Pindex 0],
@@ -312,14 +312,14 @@ test_calcPatrixFromMatrix
             \_
               ->
                 calcPatrixFromMatrix
-                  (fromRawMatrixToMatrix
-                    (fromListToRawMatrix
+                  (toMatrixFromRawMatrix
+                    (toRawMatrixFromList
                       [[2],[1],[0],[1],[0]]))
                   |>
                     Expect.equal
                       (PossibleCase
                         (Patrix 5 1
-                          (fromListToRawPatrix
+                          (toRawPatrixFromList
                             [[Null], [Null], [Null], [Pindex 2], [Null]])))
       ,
         fuzz
@@ -343,7 +343,7 @@ test_calcParentOnPatrixFromRawMatrix
             \_
               ->
                 calcParentOnPatrixFromRawMatrix
-                  (fromListToRawMatrix [[], [], [0]])
+                  (toRawMatrixFromList [[], [], [0]])
                   2
                   0
                   |>
@@ -373,7 +373,7 @@ test_calcAncestorSetOnPatrixFromRawMatrix
             \_
               ->
                 calcAncestorSetOnPatrixFromRawMatrix
-                  (fromListToRawMatrix [[], [], [0]])
+                  (toRawMatrixFromList [[], [], [0]])
                   2
                   0
                   |>
