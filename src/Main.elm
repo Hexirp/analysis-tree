@@ -48,10 +48,10 @@ view model
                 Just ast
                   ->
                     ast
-                      |> BMS_4.fromListToRawMatrix
-                      |> BMS_4.fromRawMatrixToMatrix
-                      |> BMS_4.fromMatrixToRawMatrix
-                      |> BMS_4.fromRawMatrixToList
+                      |> BMS_4.toRawMatrixFromList
+                      |> BMS_4.toMatrixFromRawMatrix
+                      |> BMS_4.toRawMatrixFromMatrix
+                      |> BMS_4.toListFromRawMatrix
                       |> BMS_4.Parsing.fromAstToString
                 Nothing -> "Parse Error!")
           ]
