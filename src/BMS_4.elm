@@ -11,6 +11,7 @@ module BMS_4
       verifyMatrix,
       toMatrixFromRawMatrix,
       toRawMatrixFromMatrix,
+      calcCoftypeOfMatrix,
       expand,
       Pindex (..),
       RawPatrix,
@@ -141,6 +142,14 @@ toRawMatrixFromMatrix matrix
   =
     case matrix of
       Matrix x y x_y_int -> x_y_int
+
+{-| 或る行列の共終タイプを計算します。 -}
+calcCoftypeOfMatrix : Matrix -> Case Coftype
+calcCoftypeOfMatrix matrix
+  =
+    case calcPatrixFromMatrix matrix of
+      ImpossibleCase -> ImpossibleCase
+      PossibleCase patrix -> calcCoftypeOfPatrix patrix
 
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
