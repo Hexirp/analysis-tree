@@ -3,6 +3,7 @@ module BMS_4
     (
       Nat (..),
       Coftype (..),
+      isLessThanCoftype,
       RawMatrix,
       toRawMatrixFromList,
       toListFromRawMatrix,
@@ -46,6 +47,19 @@ type Nat = Nat Int
 {-| これは共終タイプです。
 -}
 type Coftype = Zero | One | Omega
+
+{-| 或る自然数が、或る共終タイプよりも小さいかどうか判定します。
+-}
+isLessThanCoftype : Nat -> Coftype -> Bool
+isLessThanCoftype nat coftype
+  =
+    case coftype of
+      Zero -> False
+      One
+        ->
+          case nat of
+            Nat int -> int < 1
+      Omega -> True
 
 {-| これはバシク行列システムの行列を表す生の型です。
 
