@@ -28,7 +28,8 @@ module BMS_4
       calcParentOnPatrixFromRawMatrixWithMemo,
       calcAncestorSetOnPatrixFromRawMatrixWithMemo,
       calcMatrixFromPatrix,
-      calcElementOnMatrixFromRawPatrix
+      calcElementOnMatrixFromRawPatrix,
+      calcCoftypeOfPatrix
     )
 
 import Case exposing (Case (..))
@@ -627,3 +628,29 @@ calcElementOnMatrixFromRawPatrix x_y_pindex x y
                             ImpossibleCase -> ImpossibleCase
                             PossibleCase int -> PossibleCase (int + 1)
                         else PossibleCase 0
+
+{-| 或る `Patrix` の共終タイプを計算します。
+-}
+calcCoftypeOfPatrix : Patrix -> Case Coftype
+calcCoftypeOfPatrix patrix
+  =
+    case patrix of
+      Patrix x y x_y_pindex
+        ->
+          if Array.length x_y_pindex == 0
+            then PossibleCase Zero
+            else
+              case Array.get (Array.length x_y_pindex - 1) x_y_pindex of
+                Nothing -> ImpossibleCase
+                Just y_pindex
+                  ->
+                    let
+                      isNull pindex
+                        =
+                          case pindex of
+                            Null -> True
+                            Pindex int -> False
+                    in
+                      if Array.all isNull y_pindex
+                        then PossibleCase One
+                        else PossibleCase Omega
