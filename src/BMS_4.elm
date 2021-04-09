@@ -2,6 +2,7 @@ module BMS_4
   exposing
     (
       Nat (..),
+      Coftype (..),
       RawMatrix,
       toRawMatrixFromList,
       toListFromRawMatrix,
@@ -40,6 +41,10 @@ import Array.Extra.Folding as Array
 {-| これは自然数です。
 -}
 type Nat = Nat Int
+
+{-| これは共終タイプです。
+-}
+type Coftype = Zero | One | Omega
 
 {-| これはバシク行列システムの行列を表す生の型です。
 
