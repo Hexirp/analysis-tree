@@ -32,7 +32,7 @@ module BMS_4
       calcMatrixFromPatrix,
       calcElementOnMatrixFromRawPatrix,
       calcCoftypeOfPatrix,
-      calcBadRootLineOnPatrix
+      calcBadRootLineOfPatrix
     )
 
 import Case exposing (Case (..))
@@ -680,8 +680,8 @@ calcCoftypeOfPatrix patrix
 
 共終タイプが ω ではない時は、 `Nothing` を返します。
 -}
-calcBadRootLineOnPatrix : Patrix -> Maybe Int
-calcBadRootLineOnPatrix patrix
+calcBadRootLineOfPatrix : Patrix -> Maybe Int
+calcBadRootLineOfPatrix patrix
   =
     case patrix of
       Patrix x y x_y_pindex
