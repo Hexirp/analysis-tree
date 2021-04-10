@@ -149,7 +149,7 @@ calcCoftypeOfMatrix matrix
   =
     case calcPatrixFromMatrix matrix of
       ImpossibleCase -> ImpossibleCase
-      PossibleCase patrix -> calcCoftypeOfPatrix patrix
+      PossibleCase patrix -> PossibleCase (calcCoftypeOfPatrix patrix)
 
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
@@ -654,26 +654,23 @@ calcElementOnMatrixFromRawPatrix x_y_pindex x y
 
 {-| 或る `Patrix` の共終タイプを計算します。
 -}
-calcCoftypeOfPatrix : Patrix -> Case Coftype
+calcCoftypeOfPatrix : Patrix -> Coftype
 calcCoftypeOfPatrix patrix
   =
     case patrix of
       Patrix x y x_y_pindex
         ->
-          if Array.length x_y_pindex == 0
-            then PossibleCase Zero
-            else
-              case Array.get (Array.length x_y_pindex - 1) x_y_pindex of
-                Nothing -> ImpossibleCase
-                Just y_pindex
-                  ->
-                    let
-                      isNull pindex
-                        =
-                          case pindex of
-                            Null -> True
-                            Pindex int -> False
-                    in
-                      if Array.all isNull y_pindex
-                        then PossibleCase One
-                        else PossibleCase Omega
+          case Array.get (Array.length x_y_pindex - 1) x_y_pindex of
+            Nothing -> Zero
+            Just y_pindex
+              ->
+                let
+                  isNull pindex
+                    =
+                      case pindex of
+                        Null -> True
+                        Pindex int -> False
+                in
+                  if Array.all isNull y_pindex
+                    then One
+                    else Omega
