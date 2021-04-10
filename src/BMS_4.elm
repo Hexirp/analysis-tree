@@ -32,7 +32,8 @@ module BMS_4
       calcMatrixFromPatrix,
       calcElementOnMatrixFromRawPatrix,
       calcCoftypeOfPatrix,
-      calcBadRootLineOfPatrix
+      calcBadRootLineOfPatrix,
+      calcBadRootOfPatrix
     )
 
 import Case exposing (Case (..))
@@ -699,3 +700,37 @@ calcBadRootLineOfPatrix patrix
                 in
                   case Array.foldl helper (0, Nothing) y_pindex of
                     (i, r) -> r
+
+{-| 或るパトリックスの悪根を計算します。
+-}
+calcBadRootOfPatrix : Patrix -> Maybe (Maybe Int)
+calcBadRootOfPatrix patrix
+  =
+    case patrix of
+      Patrix x y x_y_pindex
+        ->
+          case Array.get (Array.length x_y_pindex - 1) x_y_pindex of
+            Nothing -> Nothing
+            Just y_pindex
+              ->
+                let
+                  helper pindex (i, r)
+                    =
+                      case pindex of
+                        Null -> (i + 1, r)
+                        Pindex int -> (i + 1, Just i)
+                in
+                  case Array.foldl helper (0, Nothing) y_pindex of
+                    (i, r)
+                      ->
+                        case r of
+                          Nothing -> Nothing
+                          Just int
+                            ->
+                              case Array.get int y_pindex of
+                                Nothing -> Nothing
+                                Just pindex
+                                  ->
+                                    case pindex of
+                                      Null -> Just Nothing
+                                      Pindex int_ -> Just (Just int_)
