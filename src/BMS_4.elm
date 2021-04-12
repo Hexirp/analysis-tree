@@ -155,8 +155,12 @@ calcCoftypeOfMatrix matrix
 
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
-expand : Matrix -> Nat -> Maybe Matrix
-expand n x = expand n x
+expand : Matrix -> Nat -> Case (Maybe Matrix)
+expand matrix n
+  =
+    case calcPatrixFromMatrix matrix of
+      ImpossibleCase -> ImpossibleCase
+      PossibleCase patrix -> Debug.todo "not yet implemented"
 
 {-| これはピンデックスです。ピンデックスは或る行列の要素へのポインターを意味します。
 -}
