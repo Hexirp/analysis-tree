@@ -702,6 +702,8 @@ calcBadRootLineOfPatrix patrix
                     (i, r) -> r
 
 {-| 或るパトリックスの悪根を計算します。
+
+共終タイプが ω ではない時は、 `Nothing` を返します。
 -}
 calcBadRootOfPatrix : Patrix -> Maybe Int
 calcBadRootOfPatrix patrix
