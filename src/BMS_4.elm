@@ -703,7 +703,7 @@ calcBadRootLineOfPatrix patrix
 
 {-| 或るパトリックスの悪根を計算します。
 -}
-calcBadRootOfPatrix : Patrix -> Maybe (Maybe Int)
+calcBadRootOfPatrix : Patrix -> Maybe Int
 calcBadRootOfPatrix patrix
   =
     case patrix of
@@ -714,23 +714,10 @@ calcBadRootOfPatrix patrix
             Just y_pindex
               ->
                 let
-                  helper pindex (i, r)
+                  helper pindex r
                     =
                       case pindex of
-                        Null -> (i + 1, r)
-                        Pindex int -> (i + 1, Just i)
+                        Null -> r
+                        Pindex int -> Just int
                 in
-                  case Array.foldl helper (0, Nothing) y_pindex of
-                    (i, r)
-                      ->
-                        case r of
-                          Nothing -> Nothing
-                          Just int
-                            ->
-                              case Array.get int y_pindex of
-                                Nothing -> Nothing
-                                Just pindex
-                                  ->
-                                    case pindex of
-                                      Null -> Just Nothing
-                                      Pindex int_ -> Just (Just int_)
+                  Array.foldl helper Nothing y_pindex
