@@ -2,6 +2,7 @@ module BMS_4
   exposing
     (
       Nat (..),
+      toIntFromNat,
       Coftype (..),
       isLessThanCoftype,
       RawMatrix,
@@ -46,6 +47,11 @@ import Array.Extra.Folding as Array
 {-| これは自然数です。
 -}
 type Nat = Nat Int
+
+{-| 或る自然数から或る整数へ変換します。
+-}
+toIntFromNat : Nat -> Int
+toIntFromNat (Nat int) = int
 
 {-| これは共終タイプです。
 -}
