@@ -13,7 +13,7 @@ module BMS_4
       toMatrixFromRawMatrix,
       toRawMatrixFromMatrix,
       calcCoftypeOfMatrix,
-      expand,
+      expandMatrix,
       Pindex (..),
       RawPatrix,
       toRawPatrixFromList,
@@ -34,7 +34,8 @@ module BMS_4
       calcElementOnMatrixFromRawPatrix,
       calcCoftypeOfPatrix,
       calcBadRootLineOfPatrix,
-      calcBadRootOfPatrix
+      calcBadRootOfPatrix,
+      expandPatrix
     )
 
 import Case exposing (Case (..))
@@ -161,8 +162,8 @@ calcCoftypeOfMatrix matrix
 
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
-expand : Matrix -> Nat -> Case (Maybe Matrix)
-expand matrix n
+expandMatrix : Matrix -> Nat -> Case (Maybe Matrix)
+expandMatrix matrix n
   =
     case calcPatrixFromMatrix matrix of
       ImpossibleCase -> ImpossibleCase
@@ -733,3 +734,41 @@ calcBadRootOfPatrix patrix
                         Pindex int -> Just int
                 in
                   Array.foldl helper Nothing y_pindex
+
+{-| 或るパトリックスを或る係数で展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
+-}
+expandPatrix : Patrix -> Nat -> Case (Maybe Patrix)
+expandPatrix patrix n
+  =
+    case calcCoftypeOfPatrix patrix of
+      Zero -> PossibleCase Nothing
+      One
+        ->
+          case patrix of
+            Patrix x y x_y_pindex
+              ->
+                PossibleCase
+                  (Just
+                    (Patrix (x - 1) y (Array.slice 0 -1 x_y_pindex)))
+      Omega
+        ->
+          case calcBadRootOfPatrix patrix of
+            Nothing -> ImpossibleCase
+            Just xr
+              ->
+                case patrix of
+                  Patrix x y x_y_pindex
+                    ->
+                      case expandPatrix_helper_1 x y x_y_pindex of
+                        ImpossibleCase -> ImpossibleCase
+                        PossibleCase x_y_pindex_
+                          ->
+                            PossibleCase
+                              (Just
+                                (Patrix
+                                  ((x - xr) + (xr * toIntFromNat n))
+                                  y
+                                  x_y_pindex_))
+
+expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Case RawPatrix
+expandPatrix_helper_1 = Debug.todo "not yet implemented"
