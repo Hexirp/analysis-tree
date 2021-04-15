@@ -166,7 +166,19 @@ expandMatrix matrix n
   =
     case calcPatrixFromMatrix matrix of
       ImpossibleCase -> ImpossibleCase
-      PossibleCase patrix -> Debug.todo "not yet implemented"
+      PossibleCase patrix
+        ->
+          case expandPatrix patrix n of
+            ImpossibleCase -> ImpossibleCase
+            PossibleCase m_patrix_
+              ->
+                case m_patrix_ of
+                  Nothing -> PossibleCase Nothing
+                  Just patrix_
+                    ->
+                      case calcMatrixFromPatrix patrix_ of
+                        ImpossibleCase -> ImpossibleCase
+                        PossibleCase matrix_ -> PossibleCase (Just matrix_)
 
 {-| これはピンデックスです。ピンデックスは或る行列の要素へのポインターを意味します。
 -}
