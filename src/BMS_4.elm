@@ -760,7 +760,7 @@ expandPatrix patrix n
                             PossibleCase
                               (Just
                                 (Patrix
-                                  ((x - xr) + (xr * toIntFromNat n))
+                                  (xr + (((x - xr) - 1) * toIntFromNat n))
                                   y
                                   x_y_pindex_))
 
