@@ -120,7 +120,8 @@ test_Matrix
     describe "Matrix"
       [
         test_toMatrixFromRawMatrix,
-        test_toRawMatrixFromMatrix
+        test_toRawMatrixFromMatrix,
+        test_expandMatrix
       ]
 
 test_toMatrixFromRawMatrix : Test
@@ -237,6 +238,52 @@ test_toRawMatrixFromMatrix
                     Expect.equal
                       (toRawMatrixFromList
                         [[0,0],[1,1],[2,1]])
+      ]
+
+test_expandMatrix : Test
+test_expandMatrix
+  =
+    describe "expandMatrix"
+      [
+        test "normal case"
+          <|
+            \_
+              ->
+                expandMatrix
+                  (Matrix 5 3
+                    (toRawMatrixFromList
+                      [
+                        [0, 0, 0],
+                        [1, 1, 1],
+                        [2, 2, 2],
+                        [3, 3, 3],
+                        [4, 2, 0]
+                      ]))
+                  (Nat 2)
+                  |>
+                    Expect.equal
+                      (PossibleCase
+                        (Just
+                          (Matrix 3 16
+                            (toRawMatrixFromList
+                              [
+                                [0, 0, 0],
+                                [1, 1, 1],
+                                [2, 2, 2],
+                                [3, 3, 3],
+                                [4, 1, 1],
+                                [5, 2, 2],
+                                [6, 3, 3],
+                                [7, 1, 1],
+                                [8, 2, 2],
+                                [9, 3, 3],
+                                [10, 1, 1],
+                                [11, 2, 2],
+                                [12, 3, 3],
+                                [13, 1, 1],
+                                [14, 2, 2],
+                                [15, 3, 3]
+                            ]))))
       ]
 
 test_Patrix : Test
