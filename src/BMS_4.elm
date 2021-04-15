@@ -749,9 +749,10 @@ expandPatrix patrix n
                     ->
                       case
                         expandPatrix_helper_1
-                          ((x - xr) + (xr * toIntFromNat n))
+                          x
                           y
                           x_y_pindex
+                          n
                           xr
                       of
                         ImpossibleCase -> ImpossibleCase
@@ -764,19 +765,19 @@ expandPatrix patrix n
                                   y
                                   x_y_pindex_))
 
-expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Int -> Case RawPatrix
-expandPatrix_helper_1 x y x_y_pindex xr
+expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Nat -> Int -> Case RawPatrix
+expandPatrix_helper_1 x y x_y_pindex n xr
   =
     Case.traverseArray (\case_x -> case_x)
       (Array.map (Case.traverseArray (\case_x -> case_x))
-        (expandPatrix_helper_2 x y x_y_pindex xr))
+        (expandPatrix_helper_2 x y x_y_pindex n xr))
 
 expandPatrix_helper_2
-  : Int -> Int -> RawPatrix -> Int -> Array (Array (Case Pindex))
-expandPatrix_helper_2 x y x_y_pindex xr
+  : Int -> Int -> RawPatrix -> Nat -> Int -> Array (Array (Case Pindex))
+expandPatrix_helper_2 x y x_y_pindex n xr
   =
     Array.initialize
-      x
+      (xr + (((x - xr) - 1) * toIntFromNat n))
       (\x_
         ->
           Array.initialize
