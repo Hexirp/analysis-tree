@@ -33,7 +33,6 @@ module BMS_4
       calcMatrixFromPatrix,
       calcElementOnMatrixFromRawPatrix,
       calcCoftypeOfPatrix,
-      calcBadRootLineOfPatrix,
       calcBadRootOfPatrix,
       expandPatrix
     )
@@ -688,12 +687,12 @@ calcCoftypeOfPatrix patrix
                     then One
                     else Omega
 
-{-| 或るパトリックスの悪根行を計算します。
+{-| 或るパトリックスの悪根を計算します。
 
 共終タイプが ω ではない時は、 `Nothing` を返します。
 -}
-calcBadRootLineOfPatrix : Patrix -> Maybe Int
-calcBadRootLineOfPatrix patrix
+calcBadRootOfPatrix : Patrix -> Maybe (Int, Int)
+calcBadRootOfPatrix patrix
   =
     case patrix of
       Patrix x y x_y_pindex
@@ -707,33 +706,10 @@ calcBadRootLineOfPatrix patrix
                     =
                       case pindex of
                         Null -> (i + 1, r)
-                        Pindex int -> (i + 1, Just i)
+                        Pindex int -> (i + 1, Just (int, i))
                 in
                   case Array.foldl helper (0, Nothing) y_pindex of
                     (i, r) -> r
-
-{-| 或るパトリックスの悪根を計算します。
-
-共終タイプが ω ではない時は、 `Nothing` を返します。
--}
-calcBadRootOfPatrix : Patrix -> Maybe Int
-calcBadRootOfPatrix patrix
-  =
-    case patrix of
-      Patrix x y x_y_pindex
-        ->
-          case Array.get (Array.length x_y_pindex - 1) x_y_pindex of
-            Nothing -> Nothing
-            Just y_pindex
-              ->
-                let
-                  helper pindex r
-                    =
-                      case pindex of
-                        Null -> r
-                        Pindex int -> Just int
-                in
-                  Array.foldl helper Nothing y_pindex
 
 {-| 或るパトリックスを或る係数で展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
@@ -754,12 +730,18 @@ expandPatrix patrix n
         ->
           case calcBadRootOfPatrix patrix of
             Nothing -> ImpossibleCase
-            Just xr
+            Just (xr, yr)
               ->
                 case patrix of
                   Patrix x y x_y_pindex
                     ->
-                      case expandPatrix_helper_1 x y x_y_pindex of
+                      case
+                        expandPatrix_helper_1
+                          ((x - xr) + (xr * toIntFromNat n))
+                          y
+                          x_y_pindex
+                          (xr, yr)
+                      of
                         ImpossibleCase -> ImpossibleCase
                         PossibleCase x_y_pindex_
                           ->
@@ -770,5 +752,29 @@ expandPatrix patrix n
                                   y
                                   x_y_pindex_))
 
-expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Case RawPatrix
-expandPatrix_helper_1 = Debug.todo "not yet implemented"
+expandPatrix_helper_1 : Int -> Int -> RawPatrix -> (Int, Int) -> Case RawPatrix
+expandPatrix_helper_1 x y x_y_pindex root
+  =
+    Case.traverseArray (\case_x -> case_x)
+      (Array.map (Case.traverseArray (\case_x -> case_x))
+        (expandPatrix_helper_2 x y x_y_pindex root))
+
+expandPatrix_helper_2
+  : Int -> Int -> RawPatrix -> (Int, Int) -> Array (Array (Case Pindex))
+expandPatrix_helper_2 x y x_y_pindex root
+  =
+    Array.initialize
+      x
+      (\x_
+        ->
+          Array.initialize
+            y
+            (\y_
+              ->
+                expandPatrix_helper_3 x_y_pindex root x_ y_))
+
+expandPatrix_helper_3
+  : RawPatrix -> (Int, Int) -> Int -> Int -> Case Pindex
+expandPatrix_helper_3 x_y_pindex root x y
+  =
+    Debug.todo "not yet implemented"
