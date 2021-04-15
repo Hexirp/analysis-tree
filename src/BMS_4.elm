@@ -740,7 +740,7 @@ expandPatrix patrix n
                           ((x - xr) + (xr * toIntFromNat n))
                           y
                           x_y_pindex
-                          (xr, yr)
+                          xr
                       of
                         ImpossibleCase -> ImpossibleCase
                         PossibleCase x_y_pindex_
@@ -752,16 +752,16 @@ expandPatrix patrix n
                                   y
                                   x_y_pindex_))
 
-expandPatrix_helper_1 : Int -> Int -> RawPatrix -> (Int, Int) -> Case RawPatrix
-expandPatrix_helper_1 x y x_y_pindex root
+expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Int -> Case RawPatrix
+expandPatrix_helper_1 x y x_y_pindex xr
   =
     Case.traverseArray (\case_x -> case_x)
       (Array.map (Case.traverseArray (\case_x -> case_x))
-        (expandPatrix_helper_2 x y x_y_pindex root))
+        (expandPatrix_helper_2 x y x_y_pindex xr))
 
 expandPatrix_helper_2
-  : Int -> Int -> RawPatrix -> (Int, Int) -> Array (Array (Case Pindex))
-expandPatrix_helper_2 x y x_y_pindex root
+  : Int -> Int -> RawPatrix -> Int -> Array (Array (Case Pindex))
+expandPatrix_helper_2 x y x_y_pindex xr
   =
     Array.initialize
       x
@@ -771,10 +771,21 @@ expandPatrix_helper_2 x y x_y_pindex root
             y
             (\y_
               ->
-                expandPatrix_helper_3 x_y_pindex root x_ y_))
+                expandPatrix_helper_3 x_y_pindex xr x_ y_))
 
 expandPatrix_helper_3
-  : RawPatrix -> (Int, Int) -> Int -> Int -> Case Pindex
-expandPatrix_helper_3 x_y_pindex root x y
+  : RawPatrix -> Int -> Int -> Int -> Case Pindex
+expandPatrix_helper_3 x_y_pindex xr x y
   =
-    Debug.todo "not yet implemented"
+    case Array.get x x_y_pindex of
+      Nothing -> Debug.todo "not yet implemented"
+      Just y_pindex
+        ->
+          case Array.get y y_pindex of
+            Nothing -> Debug.todo "not yet implemented"
+            Just pindex
+              ->
+                let
+                  n = modBy x (xr + 1)
+                in
+                  Debug.todo "not yet implemented"
