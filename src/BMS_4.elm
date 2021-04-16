@@ -720,7 +720,7 @@ calcBadRootOfPatrix patrix
                         Null -> (i + 1, r)
                         Pindex int
                           ->
-                            if int < Array.length x_y_pindex - 1
+                            if 0 <= int && int < Array.length x_y_pindex - 1
                               then (i + 1, Just (int, i))
                               else (i + 1, r)
                 in
