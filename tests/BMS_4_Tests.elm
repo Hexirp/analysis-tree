@@ -259,7 +259,7 @@ test_expandMatrix
                         [3, 3, 3],
                         [4, 2, 0]
                       ]))
-                  (Nat 2)
+                  (Nat 4)
                   |>
                     Expect.equal
                       (PossibleCase
