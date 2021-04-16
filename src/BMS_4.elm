@@ -830,7 +830,14 @@ expandPatrix_helper_3 x y x_y_pindex xr x_ y_
                         ->
                           case Array.get y_ y_pindex of
                             Nothing -> Debug.todo "not yet implemented"
-                            Just pindex -> PossibleCase pindex
+                            Just pindex
+                              ->
+                                case pindex of
+                                  Null -> PossibleCase Null
+                                  Pindex int
+                                    ->
+                                      PossibleCase
+                                        (Pindex (int + ((x - 1) - xr) * m))
                   else
                     case Array.get (xr + n) x_y_pindex of
                       Nothing -> Debug.todo "not yet implemented"
@@ -838,4 +845,11 @@ expandPatrix_helper_3 x y x_y_pindex xr x_ y_
                         ->
                           case Array.get y_ y_pindex of
                             Nothing -> Debug.todo "not yet implemented"
-                            Just pindex -> PossibleCase pindex
+                            Just pindex ->
+                              ->
+                                case pindex of
+                                  Null -> PossibleCase Null
+                                  Pindex int
+                                    ->
+                                      PossibleCase
+                                        (Pindex (int + ((x - 1) - xr) * m))
