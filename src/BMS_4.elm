@@ -718,7 +718,11 @@ calcBadRootOfPatrix patrix
                     =
                       case pindex of
                         Null -> (i + 1, r)
-                        Pindex int -> (i + 1, Just (int, i))
+                        Pindex int
+                          ->
+                            if int < Array.length x_y_pindex - 1
+                              then (i + 1, Just (int, i))
+                              else (i + 1, r)
                 in
                   case Array.foldl helper (0, Nothing) y_pindex of
                     (i, r) -> r
