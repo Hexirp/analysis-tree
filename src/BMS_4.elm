@@ -875,7 +875,14 @@ expandPatrix_helper_3 x y x_y_pindex xr yr x_ y_
                         Just y_pindex
                           ->
                             case Array.get y_ y_pindex of
-                              Nothing -> Debug.todo "not yet implemented"
+                              Nothing
+                                ->
+                                  if 0 <= y_
+                                    then
+                                      if y_ < Array.length y_pindex
+                                        then ImpossibleCase
+                                        else PossibleCase Null
+                                    else PossibleCase (Pindex (xr + n - 1))
                               Just pindex
                                 ->
                                   case pindex of
