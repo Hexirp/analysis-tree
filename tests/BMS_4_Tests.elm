@@ -259,12 +259,12 @@ test_expandMatrix
                         [3, 3, 3],
                         [4, 2, 0]
                       ]))
-                  (Nat 2)
+                  (Nat 4)
                   |>
                     Expect.equal
                       (PossibleCase
                         (Just
-                          (Matrix 3 16
+                          (Matrix 16 3
                             (toRawMatrixFromList
                               [
                                 [0, 0, 0],
@@ -296,7 +296,8 @@ test_Patrix
         test_calcParentOnPatrixFromRawMatrix,
         test_calcAncestorSetOnPatrixFromRawMatrix,
         test_calcMatrixFromPatrix,
-        test_calcElementOnMatrixFromRawPatrix
+        test_calcElementOnMatrixFromRawPatrix,
+        test_calcBadRootOfPatrix
       ]
 
 test_calcPatrixFromMatrix : Test
@@ -354,6 +355,33 @@ test_calcPatrixFromMatrix
                               [Pindex 0, Pindex 0]
                             ])))
       ,
+        test "big case"
+          <|
+            \_
+              ->
+                calcPatrixFromMatrix
+                  (toMatrixFromRawMatrix
+                    (toRawMatrixFromList
+                      [
+                        [0, 0, 0],
+                        [1, 1, 1],
+                        [2, 2, 2],
+                        [3, 3, 3],
+                        [4, 2, 0]
+                      ]))
+                  |>
+                    Expect.equal
+                      (PossibleCase
+                        (Patrix 5 3
+                          (toRawPatrixFromList
+                            [
+                              [Null, Null, Null],
+                              [Pindex 0, Pindex 0, Pindex 0],
+                              [Pindex 1, Pindex 1, Pindex 1],
+                              [Pindex 2, Pindex 2, Pindex 2],
+                              [Pindex 3, Pindex 1, Null]
+                            ])))
+      ,
         test "non-ascending sequence"
           <|
             \_
@@ -361,7 +389,7 @@ test_calcPatrixFromMatrix
                 calcPatrixFromMatrix
                   (toMatrixFromRawMatrix
                     (toRawMatrixFromList
-                      [[2],[1],[0],[1],[0]]))
+                      [[2], [1], [0], [1], [0]]))
                   |>
                     Expect.equal
                       (PossibleCase
@@ -471,4 +499,27 @@ test_calcElementOnMatrixFromRawPatrix
                 calcElementOnMatrixFromRawPatrix x_y_pindex x y
                   |>
                     expect_notImpossibleCase
+      ]
+
+test_calcBadRootOfPatrix : Test
+test_calcBadRootOfPatrix
+  =
+    describe "calcBadRootOfPatrix"
+      [
+        test "normal case"
+          <|
+            \_
+              ->
+                calcBadRootOfPatrix
+                  (Patrix 5 3
+                    (toRawPatrixFromList
+                      [
+                        [Null, Null, Null],
+                        [Pindex 0, Pindex 0, Pindex 0],
+                        [Pindex 1, Pindex 1, Pindex 1],
+                        [Pindex 2, Pindex 2, Pindex 2],
+                        [Pindex 3, Pindex 1, Null]
+                      ]))
+                  |>
+                    Expect.equal (Just (1, 1))
       ]
