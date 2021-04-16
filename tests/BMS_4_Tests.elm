@@ -121,7 +121,6 @@ test_Matrix
       [
         test_toMatrixFromRawMatrix,
         test_toRawMatrixFromMatrix,
-        test_calcBadRootOfPatrix,
         test_expandMatrix
       ]
 
@@ -241,29 +240,6 @@ test_toRawMatrixFromMatrix
                         [[0,0],[1,1],[2,1]])
       ]
 
-test_calcBadRootOfPatrix : Test
-test_calcBadRootOfPatrix
-  =
-    describe "calcBadRootOfPatrix"
-      [
-        test "normal case"
-          <|
-            \_
-              ->
-                calcBadRootOfPatrix
-                  (Patrix 5 3
-                    (toRawPatrixFromList
-                      [
-                        [Null, Null, Null],
-                        [Pindex 0, Pindex 0, Pindex 0],
-                        [Pindex 1, Pindex 1, Pindex 1],
-                        [Pindex 2, Pindex 2, Pindex 2],
-                        [Pindex 3, Pindex 1, Null]
-                      ]))
-                  |>
-                    Expect.equal (Just (1, 1))
-      ]
-
 test_expandMatrix : Test
 test_expandMatrix
   =
@@ -320,7 +296,8 @@ test_Patrix
         test_calcParentOnPatrixFromRawMatrix,
         test_calcAncestorSetOnPatrixFromRawMatrix,
         test_calcMatrixFromPatrix,
-        test_calcElementOnMatrixFromRawPatrix
+        test_calcElementOnMatrixFromRawPatrix,
+        test_calcBadRootOfPatrix
       ]
 
 test_calcPatrixFromMatrix : Test
@@ -495,4 +472,27 @@ test_calcElementOnMatrixFromRawPatrix
                 calcElementOnMatrixFromRawPatrix x_y_pindex x y
                   |>
                     expect_notImpossibleCase
+      ]
+
+test_calcBadRootOfPatrix : Test
+test_calcBadRootOfPatrix
+  =
+    describe "calcBadRootOfPatrix"
+      [
+        test "normal case"
+          <|
+            \_
+              ->
+                calcBadRootOfPatrix
+                  (Patrix 5 3
+                    (toRawPatrixFromList
+                      [
+                        [Null, Null, Null],
+                        [Pindex 0, Pindex 0, Pindex 0],
+                        [Pindex 1, Pindex 1, Pindex 1],
+                        [Pindex 2, Pindex 2, Pindex 2],
+                        [Pindex 3, Pindex 1, Null]
+                      ]))
+                  |>
+                    Expect.equal (Just (1, 1))
       ]
