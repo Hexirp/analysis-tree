@@ -809,11 +809,12 @@ expandPatrix_helper_3 x y x_y_pindex xr x_ y_
                   Just pindex -> PossibleCase pindex
         else
           let
+            m = (x_ - xr) // ((x - 1) - xr)
             n = modBy ((x - 1) - xr) (x_ - xr)
           in
-            if n == 0
+            if m == 0
               then
-                case Array.get (Array.length x_y_pindex - 1) x_y_pindex of
+                case Array.get x_ x_y_pindex of
                   Nothing -> Debug.todo "not yet implemented"
                   Just y_pindex
                     ->
@@ -821,10 +822,20 @@ expandPatrix_helper_3 x y x_y_pindex xr x_ y_
                         Nothing -> Debug.todo "not yet implemented"
                         Just pindex -> PossibleCase pindex
               else
-                case Array.get (xr + n) x_y_pindex of
-                  Nothing -> Debug.todo "not yet implemented"
-                  Just y_pindex
-                    ->
-                      case Array.get y_ y_pindex of
-                        Nothing -> Debug.todo "not yet implemented"
-                        Just pindex -> PossibleCase pindex
+                if n == 0
+                  then
+                    case Array.get (x - 1) x_y_pindex of
+                      Nothing -> Debug.todo "not yet implemented"
+                      Just y_pindex
+                        ->
+                          case Array.get y_ y_pindex of
+                            Nothing -> Debug.todo "not yet implemented"
+                            Just pindex -> PossibleCase pindex
+                  else
+                    case Array.get (xr + n) x_y_pindex of
+                      Nothing -> Debug.todo "not yet implemented"
+                      Just y_pindex
+                        ->
+                          case Array.get y_ y_pindex of
+                            Nothing -> Debug.todo "not yet implemented"
+                            Just pindex -> PossibleCase pindex
