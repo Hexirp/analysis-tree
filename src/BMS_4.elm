@@ -754,6 +754,7 @@ expandPatrix patrix n
                           x_y_pindex
                           n
                           xr
+                          yr
                       of
                         ImpossibleCase -> ImpossibleCase
                         PossibleCase x_y_pindex_
@@ -765,16 +766,17 @@ expandPatrix patrix n
                                   y
                                   x_y_pindex_))
 
-expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Nat -> Int -> Case RawPatrix
-expandPatrix_helper_1 x y x_y_pindex n xr
+expandPatrix_helper_1
+  : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Case RawPatrix
+expandPatrix_helper_1 x y x_y_pindex n xr yr
   =
     Case.traverseArray (\case_x -> case_x)
       (Array.map (Case.traverseArray (\case_x -> case_x))
-        (expandPatrix_helper_2 x y x_y_pindex n xr))
+        (expandPatrix_helper_2 x y x_y_pindex n xr yr))
 
 expandPatrix_helper_2
-  : Int -> Int -> RawPatrix -> Nat -> Int -> Array (Array (Case Pindex))
-expandPatrix_helper_2 x y x_y_pindex n xr
+  : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Array (Array (Case Pindex))
+expandPatrix_helper_2 x y x_y_pindex n xr yr
   =
     Array.initialize
       (xr + (((x - 1) - xr) * (toIntFromNat n + 1)))
@@ -784,17 +786,18 @@ expandPatrix_helper_2 x y x_y_pindex n xr
             y
             (\y_
               ->
-                expandPatrix_helper_3 x y x_y_pindex xr x_ y_))
+                expandPatrix_helper_3 x y x_y_pindex xr yr x_ y_))
 
 expandPatrix_helper_3
-  : Int -> Int -> RawPatrix -> Int -> Int -> Int -> Case Pindex
-expandPatrix_helper_3 x y x_y_pindex xr x_ y_
+  : Int -> Int -> RawPatrix -> Int -> Int -> Int -> Int -> Case Pindex
+expandPatrix_helper_3 x y x_y_pindex xr yr x_ y_
   =
     let
       _ = Debug.log "expandPatrix_helper_3 x" x
       _ = Debug.log "expandPatrix_helper_3 y" y
       _ = Debug.log "expandPatrix_helper_3 x_y_pindex" x_y_pindex
       _ = Debug.log "expandPatrix_helper_3 xr" xr
+      _ = Debug.log "expandPatrix_helper_3 yr" yr
       _ = Debug.log "expandPatrix_helper_3 x_" x_
       _ = Debug.log "expandPatrix_helper_3 y_" y_
     in
@@ -836,9 +839,15 @@ expandPatrix_helper_3 x y x_y_pindex xr x_ y_
                                   Null -> PossibleCase Null
                                   Pindex int
                                     ->
-                                      PossibleCase
-                                        (Pindex
-                                          (int + ((x - 1) - xr) * (m - 1)))
+                                      if y_ < yr
+                                        then
+                                          PossibleCase
+                                            (Pindex
+                                              (int + ((x - 1) - xr) * (m - 1)))
+                                        else
+                                          PossibleCase
+                                            (Pindex
+                                              int)
                   else
                     case Array.get (xr + n) x_y_pindex of
                       Nothing -> Debug.todo "not yet implemented"
@@ -852,6 +861,12 @@ expandPatrix_helper_3 x y x_y_pindex xr x_ y_
                                   Null -> PossibleCase Null
                                   Pindex int
                                     ->
-                                      PossibleCase
-                                        (Pindex
-                                          (int + ((x - 1) - xr) * m))
+                                      if y_ < yr
+                                        then
+                                          PossibleCase
+                                            (Pindex
+                                              (int + ((x - 1) - xr) * m))
+                                        else
+                                          PossibleCase
+                                            (Pindex
+                                              int)
