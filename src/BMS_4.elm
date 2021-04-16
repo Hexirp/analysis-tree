@@ -786,11 +786,11 @@ expandPatrix_helper_2 x y x_y_pindex n xr yr
             y
             (\y_
               ->
-                expandPatrix_helper_3 x y x_y_pindex xr yr x_ y_))
+                expandPatrix_helper_3 x_y_pindex xr yr x_ y_))
 
 expandPatrix_helper_3
-  : Int -> Int -> RawPatrix -> Int -> Int -> Int -> Int -> Case Pindex
-expandPatrix_helper_3 x y x_y_pindex xr yr x_ y_
+  : RawPatrix -> Int -> Int -> Int -> Int -> Case Pindex
+expandPatrix_helper_3 x_y_pindex xr yr x_ y_
   =
     if x_ < xr
       then
@@ -803,6 +803,7 @@ expandPatrix_helper_3 x y x_y_pindex xr yr x_ y_
                 Just pindex -> PossibleCase pindex
       else
         let
+          x = Array.length x_y_pindex
           m = (x_ - xr) // ((x - 1) - xr)
           n = modBy ((x - 1) - xr) (x_ - xr)
         in
