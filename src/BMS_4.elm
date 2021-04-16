@@ -761,7 +761,7 @@ expandPatrix patrix n
                             PossibleCase
                               (Just
                                 (Patrix
-                                  (xr + (((x - xr) - 1) * toIntFromNat n))
+                                  (xr + ((x - xr) * toIntFromNat n))
                                   y
                                   x_y_pindex_))
 
@@ -777,7 +777,7 @@ expandPatrix_helper_2
 expandPatrix_helper_2 x y x_y_pindex n xr
   =
     Array.initialize
-      (xr + (((x - xr) - 1) * toIntFromNat n))
+      (xr + ((x - xr) * toIntFromNat n))
       (\x_
         ->
           Array.initialize
