@@ -827,22 +827,6 @@ expandPatrix_helper_3 x y x_y_pindex xr yr x_ y_
               else
                 if y_ < yr
                   then
-                    case Array.get (xr + n) x_y_pindex of
-                      Nothing -> Debug.todo "not yet implemented"
-                      Just y_pindex
-                        ->
-                          case Array.get y_ y_pindex of
-                            Nothing -> Debug.todo "not yet implemented"
-                            Just pindex
-                              ->
-                                case pindex of
-                                  Null -> PossibleCase Null
-                                  Pindex int
-                                    ->
-                                      PossibleCase
-                                        (Pindex
-                                          (int + ((x - 1) - xr) * m))
-                  else
                     if n == 0
                       then
                         case Array.get (x - 1) x_y_pindex of
@@ -860,6 +844,40 @@ expandPatrix_helper_3 x y x_y_pindex xr yr x_ y_
                                           PossibleCase
                                             (Pindex
                                               (int + ((x - 1) - xr) * (m - 1)))
+                      else
+                        case Array.get (xr + n) x_y_pindex of
+                          Nothing -> Debug.todo "not yet implemented"
+                          Just y_pindex
+                            ->
+                              case Array.get y_ y_pindex of
+                                Nothing -> Debug.todo "not yet implemented"
+                                Just pindex
+                                  ->
+                                    case pindex of
+                                      Null -> PossibleCase Null
+                                      Pindex int
+                                        ->
+                                          PossibleCase
+                                            (Pindex
+                                              (int + ((x - 1) - xr) * m))
+                  else
+                    if n == 0
+                      then
+                        case Array.get xr x_y_pindex of
+                          Nothing -> Debug.todo "not yet implemented"
+                          Just y_pindex
+                            ->
+                              case Array.get y_ y_pindex of
+                                Nothing -> Debug.todo "not yet implemented"
+                                Just pindex
+                                  ->
+                                    case pindex of
+                                      Null -> PossibleCase Null
+                                      Pindex int
+                                        ->
+                                          PossibleCase
+                                            (Pindex
+                                              int)
                       else
                         case Array.get (xr + n) x_y_pindex of
                           Nothing -> Debug.todo "not yet implemented"
