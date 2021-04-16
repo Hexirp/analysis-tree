@@ -803,7 +803,17 @@ expandPatrix_helper_3 x_y_pindex xr yr x_ y_
           Just y_pindex
             ->
               case Array.get y_ y_pindex of
-                Nothing -> Debug.todo "not yet implemented"
+                Nothing
+                  ->
+                    if 0 <= y_
+                      then
+                        if y_ < Array.length y_pindex
+                          then ImpossibleCase
+                          else PossibleCase Null
+                      else
+                        if x_ == 0
+                          then PossibleCase Null
+                          else PossibleCase (Pindex (x_ - 1))
                 Just pindex -> PossibleCase pindex
       else
         let
