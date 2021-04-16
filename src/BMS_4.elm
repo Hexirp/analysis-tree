@@ -809,7 +809,7 @@ expandPatrix_helper_3 x y x_y_pindex xr x_ y_
                   Just pindex -> PossibleCase pindex
         else
           let
-            n = modBy (x - xr) (x_ - xr)
+            n = modBy ((x - 1) - xr) (x_ - xr)
           in
             if n == 0
               then
