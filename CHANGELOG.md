@@ -2,9 +2,13 @@
 
 ## not yet released
 
+https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/6 により次の変更が行われた。
+
+* `expandMatrix` などの、行列の展開に関連する定義を追加する。
+
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/4 により次の変更が行われた。
 
-* `fromAlphaToBeta` を `toBetaFromAlpha` へ改名する。
+* `fromAlphaToBeta` を `toBetaFromAlpha` へ改名する。たとえば、 `fromListToRawMatrix` を `toRawMatrixFromList` へ改名する。
 
 ## 0.2.0
 
