@@ -790,33 +790,41 @@ expandPatrix_helper_3
   : Int -> Int -> RawPatrix -> Int -> Int -> Int -> Case Pindex
 expandPatrix_helper_3 x y x_y_pindex xr x_ y_
   =
-    if x_ < xr
-      then
-        case Array.get x_ x_y_pindex of
-          Nothing -> Debug.todo "not yet implemented"
-          Just y_pindex
-            ->
-              case Array.get y_ y_pindex of
-                Nothing -> Debug.todo "not yet implemented"
-                Just pindex -> PossibleCase pindex
-      else
-        let
-          n = modBy (x_ - xr) (x - xr)
-        in
-          if n == 0
-            then
-              case Array.get (Array.length x_y_pindex - 1) x_y_pindex of
-                Nothing -> Debug.todo "not yet implemented"
-                Just y_pindex
-                  ->
-                    case Array.get y_ y_pindex of
-                      Nothing -> Debug.todo "not yet implemented"
-                      Just pindex -> PossibleCase pindex
-            else
-              case Array.get (xr + n) x_y_pindex of
-                Nothing -> Debug.todo "not yet implemented"
-                Just y_pindex
-                  ->
-                    case Array.get y_ y_pindex of
-                      Nothing -> Debug.todo "not yet implemented"
-                      Just pindex -> PossibleCase pindex
+    let
+      _ = Debug.log "expandPatrix_helper_3 x" x
+      _ = Debug.log "expandPatrix_helper_3 y" y
+      _ = Debug.log "expandPatrix_helper_3 x_y_pindex" x_y_pindex
+      _ = Debug.log "expandPatrix_helper_3 xr" xr
+      _ = Debug.log "expandPatrix_helper_3 x_" x_
+      _ = Debug.log "expandPatrix_helper_3 y_" y_
+    in
+      if x_ < xr
+        then
+          case Array.get x_ x_y_pindex of
+            Nothing -> Debug.todo "not yet implemented"
+            Just y_pindex
+              ->
+                case Array.get y_ y_pindex of
+                  Nothing -> Debug.todo "not yet implemented"
+                  Just pindex -> PossibleCase pindex
+        else
+          let
+            n = modBy (x_ - xr) (x - xr)
+          in
+            if n == 0
+              then
+                case Array.get (Array.length x_y_pindex - 1) x_y_pindex of
+                  Nothing -> Debug.todo "not yet implemented"
+                  Just y_pindex
+                    ->
+                      case Array.get y_ y_pindex of
+                        Nothing -> Debug.todo "not yet implemented"
+                        Just pindex -> PossibleCase pindex
+              else
+                case Array.get (xr + n) x_y_pindex of
+                  Nothing -> Debug.todo "not yet implemented"
+                  Just y_pindex
+                    ->
+                      case Array.get y_ y_pindex of
+                        Nothing -> Debug.todo "not yet implemented"
+                        Just pindex -> PossibleCase pindex
