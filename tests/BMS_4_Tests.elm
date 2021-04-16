@@ -355,6 +355,33 @@ test_calcPatrixFromMatrix
                               [Pindex 0, Pindex 0]
                             ])))
       ,
+        test "big case"
+          <|
+            \_
+              ->
+                calcPatrixFromMatrix
+                  (toMatrixFromRawMatrix
+                    (toRawMatrixFromList
+                      [
+                        [0, 0, 0],
+                        [1, 1, 1],
+                        [2, 2, 2],
+                        [3, 3, 3],
+                        [4, 2, 0]
+                      ]))
+                  |>
+                    Expect.equal
+                      (PossibleCase
+                        (Patrix 5 3
+                          (toRawPatrixFromList
+                            [
+                              [Null, Null, Null],
+                              [Pindex 0, Pindex 0, Pindex 0],
+                              [Pindex 1, Pindex 1, Pindex 1],
+                              [Pindex 2, Pindex 2, Pindex 2],
+                              [Pindex 3, Pindex 1, Null]
+                            ])))
+      ,
         test "non-ascending sequence"
           <|
             \_
