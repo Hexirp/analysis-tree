@@ -17,6 +17,18 @@ import Test exposing (Test, describe, test, fuzz, fuzz2, fuzz3)
 expect_notImpossibleCase : Case a -> Expectation
 expect_notImpossibleCase = Expect.notEqual ImpossibleCase
 
+fuzzer_Nat : Fuzzer Nat
+fuzzer_Nat
+  =
+    let
+      generator = Random.map Nat (Random.int -100 100)
+      shrinker nat
+        =
+          case nat of
+            Nat int -> Shrink.map Nat (Shrink.int <| int)
+    in
+      Fuzz.custom generator shrinker
+
 fuzzer_RawMatrix : Fuzzer RawMatrix
 fuzzer_RawMatrix = Fuzz.array (Fuzz.array Fuzz.int)
 
@@ -297,7 +309,8 @@ test_Patrix
         test_calcAncestorSetOnPatrixFromRawMatrix,
         test_calcMatrixFromPatrix,
         test_calcElementOnMatrixFromRawPatrix,
-        test_calcBadRootOfPatrix
+        test_calcBadRootOfPatrix,
+        test_expandPatrix
       ]
 
 test_calcPatrixFromMatrix : Test
@@ -522,4 +535,21 @@ test_calcBadRootOfPatrix
                       ]))
                   |>
                     Expect.equal (Just (1, 1))
+      ]
+
+test_expandPatrix : Test
+test_expandPatrix
+  =
+    describe "expandPatrix"
+      [
+        fuzz2
+          fuzzer_Patrix
+          fuzzer_Nat
+          "follow the rule of the type `Case`"
+          <|
+            \patrix nat
+              ->
+                expandPatrix patrix nat
+                  |>
+                    expect_notImpossibleCase
       ]
