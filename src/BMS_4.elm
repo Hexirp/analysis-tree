@@ -740,17 +740,15 @@ expandPatrix patrix n
       Zero -> PossibleCase Nothing
       One
         ->
-          case n of
-            Nat int ->
-              if int == 0
-                then
-                  case patrix of
-                    Patrix x y x_y_pindex
-                      ->
-                        PossibleCase
-                          (Just
-                            (Patrix (x - 1) y (Array.slice 0 -1 x_y_pindex)))
-                else PossibleCase Nothing
+          if isLessThanCoftype n One
+            then
+              case patrix of
+                Patrix x y x_y_pindex
+                  ->
+                    PossibleCase
+                      (Just
+                        (Patrix (x - 1) y (Array.slice 0 -1 x_y_pindex)))
+            else PossibleCase Nothing
       Omega
         ->
           case calcBadRootOfPatrix patrix of
