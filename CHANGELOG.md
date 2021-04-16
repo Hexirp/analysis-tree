@@ -2,6 +2,8 @@
 
 ## not yet released
 
+## 0.3.0
+
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/6 により次の変更が行われた。
 
 * `expandMatrix` などの、行列の展開に関連する定義を追加する。
