@@ -17,6 +17,18 @@ import Test exposing (Test, describe, test, fuzz, fuzz2, fuzz3)
 expect_notImpossibleCase : Case a -> Expectation
 expect_notImpossibleCase = Expect.notEqual ImpossibleCase
 
+fuzzer_Nat : Fuzzer Nat
+fuzzer_Nat
+  =
+    let
+      generator = Random.map Nat (Random.int -100 100)
+      shrinker nat
+        =
+          case nat of
+            Nat int -> Shrink.map Nat (Shrink.int <| int)
+    in
+      Fuzz.custom generator shrinker
+
 fuzzer_RawMatrix : Fuzzer RawMatrix
 fuzzer_RawMatrix = Fuzz.array (Fuzz.array Fuzz.int)
 
@@ -120,7 +132,8 @@ test_Matrix
     describe "Matrix"
       [
         test_toMatrixFromRawMatrix,
-        test_toRawMatrixFromMatrix
+        test_toRawMatrixFromMatrix,
+        test_expandMatrix
       ]
 
 test_toMatrixFromRawMatrix : Test
@@ -239,6 +252,52 @@ test_toRawMatrixFromMatrix
                         [[0,0],[1,1],[2,1]])
       ]
 
+test_expandMatrix : Test
+test_expandMatrix
+  =
+    describe "expandMatrix"
+      [
+        test "normal case"
+          <|
+            \_
+              ->
+                expandMatrix
+                  (Matrix 5 3
+                    (toRawMatrixFromList
+                      [
+                        [0, 0, 0],
+                        [1, 1, 1],
+                        [2, 2, 2],
+                        [3, 3, 3],
+                        [4, 2, 0]
+                      ]))
+                  (Nat 4)
+                  |>
+                    Expect.equal
+                      (PossibleCase
+                        (Just
+                          (Matrix 16 3
+                            (toRawMatrixFromList
+                              [
+                                [0, 0, 0],
+                                [1, 1, 1],
+                                [2, 2, 2],
+                                [3, 3, 3],
+                                [4, 1, 1],
+                                [5, 2, 2],
+                                [6, 3, 3],
+                                [7, 1, 1],
+                                [8, 2, 2],
+                                [9, 3, 3],
+                                [10, 1, 1],
+                                [11, 2, 2],
+                                [12, 3, 3],
+                                [13, 1, 1],
+                                [14, 2, 2],
+                                [15, 3, 3]
+                            ]))))
+      ]
+
 test_Patrix : Test
 test_Patrix
   =
@@ -249,7 +308,9 @@ test_Patrix
         test_calcParentOnPatrixFromRawMatrix,
         test_calcAncestorSetOnPatrixFromRawMatrix,
         test_calcMatrixFromPatrix,
-        test_calcElementOnMatrixFromRawPatrix
+        test_calcElementOnMatrixFromRawPatrix,
+        test_calcBadRootOfPatrix,
+        test_expandPatrix
       ]
 
 test_calcPatrixFromMatrix : Test
@@ -307,6 +368,33 @@ test_calcPatrixFromMatrix
                               [Pindex 0, Pindex 0]
                             ])))
       ,
+        test "big case"
+          <|
+            \_
+              ->
+                calcPatrixFromMatrix
+                  (toMatrixFromRawMatrix
+                    (toRawMatrixFromList
+                      [
+                        [0, 0, 0],
+                        [1, 1, 1],
+                        [2, 2, 2],
+                        [3, 3, 3],
+                        [4, 2, 0]
+                      ]))
+                  |>
+                    Expect.equal
+                      (PossibleCase
+                        (Patrix 5 3
+                          (toRawPatrixFromList
+                            [
+                              [Null, Null, Null],
+                              [Pindex 0, Pindex 0, Pindex 0],
+                              [Pindex 1, Pindex 1, Pindex 1],
+                              [Pindex 2, Pindex 2, Pindex 2],
+                              [Pindex 3, Pindex 1, Null]
+                            ])))
+      ,
         test "non-ascending sequence"
           <|
             \_
@@ -314,7 +402,7 @@ test_calcPatrixFromMatrix
                 calcPatrixFromMatrix
                   (toMatrixFromRawMatrix
                     (toRawMatrixFromList
-                      [[2],[1],[0],[1],[0]]))
+                      [[2], [1], [0], [1], [0]]))
                   |>
                     Expect.equal
                       (PossibleCase
@@ -422,6 +510,46 @@ test_calcElementOnMatrixFromRawPatrix
             \x_y_pindex x y
               ->
                 calcElementOnMatrixFromRawPatrix x_y_pindex x y
+                  |>
+                    expect_notImpossibleCase
+      ]
+
+test_calcBadRootOfPatrix : Test
+test_calcBadRootOfPatrix
+  =
+    describe "calcBadRootOfPatrix"
+      [
+        test "normal case"
+          <|
+            \_
+              ->
+                calcBadRootOfPatrix
+                  (Patrix 5 3
+                    (toRawPatrixFromList
+                      [
+                        [Null, Null, Null],
+                        [Pindex 0, Pindex 0, Pindex 0],
+                        [Pindex 1, Pindex 1, Pindex 1],
+                        [Pindex 2, Pindex 2, Pindex 2],
+                        [Pindex 3, Pindex 1, Null]
+                      ]))
+                  |>
+                    Expect.equal (Just (1, 1))
+      ]
+
+test_expandPatrix : Test
+test_expandPatrix
+  =
+    describe "expandPatrix"
+      [
+        fuzz2
+          fuzzer_Patrix
+          fuzzer_Nat
+          "follow the rule of the type `Case`"
+          <|
+            \patrix nat
+              ->
+                expandPatrix patrix nat
                   |>
                     expect_notImpossibleCase
       ]

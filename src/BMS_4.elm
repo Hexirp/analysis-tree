@@ -2,6 +2,9 @@ module BMS_4
   exposing
     (
       Nat (..),
+      toIntFromNat,
+      Coftype (..),
+      isLessThanCoftype,
       RawMatrix,
       toRawMatrixFromList,
       toListFromRawMatrix,
@@ -9,7 +12,8 @@ module BMS_4
       verifyMatrix,
       toMatrixFromRawMatrix,
       toRawMatrixFromMatrix,
-      expand,
+      calcCoftypeOfMatrix,
+      expandMatrix,
       Pindex (..),
       RawPatrix,
       toRawPatrixFromList,
@@ -27,7 +31,10 @@ module BMS_4
       calcParentOnPatrixFromRawMatrixWithMemo,
       calcAncestorSetOnPatrixFromRawMatrixWithMemo,
       calcMatrixFromPatrix,
-      calcElementOnMatrixFromRawPatrix
+      calcElementOnMatrixFromRawPatrix,
+      calcCoftypeOfPatrix,
+      calcBadRootOfPatrix,
+      expandPatrix
     )
 
 import Case exposing (Case (..))
@@ -40,6 +47,28 @@ import Array.Extra.Folding as Array
 {-| これは自然数です。
 -}
 type Nat = Nat Int
+
+{-| 或る自然数から或る整数へ変換します。
+-}
+toIntFromNat : Nat -> Int
+toIntFromNat (Nat int) = int
+
+{-| これは共終タイプです。
+-}
+type Coftype = Zero | One | Omega
+
+{-| 或る自然数が、或る共終タイプよりも小さいかどうか判定します。
+-}
+isLessThanCoftype : Nat -> Coftype -> Bool
+isLessThanCoftype nat coftype
+  =
+    case coftype of
+      Zero -> False
+      One
+        ->
+          case nat of
+            Nat int -> int < 1
+      Omega -> True
 
 {-| これはバシク行列システムの行列を表す生の型です。
 
@@ -122,10 +151,34 @@ toRawMatrixFromMatrix matrix
     case matrix of
       Matrix x y x_y_int -> x_y_int
 
+{-| 或る行列の共終タイプを計算します。 -}
+calcCoftypeOfMatrix : Matrix -> Case Coftype
+calcCoftypeOfMatrix matrix
+  =
+    case calcPatrixFromMatrix matrix of
+      ImpossibleCase -> ImpossibleCase
+      PossibleCase patrix -> PossibleCase (calcCoftypeOfPatrix patrix)
+
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
-expand : Matrix -> Nat -> Maybe Matrix
-expand n x = expand n x
+expandMatrix : Matrix -> Nat -> Case (Maybe Matrix)
+expandMatrix matrix n
+  =
+    case calcPatrixFromMatrix matrix of
+      ImpossibleCase -> ImpossibleCase
+      PossibleCase patrix
+        ->
+          case expandPatrix patrix n of
+            ImpossibleCase -> ImpossibleCase
+            PossibleCase m_patrix_
+              ->
+                case m_patrix_ of
+                  Nothing -> PossibleCase Nothing
+                  Just patrix_
+                    ->
+                      case calcMatrixFromPatrix patrix_ of
+                        ImpossibleCase -> ImpossibleCase
+                        PossibleCase matrix_ -> PossibleCase (Just matrix_)
 
 {-| これはピンデックスです。ピンデックスは或る行列の要素へのポインターを意味します。
 -}
@@ -622,3 +675,267 @@ calcElementOnMatrixFromRawPatrix x_y_pindex x y
                             ImpossibleCase -> ImpossibleCase
                             PossibleCase int -> PossibleCase (int + 1)
                         else PossibleCase 0
+
+{-| 或る `Patrix` の共終タイプを計算します。
+-}
+calcCoftypeOfPatrix : Patrix -> Coftype
+calcCoftypeOfPatrix patrix
+  =
+    case patrix of
+      Patrix x y x_y_pindex
+        ->
+          case Array.get (Array.length x_y_pindex - 1) x_y_pindex of
+            Nothing -> Zero
+            Just y_pindex
+              ->
+                let
+                  f pindex
+                    =
+                      case pindex of
+                        Null -> True
+                        Pindex int
+                          ->
+                            if 0 <= int && int < Array.length x_y_pindex - 1
+                              then False
+                              else True
+                in
+                  if Array.all f y_pindex
+                    then One
+                    else Omega
+
+{-| 或るパトリックスの悪根を計算します。
+
+共終タイプが ω ではない時は、 `Nothing` を返します。
+-}
+calcBadRootOfPatrix : Patrix -> Maybe (Int, Int)
+calcBadRootOfPatrix patrix
+  =
+    case patrix of
+      Patrix x y x_y_pindex
+        ->
+          case Array.get (Array.length x_y_pindex - 1) x_y_pindex of
+            Nothing -> Nothing
+            Just y_pindex
+              ->
+                let
+                  helper pindex (i, r)
+                    =
+                      case pindex of
+                        Null -> (i + 1, r)
+                        Pindex int
+                          ->
+                            if 0 <= int && int < Array.length x_y_pindex - 1
+                              then (i + 1, Just (int, i))
+                              else (i + 1, r)
+                in
+                  case Array.foldl helper (0, Nothing) y_pindex of
+                    (i, r) -> r
+
+{-| 或るパトリックスを或る係数で展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
+-}
+expandPatrix : Patrix -> Nat -> Case (Maybe Patrix)
+expandPatrix patrix n
+  =
+    case calcCoftypeOfPatrix patrix of
+      Zero -> PossibleCase Nothing
+      One
+        ->
+          case n of
+            Nat int ->
+              if int == 0
+                then
+                  case patrix of
+                    Patrix x y x_y_pindex
+                      ->
+                        PossibleCase
+                          (Just
+                            (Patrix (x - 1) y (Array.slice 0 -1 x_y_pindex)))
+                else PossibleCase Nothing
+      Omega
+        ->
+          case calcBadRootOfPatrix patrix of
+            Nothing -> ImpossibleCase
+            Just (xr, yr)
+              ->
+                case patrix of
+                  Patrix x y x_y_pindex
+                    ->
+                      case
+                        expandPatrix_helper_1
+                          x
+                          y
+                          x_y_pindex
+                          n
+                          xr
+                          yr
+                      of
+                        ImpossibleCase -> ImpossibleCase
+                        PossibleCase x_y_pindex_
+                          ->
+                            PossibleCase
+                              (Just
+                                (Patrix
+                                  (xr + (((x - 1) - xr) * (toIntFromNat n + 1)))
+                                  y
+                                  x_y_pindex_))
+
+expandPatrix_helper_1
+  : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Case RawPatrix
+expandPatrix_helper_1 x y x_y_pindex n xr yr
+  =
+    Case.traverseArray (\case_x -> case_x)
+      (Array.map (Case.traverseArray (\case_x -> case_x))
+        (expandPatrix_helper_2 x y x_y_pindex n xr yr))
+
+expandPatrix_helper_2
+  : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Array (Array (Case Pindex))
+expandPatrix_helper_2 x y x_y_pindex n xr yr
+  =
+    Array.initialize
+      (xr + (((x - 1) - xr) * (toIntFromNat n + 1)))
+      (\x_
+        ->
+          Array.initialize
+            y
+            (\y_
+              ->
+                expandPatrix_helper_3 x_y_pindex xr yr x_ y_))
+
+expandPatrix_helper_3
+  : RawPatrix -> Int -> Int -> Int -> Int -> Case Pindex
+expandPatrix_helper_3 x_y_pindex xr yr x_ y_
+  =
+    if x_ < xr
+      then
+        case Array.get x_ x_y_pindex of
+          Nothing -> ImpossibleCase
+          Just y_pindex
+            ->
+              case Array.get y_ y_pindex of
+                Nothing
+                  ->
+                    if 0 <= y_
+                      then
+                        if y_ < Array.length y_pindex
+                          then ImpossibleCase
+                          else PossibleCase Null
+                      else
+                        if x_ == 0
+                          then PossibleCase Null
+                          else PossibleCase (Pindex (x_ - 1))
+                Just pindex -> PossibleCase pindex
+      else
+        let
+          x = Array.length x_y_pindex
+          m = (x_ - xr) // ((x - 1) - xr)
+          n = modBy ((x - 1) - xr) (x_ - xr)
+        in
+          if m == 0
+            then
+              case Array.get x_ x_y_pindex of
+                Nothing -> ImpossibleCase
+                Just y_pindex
+                  ->
+                    case Array.get y_ y_pindex of
+                      Nothing
+                        ->
+                          if 0 <= y_
+                            then
+                              if y_ < Array.length y_pindex
+                                then ImpossibleCase
+                                else PossibleCase Null
+                            else
+                              if x_ == 0
+                                then PossibleCase Null
+                                else PossibleCase (Pindex (x_ - 1))
+                      Just pindex -> PossibleCase pindex
+            else
+              if y_ < yr
+                then
+                  if n == 0
+                    then
+                      case Array.get (x - 1) x_y_pindex of
+                        Nothing -> ImpossibleCase
+                        Just y_pindex
+                          ->
+                            case Array.get y_ y_pindex of
+                              Nothing -> ImpossibleCase
+                              Just pindex
+                                ->
+                                  case pindex of
+                                    Null -> PossibleCase Null
+                                    Pindex int
+                                      ->
+                                        PossibleCase
+                                          (Pindex
+                                            (int + ((x - 1) - xr) * (m - 1)))
+                    else
+                      case Array.get (xr + n) x_y_pindex of
+                        Nothing -> ImpossibleCase
+                        Just y_pindex
+                          ->
+                            case Array.get y_ y_pindex of
+                              Nothing -> ImpossibleCase
+                              Just pindex
+                                ->
+                                  case pindex of
+                                    Null -> PossibleCase Null
+                                    Pindex int
+                                      ->
+                                        PossibleCase
+                                          (Pindex
+                                            (int + ((x - 1) - xr) * m))
+                else
+                  if n == 0
+                    then
+                      case Array.get xr x_y_pindex of
+                        Nothing -> ImpossibleCase
+                        Just y_pindex
+                          ->
+                            case Array.get y_ y_pindex of
+                              Nothing
+                                ->
+                                  if 0 <= y_
+                                    then
+                                      if y_ < Array.length y_pindex
+                                        then ImpossibleCase
+                                        else PossibleCase Null
+                                    else
+                                      if x_ == 0
+                                        then PossibleCase Null
+                                        else PossibleCase (Pindex (x_ - 1))
+                              Just pindex
+                                ->
+                                  case pindex of
+                                    Null -> PossibleCase Null
+                                    Pindex int
+                                      ->
+                                        PossibleCase
+                                          (Pindex
+                                            int)
+                    else
+                      case Array.get (xr + n) x_y_pindex of
+                        Nothing -> ImpossibleCase
+                        Just y_pindex
+                          ->
+                            case Array.get y_ y_pindex of
+                              Nothing
+                                ->
+                                  if 0 <= y_
+                                    then
+                                      if y_ < Array.length y_pindex
+                                        then ImpossibleCase
+                                        else PossibleCase Null
+                                    else
+                                      if x_ == 0
+                                        then PossibleCase Null
+                                        else PossibleCase (Pindex (x_ - 1))
+                              Just pindex
+                                ->
+                                  case pindex of
+                                    Null -> PossibleCase Null
+                                    Pindex int
+                                      ->
+                                        PossibleCase
+                                          (Pindex
+                                            (int + ((x - 1) - xr) * m))
