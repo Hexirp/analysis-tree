@@ -887,7 +887,10 @@ expandPatrix_helper_3 x_y_pindex xr yr x_ y_
                                       if y_ < Array.length y_pindex
                                         then ImpossibleCase
                                         else PossibleCase Null
-                                    else PossibleCase (Pindex (xr + n - 1))
+                                    else
+                                      if x_ == 0
+                                        then PossibleCase Null
+                                        else PossibleCase (Pindex (x_ - 1))
                               Just pindex
                                 ->
                                   case pindex of
