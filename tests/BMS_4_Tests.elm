@@ -121,6 +121,7 @@ test_Matrix
       [
         test_toMatrixFromRawMatrix,
         test_toRawMatrixFromMatrix,
+        test_calcBadRootOfPatrix,
         test_expandMatrix
       ]
 
@@ -238,6 +239,29 @@ test_toRawMatrixFromMatrix
                     Expect.equal
                       (toRawMatrixFromList
                         [[0,0],[1,1],[2,1]])
+      ]
+
+test_calcBadRootOfPatrix : Test
+test_calcBadRootOfPatrix
+  =
+    describe "calcBadRootOfPatrix"
+      [
+        test "normal case"
+          <|
+            \_
+              ->
+                calcBadRootOfPatrix
+                  (Patrix 5 3
+                    (toRawPatrixFromList
+                      [
+                        [Null, Null, Null],
+                        [Pindex 0, Pindex 0, Pindex 0],
+                        [Pindex 1, Pindex 1, Pindex 1],
+                        [Pindex 2, Pindex 2, Pindex 2],
+                        [Pindex 3, Pindex 1, Null]
+                      ]))
+                  |>
+                    Expect.equal (Just (1, 1))
       ]
 
 test_expandMatrix : Test
