@@ -1,6 +1,12 @@
 module BMS_4.Parsing
   exposing
     (
+      Ast,
+      Ast_Matrix,
+      Ast_Sequence,
+      Ast_NaturalNumber,
+      fromStringToAst,
+      fromAstToString,
       SyntaxTree,
       Expression (..),
       Matrix (..),
@@ -37,10 +43,6 @@ module BMS_4.Parsing
       Symbol_37 (..),
       Symbol_38 (..),
       Symbol_39 (..),
-      Ast,
-      Ast_Matrix,
-      Ast_Sequence,
-      Ast_NaturalNumber,
       fromSyntaxTreeToAst,
       fromExpression,
       fromMatrix,
@@ -94,9 +96,7 @@ module BMS_4.Parsing
       parseSymbol_36,
       parseSymbol_37,
       parseSymbol_38,
-      parseSymbol_39,
-      fromStringToAst,
-      fromAstToString
+      parseSymbol_39
     )
 
 {-| `BMS_4` でのパーサー部分だけを切り出したモジュールです。
@@ -115,21 +115,9 @@ module BMS_4.Parsing
   break = "\n" , ["\r"] | "\r";
   space = " " | "\t";
 
-# 構文木
-
-@docs SyntaxTree, Expression, Matrix, Matrix0, Matrix00, Matrix01, Row, Row0, Row00, Row01, NaturalNumber, Digit, NonZeroDigit, SpacesAndBreaks, Spaces, SpaceOrBreak, Break, Space, Symbol_09, Symbol_0A, Symbol_0D, Symbol_0D0A, Symbol_20, Symbol_28, Symbol_29, Symbol_2C, Symbol_30, Symbol_31, Symbol_32, Symbol_33, Symbol_34, Symbol_35, Symbol_36, Symbol_37, Symbol_38, Symbol_39
-
 # 抽象構文木
 
 @docs Ast, Ast_Matrix, Ast_Sequence, Ast_NaturalNumber
-
-# 構文木から抽象構文木への変換
-
-@docs fromSyntaxTreeToAst, fromExpression, fromMatrix, fromMatrix0, fromMatrix00, fromMatrix01, fromRow, fromRow0, fromRow00, fromRow01, fromNaturalNumber, fromDigit, fromNonZeroDigit, fromSpacesAndBreaks, fromSpaces, fromSpaceOrBreak, fromBreak, fromSpace
-
-# 文字列から構文木への変換
-
-@docs parse, parseExpression, parseMatrix, parseMatrix0, parseMatrix00, parseMatrix01, parseRow, parseRow0, parseRow00, parseRow01, parseNaturalNumber, parseDigit, parseNonZeroDigit, parseSpacesAndBreaks, parseSpaces, parseSpaceOrBreak, parseBreak, parseSpace, parseSymbol_09, parseSymbol_0A, parseSymbol_0D, parseSymbol_0D0A, parseSymbol_20, parseSymbol_28, parseSymbol_29, parseSymbol_2C, parseSymbol_30, parseSymbol_31, parseSymbol_32, parseSymbol_33, parseSymbol_34, parseSymbol_35, parseSymbol_36, parseSymbol_37, parseSymbol_38, parseSymbol_39
 
 # 文字列から抽象構文木への変換
 
@@ -139,11 +127,64 @@ module BMS_4.Parsing
 
 @docs fromAstToString
 
+# 構文木
+
+@docs SyntaxTree, Expression, Matrix, Matrix0, Matrix00, Matrix01, Row, Row0, Row00, Row01, NaturalNumber, Digit, NonZeroDigit, SpacesAndBreaks, Spaces, SpaceOrBreak, Break, Space, Symbol_09, Symbol_0A, Symbol_0D, Symbol_0D0A, Symbol_20, Symbol_28, Symbol_29, Symbol_2C, Symbol_30, Symbol_31, Symbol_32, Symbol_33, Symbol_34, Symbol_35, Symbol_36, Symbol_37, Symbol_38, Symbol_39
+
+# 構文木から抽象構文木への変換
+
+@docs fromSyntaxTreeToAst, fromExpression, fromMatrix, fromMatrix0, fromMatrix00, fromMatrix01, fromRow, fromRow0, fromRow00, fromRow01, fromNaturalNumber, fromDigit, fromNonZeroDigit, fromSpacesAndBreaks, fromSpaces, fromSpaceOrBreak, fromBreak, fromSpace
+
+# 文字列から構文木への変換
+
+@docs parse, parseExpression, parseMatrix, parseMatrix0, parseMatrix00, parseMatrix01, parseRow, parseRow0, parseRow00, parseRow01, parseNaturalNumber, parseDigit, parseNonZeroDigit, parseSpacesAndBreaks, parseSpaces, parseSpaceOrBreak, parseBreak, parseSpace, parseSymbol_09, parseSymbol_0A, parseSymbol_0D, parseSymbol_0D0A, parseSymbol_20, parseSymbol_28, parseSymbol_29, parseSymbol_2C, parseSymbol_30, parseSymbol_31, parseSymbol_32, parseSymbol_33, parseSymbol_34, parseSymbol_35, parseSymbol_36, parseSymbol_37, parseSymbol_38, parseSymbol_39
+
 -}
 
 import Parser
   exposing (Parser, succeed, (|=), (|.), oneOf, symbol)
 import Parser.Extra as Parser exposing (brackets, braces)
+
+-- 抽象構文木
+
+type alias Ast = Ast_Matrix
+
+type alias Ast_Matrix = List Ast_Sequence
+
+type alias Ast_Sequence = List Ast_NaturalNumber
+
+type alias Ast_NaturalNumber = Int
+
+-- 文字列から抽象構文木への変換
+
+fromStringToAst : String -> Maybe Ast
+fromStringToAst string
+  =
+    case Parser.run parse string of
+      Ok syntaxTree -> Just (fromSyntaxTreeToAst syntaxTree)
+      Err _ -> Nothing
+
+-- 抽象構文木から文字列への変換
+
+fromAstToString : Ast -> String
+fromAstToString ast
+  =
+    List.foldl (\y_list r -> r ++ fromAstToString_helper y_list) "" ast
+
+fromAstToString_helper : List Int -> String
+fromAstToString_helper y_list
+  =
+    case y_list of
+      [] -> "()"
+      y_list_p :: y_list_s
+        ->
+          ""
+            ++
+              List.foldl
+                (\n r -> r ++ "," ++ String.fromInt n)
+                ("(" ++ String.fromInt y_list_p)
+                y_list_s
+            ++ ")"
 
 -- 構文木
 
@@ -240,16 +281,6 @@ type Symbol_37 = Symbol_37
 type Symbol_38 = Symbol_38
 
 type Symbol_39 = Symbol_39
-
--- 抽象構文木
-
-type alias Ast = Ast_Matrix
-
-type alias Ast_Matrix = List Ast_Sequence
-
-type alias Ast_Sequence = List Ast_NaturalNumber
-
-type alias Ast_NaturalNumber = Int
 
 -- 構文木から抽象構文木への変換
 
@@ -559,34 +590,3 @@ parseSymbol_38 = succeed Symbol_38 |. symbol "8"
 
 parseSymbol_39 : Parser Symbol_39
 parseSymbol_39 = succeed Symbol_39 |. symbol "9"
-
--- 文字列から抽象構文木への変換
-
-fromStringToAst : String -> Maybe Ast
-fromStringToAst string
-  =
-    case Parser.run parse string of
-      Ok syntaxTree -> Just (fromSyntaxTreeToAst syntaxTree)
-      Err _ -> Nothing
-
--- 抽象構文木から文字列への変換
-
-fromAstToString : Ast -> String
-fromAstToString ast
-  =
-    List.foldl (\y_list r -> r ++ fromAstToString_helper y_list) "" ast
-
-fromAstToString_helper : List Int -> String
-fromAstToString_helper y_list
-  =
-    case y_list of
-      [] -> "()"
-      y_list_p :: y_list_s
-        ->
-          ""
-            ++
-              List.foldl
-                (\n r -> r ++ "," ++ String.fromInt n)
-                ("(" ++ String.fromInt y_list_p)
-                y_list_s
-            ++ ")"
