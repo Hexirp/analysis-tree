@@ -689,13 +689,17 @@ calcCoftypeOfPatrix patrix
             Just y_pindex
               ->
                 let
-                  isNull pindex
+                  f pindex
                     =
                       case pindex of
                         Null -> True
-                        Pindex int -> False
+                        Pindex int
+                          ->
+                            if 0 <= int && int < Array.length x_y_pindex - 1
+                              then False
+                              else True
                 in
-                  if Array.all isNull y_pindex
+                  if Array.all f y_pindex
                     then One
                     else Omega
 
