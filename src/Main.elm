@@ -44,7 +44,7 @@ view model
           [ class "output-element" ]
           [
             text
-              (case BMS_4.Parsing.fromStringToAst model.content of
+              (case BMS_4.Parsing.toAstFromString model.content of
                 Just ast
                   ->
                     ast
@@ -52,7 +52,7 @@ view model
                       |> BMS_4.toMatrixFromRawMatrix
                       |> BMS_4.toRawMatrixFromMatrix
                       |> BMS_4.toListFromRawMatrix
-                      |> BMS_4.Parsing.fromAstToString
+                      |> BMS_4.Parsing.toStringFromAst
                 Nothing -> "Parse Error!")
           ]
       ]

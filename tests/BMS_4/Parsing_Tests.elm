@@ -1,5 +1,5 @@
 module BMS_4.Parsing_Tests
-  exposing (test_parse, test_fromStringToAst, test_fromAstToString)
+  exposing (test_parse, test_toAstFromString, test_toStringFromAst)
 
 import Parser
 
@@ -30,25 +30,25 @@ test_parse
                 (Parser.run parse "(0, 0, 0)\n(1, 1, 1)\n(2, 2, 0)\n"))
       ]
 
-test_fromStringToAst : Test
-test_fromStringToAst
+test_toAstFromString : Test
+test_toAstFromString
   =
     describe
-      "fromStringToAst"
+      "toAstFromString"
       [
         test
           "normal case"
           (\_
             ->
               Expect.equal
-                (fromStringToAst "(0,0,0)(1,1,1)(2,2,0)")
+                (toAstFromString "(0,0,0)(1,1,1)(2,2,0)")
                 (Just [[0, 0, 0], [1, 1, 1], [2, 2, 0]])),
         test
           "some spaces and some breaks"
           (\_
             ->
               Expect.equal
-                (fromStringToAst
+                (toAstFromString
                   """
                   (0, 0, 0)
                   (1, 1, 1)
@@ -57,17 +57,17 @@ test_fromStringToAst
                 (Just [[0, 0, 0], [1, 1, 1], [2, 2, 0]]))
       ]
 
-test_fromAstToString : Test
-test_fromAstToString
+test_toStringFromAst : Test
+test_toStringFromAst
   =
     describe
-      "fromAstToString"
+      "toStringFromAst"
       [
         test
           "normal case"
           (\_
             ->
               Expect.equal
-                (fromAstToString [[0, 0, 0], [1, 1, 1], [2, 2, 0]])
+                (toStringFromAst [[0, 0, 0], [1, 1, 1], [2, 2, 0]])
                 "(0,0,0)(1,1,1)(2,2,0)")
       ]

@@ -5,8 +5,8 @@ module BMS_4.Parsing
       Ast_Matrix,
       Ast_Sequence,
       Ast_NaturalNumber,
-      fromStringToAst,
-      fromAstToString,
+      toAstFromString,
+      toStringFromAst,
       SyntaxTree,
       Expression (..),
       Matrix (..),
@@ -121,11 +121,11 @@ module BMS_4.Parsing
 
 # 文字列から抽象構文木への変換
 
-@docs fromStringToAst
+@docs toAstFromString
 
 # 抽象構文木から文字列への変換
 
-@docs fromAstToString
+@docs toStringFromAst
 
 # 構文木
 
@@ -157,8 +157,8 @@ type alias Ast_NaturalNumber = Int
 
 -- 文字列から抽象構文木への変換
 
-fromStringToAst : String -> Maybe Ast
-fromStringToAst string
+toAstFromString : String -> Maybe Ast
+toAstFromString string
   =
     case Parser.run parse string of
       Ok syntaxTree -> Just (fromSyntaxTreeToAst syntaxTree)
@@ -166,13 +166,13 @@ fromStringToAst string
 
 -- 抽象構文木から文字列への変換
 
-fromAstToString : Ast -> String
-fromAstToString ast
+toStringFromAst : Ast -> String
+toStringFromAst ast
   =
-    List.foldl (\y_list r -> r ++ fromAstToString_helper y_list) "" ast
+    List.foldl (\y_list r -> r ++ toStringFromAst_helper y_list) "" ast
 
-fromAstToString_helper : List Int -> String
-fromAstToString_helper y_list
+toStringFromAst_helper : List Int -> String
+toStringFromAst_helper y_list
   =
     case y_list of
       [] -> "()"
