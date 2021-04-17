@@ -43,7 +43,7 @@ module BMS_4.Parsing
       Symbol_37 (..),
       Symbol_38 (..),
       Symbol_39 (..),
-      fromSyntaxTreeToAst,
+      toAstFromSyntaxTree,
       fromExpression,
       fromMatrix,
       fromMatrix0,
@@ -133,7 +133,7 @@ module BMS_4.Parsing
 
 # 構文木から抽象構文木への変換
 
-@docs fromSyntaxTreeToAst, fromExpression, fromMatrix, fromMatrix0, fromMatrix00, fromMatrix01, fromRow, fromRow0, fromRow00, fromRow01, fromNaturalNumber, fromDigit, fromNonZeroDigit, fromSpacesAndBreaks, fromSpaces, fromSpaceOrBreak, fromBreak, fromSpace
+@docs toAstFromSyntaxTree, fromExpression, fromMatrix, fromMatrix0, fromMatrix00, fromMatrix01, fromRow, fromRow0, fromRow00, fromRow01, fromNaturalNumber, fromDigit, fromNonZeroDigit, fromSpacesAndBreaks, fromSpaces, fromSpaceOrBreak, fromBreak, fromSpace
 
 # 文字列から構文木への変換
 
@@ -161,7 +161,7 @@ toAstFromString : String -> Maybe Ast
 toAstFromString string
   =
     case Parser.run parse string of
-      Ok syntaxTree -> Just (fromSyntaxTreeToAst syntaxTree)
+      Ok syntaxTree -> Just (toAstFromSyntaxTree syntaxTree)
       Err _ -> Nothing
 
 -- 抽象構文木から文字列への変換
@@ -284,8 +284,8 @@ type Symbol_39 = Symbol_39
 
 -- 構文木から抽象構文木への変換
 
-fromSyntaxTreeToAst : SyntaxTree -> Ast
-fromSyntaxTreeToAst = fromExpression
+toAstFromSyntaxTree : SyntaxTree -> Ast
+toAstFromSyntaxTree = fromExpression
 
 fromExpression : Expression -> Ast_Matrix
 fromExpression expression
