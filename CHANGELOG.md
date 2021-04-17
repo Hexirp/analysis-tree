@@ -2,6 +2,14 @@
 
 ## not yet released
 
+https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/7 により次の変更が行われた。
+
+* `fromAlphaToBeta` を `toBetaFromAlpha` へ改名する。たとえば、 `fromSyntaxTreeToAst` を `toAstFromSyntaxTree` へ改名する。
+  * `calcBetaFromAlpha` と語順が同じになるため。
+  * 関数を適用する時に、 `toGammaFromBeta (toBetaFromAlpha alpha)` という風に方向が合うため。
+* `BMS_4.Parsing` モジュールの内容を、基本的な型が上に来るように並べ替えた。
+  * モジュールの内容を分かりやすくするため。
+
 ## 0.3.0
 
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/6 により次の変更が行われた。
