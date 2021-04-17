@@ -15,6 +15,46 @@ type Model = Model Shape Mapping Memo
 
 type Shape = Shape (List Shape)
 
+expandShape : List Int -> Shape -> Shape
+expandShape x (Shape shape)
+  =
+    case x of
+      [] -> Shape (shape ++ [Shape []])
+      xp :: xs
+        ->
+          Shape (expandShape_helper_1 xp xs shape)
+
+expandShape_helper_1 : Int -> List Int -> List Shape -> List Shape
+expandShape_helper_1 xp xs shape
+  =
+    case shape of
+      [] -> []
+      shape_p :: shape_s
+        ->
+          if xp == 0
+            then expandShape xs shape_p :: shape_s
+            else shape_p :: expandShape_helper_1 (xp - 1) xs shape_s
+
+retractShape : List Int -> Shape -> Shape
+retractShape x (Shape shape)
+  =
+    case x of
+      [] -> Shape []
+      xp :: xs
+        ->
+          Shape (retractShape_helper_1 xp xs shape)
+
+retractShape_helper_1 : Int -> List Int -> List Shape -> List Shape
+retractShape_helper_1 xp xs shape
+  =
+    case shape of
+      [] -> []
+      shape_p :: shape_s
+        ->
+          if xp == 0
+            then retractShape xs shape_p :: shape_s
+            else shape_p :: retractShape_helper_1 (xp - 1) xs shape_s
+
 type Mapping = Mapping (Dict (List Int) String)
 
 emptyMapping : Mapping
@@ -63,8 +103,18 @@ update message model
             Model shape mapping memo
               ->
                 Model shape mapping (insertMemo x s memo)
-      Expand x -> Debug.todo "not yet implemented"
-      Retract x -> Debug.todo "not yet implemented"
+      Expand x
+        ->
+          case model of
+            Model shape mapping memo
+              ->
+                Model (expandShape x shape) mapping memo
+      Retract x
+        ->
+          case model of
+            Model shape mapping memo
+              ->
+                Model (retractShape x shape) mapping memo
 
 view : Model -> Html Message
 view model
