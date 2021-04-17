@@ -39,7 +39,7 @@ retractShape : List Int -> Shape -> Shape
 retractShape x (Shape shape)
   =
     case x of
-      [] -> Shape []
+      [] -> Shape shape
       xp :: xs
         ->
           Shape (retractShape_helper_1 xp xs shape)
@@ -52,7 +52,10 @@ retractShape_helper_1 xp xs shape
       shape_p :: shape_s
         ->
           if xp == 0
-            then retractShape xs shape_p :: shape_s
+            then
+              case xs of
+                [] -> shape_s
+                _ :: _ -> retractShape xs shape_p :: shape_s
             else shape_p :: retractShape_helper_1 (xp - 1) xs shape_s
 
 type Mapping = Mapping (Dict (List Int) String)
