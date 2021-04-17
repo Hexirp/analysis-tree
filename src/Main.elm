@@ -1,5 +1,7 @@
 module Main exposing (Model, Message, initialize, view, update, main)
 
+import Dict exposing (Dict)
+
 import BMS_4
 import BMS_4.Parsing
 
@@ -9,60 +11,113 @@ import Html.Events exposing (onClick, onInput)
 
 import Browser
 
-type alias Model = { content : String }
+type Model = Model Shape Mapping Memo
 
-type Message = Change String | Expand | Clear
+type Shape = Shape (List Shape)
+
+type Mapping = Mapping (Dict (List Int) String)
+
+emptyMapping : Mapping
+emptyMapping = Mapping Dict.empty
+
+type Memo = Memo (Dict (List Int) String)
+
+emptyMemo : Memo
+emptyMemo = Memo Dict.empty
+
+type Message
+  =
+    Edit_Mapping (List Int) String
+      | Edit_Memo (List Int) String
+      | Expand (List Int)
+      | Retract (List Int)
 
 initialize : Model
-initialize = { content = "" }
-
-view : Model -> Html Message
-view model
-  =
-    div
-      [ class "element" ]
-      [
-        div
-          [ class "input-element" ]
-          [
-            input
-              [
-                class "input-text-element",
-                placeholder "matrix or sequence with parentheses",
-                value model.content,
-                onInput Change
-              ]
-              [],
-            button
-              [ class "input-expand-element", onClick Expand ]
-              [ text "Expand" ],
-            button
-              [ class "input-clear-element", onClick Clear ]
-              [ text "Clear" ]
-          ],
-        div
-          [ class "output-element" ]
-          [
-            text
-              (case BMS_4.Parsing.toAstFromString model.content of
-                Just ast
-                  ->
-                    ast
-                      |> BMS_4.toRawMatrixFromList
-                      |> BMS_4.toMatrixFromRawMatrix
-                      |> BMS_4.toRawMatrixFromMatrix
-                      |> BMS_4.toListFromRawMatrix
-                      |> BMS_4.Parsing.toStringFromAst
-                Nothing -> "Parse Error!")
-          ]
-      ]
+initialize = Model (Shape []) emptyMapping emptyMemo
 
 update : Message -> Model -> Model
 update message model
   =
     case message of
-      Change s -> { model | content = s }
-      _ -> model
+      Edit_Mapping x s -> Debug.todo "not yet implemented"
+      Edit_Memo x s -> Debug.todo "not yet implemented"
+      Expand x -> Debug.todo "not yet implemented"
+      Retract x -> Debug.todo "not yet implemented"
+
+view : Model -> Html Message
+view model
+  =
+    case model of
+      Model shape mapping memo
+        ->
+          view_helper_1 shape mapping memo []
+
+view_helper_1 : Shape -> Mapping -> Memo -> List Int -> Html Message
+view_helper_1 shape mapping memo x
+  =
+    case shape of
+      Shape shape_
+        ->
+          let
+            f i shape__ = view_helper_1 shape__ mapping memo (x ++ [i])
+          in
+            view_helper_2 x (List.indexedMap f shape_)
+
+view_helper_2 : List Int -> List (Html Message) -> Html Message
+view_helper_2 x nodes
+  =
+    div [ class "node" ]
+      [
+        div [ class "node-button" ]
+          [
+            button
+              [
+                class "node-button-expand"
+              ,
+                onClick (Expand x)
+              ]
+              [
+                text "Expand"
+              ]
+          ,
+            button
+              [
+                class "node-button-retract"
+              ,
+                onClick (Retract x)
+              ]
+              [
+                text "Retract"
+              ]
+          ]
+      ,
+        div [ class "node-children" ] nodes
+      ,
+        div [ class "node-input" ]
+          [
+            div [ class "node-input-mapping" ]
+              [
+                input
+                  [
+                    class "node-input-mapping-body"
+                  ,
+                    onInput (Edit_Mapping x)
+                  ]
+                  []
+              ]
+          ,
+            div [ class "node-input-memo" ]
+              [
+                input
+                  [
+                    class "node-input-memo-body"
+                  ,
+                    onInput (Edit_Memo x)
+                  ]
+                  []
+              ]
+          ]
+      ]
 
 main : Program () Model Message
 main = Browser.sandbox { init = initialize, view = view, update = update }
