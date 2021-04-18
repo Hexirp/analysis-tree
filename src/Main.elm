@@ -129,7 +129,15 @@ view model
     case model of
       Model shape mapping memo
         ->
-          view_helper_1 shape mapping memo []
+          div []
+            [
+              div []
+              [
+                text (Debug.toString model)
+              ]
+            ,
+              view_helper_1 shape mapping memo []
+            ]
 
 view_helper_1 : Shape -> Mapping -> Memo -> List Int -> Html Message
 view_helper_1 shape mapping memo x
