@@ -5,8 +5,8 @@ import Dict exposing (Dict)
 import BMS_4
 import BMS_4.Parsing
 
-import Html exposing (Html, div, input, button, text)
-import Html.Attributes exposing (class, placeholder, value)
+import Html exposing (Html, div, textarea, button, text)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick, onInput)
 
 import Browser
@@ -185,7 +185,7 @@ view_helper_2 mapping memo x nodes
           [
             div [ class "node-input-mapping" ]
               [
-                input
+                textarea
                   [
                     class "node-input-mapping-body"
                   ,
@@ -200,7 +200,7 @@ view_helper_2 mapping memo x nodes
           ,
             div [ class "node-input-memo" ]
               [
-                input
+                textarea
                   [
                     class "node-input-memo-body"
                   ,
