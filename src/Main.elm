@@ -171,15 +171,7 @@ view_helper_2 mapping memo x nodes
               ]
           ]
       ,
-        div
-          [
-            class "node-children"
-          ,
-            Html.Attributes.style "padding" "1em"
-          ,
-            Html.Attributes.style "border" "solid"
-          ]
-          nodes
+        div [ class "node-children" ] nodes
       ,
         div [ class "node-input" ]
           [
