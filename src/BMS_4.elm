@@ -9,6 +9,7 @@ module BMS_4
       toRawMatrixFromList,
       toListFromRawMatrix,
       Matrix (..),
+      compareMatrix,
       verifyMatrix,
       toMatrixFromRawMatrix,
       toRawMatrixFromMatrix,
@@ -34,7 +35,12 @@ module BMS_4
       calcElementOnMatrixFromRawPatrix,
       calcCoftypeOfPatrix,
       calcBadRootOfPatrix,
-      expandPatrix
+      expandPatrix,
+      RawOuter,
+      toMatrixFromRawOuter,
+      Outer (..),
+      toOuterFromMatrix,
+      toMatrixFromOuter
     )
 
 import Case exposing (Case (..))
@@ -47,6 +53,11 @@ import Array.Extra.Folding as Array
 {-| これは自然数です。
 -}
 type Nat = Nat Int
+
+{-| 或る整数から或る自然数へ変換します。
+-}
+toNatFromInt : Int -> Maybe Nat
+toNatFromInt x = if 0 <= x then Just (Nat x) else Nothing
 
 {-| 或る自然数から或る整数へ変換します。
 -}
@@ -93,6 +104,12 @@ toListFromRawMatrix array = Array.toList (Array.map Array.toList array)
 構築子は `Matrix` 型の規約が守られていることが保証されていないため、テスト以外で使ってはいけません。
 -}
 type Matrix = Matrix Int Int RawMatrix
+
+{-| 行列同士を比較します。 -}
+compareMatrix : Matrix -> Matrix -> Order
+compareMatrix (Matrix _ _ x) (Matrix _ _ y)
+  =
+    compare (toListFromRawMatrix x) (toListFromRawMatrix y)
 
 {-| 或る値が `Matrix` 型の規約を満たしているか検証します。
 -}
@@ -937,3 +954,103 @@ expandPatrix_helper_3 x_y_pindex xr yr x_ y_
                                         PossibleCase
                                           (Pindex
                                             (int + ((x - 1) - xr) * m))
+
+{-| バシク行列システム 4 の生の外表記です。
+-}
+type alias RawOuter = List Int
+
+{-| 生の外表記から行列へ変換します。
+-}
+toMatrixFromRawOuter : RawOuter -> Case (Maybe (Maybe Matrix))
+toMatrixFromRawOuter outer
+  =
+    let
+      f int c_m_m_matrix
+        =
+          case c_m_m_matrix of
+            ImpossibleCase -> ImpossibleCase
+            PossibleCase m_m_matrix
+              ->
+                case m_m_matrix of
+                  Nothing -> PossibleCase Nothing
+                  Just m_matrix
+                    ->
+                      case m_matrix of
+                        Nothing
+                          ->
+                            if 0 <= int
+                              then
+                                PossibleCase
+                                  (Just
+                                    (Just
+                                      (toMatrixFromRawMatrix
+                                        (toRawMatrixFromList
+                                          [
+                                            List.repeat int 0
+                                          ,
+                                            List.repeat int 1
+                                          ]))))
+                              else
+                                PossibleCase Nothing
+                        Just matrix
+                          ->
+                            case toNatFromInt int of
+                              Nothing -> PossibleCase Nothing
+                              Just nat
+                                ->
+                                  case expandMatrix matrix nat of
+                                    ImpossibleCase -> ImpossibleCase
+                                    PossibleCase m_matrix_
+                                      ->
+                                        case m_matrix_ of
+                                          Nothing -> PossibleCase Nothing
+                                          Just matrix_
+                                            ->
+                                              PossibleCase (Just (Just matrix_))
+    in
+      List.foldl f (PossibleCase (Just Nothing)) outer
+
+{-| バシク行列システム 4 の外表記です。
+-}
+type Outer = Outer RawOuter
+
+{-| 行列から外表記へ変換します。
+-}
+toOuterFromMatrix : Matrix -> Case (Maybe Outer)
+toOuterFromMatrix matrix
+  =
+    toOuterFromMatrix_helper_1 matrix []
+
+toOuterFromMatrix_helper_1 : Matrix -> List Int -> Case (Maybe Outer)
+toOuterFromMatrix_helper_1 matrix x
+  =
+    toOuterFromMatrix_helper_2 matrix x 0
+
+toOuterFromMatrix_helper_2 : Matrix -> List Int -> Int -> Case (Maybe Outer)
+toOuterFromMatrix_helper_2 matrix x n
+  =
+    case toMatrixFromRawOuter (x ++ [n]) of
+      ImpossibleCase -> ImpossibleCase
+      PossibleCase m_m_matrix_
+        ->
+          case m_m_matrix_ of
+            Nothing
+              ->
+                if n == 0
+                  then PossibleCase Nothing
+                  else toOuterFromMatrix_helper_1 matrix (x ++ [n - 1])
+            Just m_matrix_
+              ->
+                case m_matrix_ of
+                  Nothing -> ImpossibleCase
+                  Just matrix_
+                    ->
+                      case compareMatrix matrix matrix_ of
+                        LT -> toOuterFromMatrix_helper_1 matrix (x ++ [n - 1])
+                        EQ -> PossibleCase (Just (Outer (x ++ [n])))
+                        GT -> toOuterFromMatrix_helper_2 matrix x (n + 1)
+
+{-| 外表記から行列へ変換します。
+-}
+toMatrixFromOuter : Outer -> Case (Maybe (Maybe Matrix))
+toMatrixFromOuter (Outer outer) = toMatrixFromRawOuter outer
