@@ -146,14 +146,7 @@ view_helper_2
   : Mapping -> Memo -> List Int -> List (Html Message) -> Html Message
 view_helper_2 mapping memo x nodes
   =
-    div
-      [
-        class "node"
-      ,
-        Html.Attributes.style "padding" "1em"
-      ,
-        Html.Attributes.style "border" "solid"
-      ]
+    div [ class "node" ]
       [
         div [ class "node-button" ]
           [
@@ -178,7 +171,15 @@ view_helper_2 mapping memo x nodes
               ]
           ]
       ,
-        div [ class "node-children" ] nodes
+        div
+          [
+            class "node-children"
+          ,
+            Html.Attributes.style "padding" "1em"
+          ,
+            Html.Attributes.style "border" "solid"
+          ]
+          nodes
       ,
         div [ class "node-input" ]
           [
