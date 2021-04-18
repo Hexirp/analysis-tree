@@ -40,7 +40,9 @@ module BMS_4
       toMatrixFromRawOuter,
       Outer (..),
       toOuterFromMatrix,
-      toMatrixFromOuter
+      toMatrixFromOuter,
+      toOuterFromRawOuter,
+      toRawOuterFromOuter
     )
 
 import Case exposing (Case (..))
@@ -1016,10 +1018,12 @@ type Outer = Outer RawOuter
 
 {-| 行列から外表記へ変換します。
 -}
-toOuterFromMatrix : Matrix -> Case (Maybe Outer)
-toOuterFromMatrix matrix
+toOuterFromMatrix : Maybe Matrix -> Case (Maybe Outer)
+toOuterFromMatrix m_matrix
   =
-    toOuterFromMatrix_helper_1 matrix []
+    case m_matrix of
+      Nothing -> PossibleCase (Just (Outer []))
+      Just matrix -> toOuterFromMatrix_helper_1 matrix []
 
 toOuterFromMatrix_helper_1 : Matrix -> List Int -> Case (Maybe Outer)
 toOuterFromMatrix_helper_1 matrix x
@@ -1054,3 +1058,22 @@ toOuterFromMatrix_helper_2 matrix x n
 -}
 toMatrixFromOuter : Outer -> Case (Maybe (Maybe Matrix))
 toMatrixFromOuter (Outer outer) = toMatrixFromRawOuter outer
+
+{-| 生の外表記から外表記へ変換します。
+-}
+toOuterFromRawOuter : RawOuter -> Case (Maybe Outer)
+toOuterFromRawOuter x
+  =
+    case toMatrixFromRawOuter x of
+      ImpossibleCase -> ImpossibleCase
+      PossibleCase m_m_matrix
+        ->
+          case m_m_matrix of
+            Nothing -> PossibleCase Nothing
+            Just m_matrix
+              -> toOuterFromMatrix m_matrix
+
+{-| 外表記から生の外表記へ変換します。
+-}
+toRawOuterFromOuter : Outer -> RawOuter
+toRawOuterFromOuter (Outer x) = x

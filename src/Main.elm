@@ -2,6 +2,8 @@ module Main exposing (Model, Message, initialize, view, update, main)
 
 import Dict exposing (Dict)
 
+import Case exposing (Case (..))
+
 import BMS_4
 import BMS_4.Parsing
 
@@ -10,6 +12,17 @@ import Html.Attributes exposing (class)
 import Html.Events exposing (onClick, onInput)
 
 import Browser
+
+canonicalize : List Int -> List Int
+canonicalize x
+  =
+    case BMS_4.toOuterFromRawOuter x of
+      ImpossibleCase -> x
+      PossibleCase m_outer
+        ->
+          case m_outer of
+            Nothing -> x
+            Just outer -> BMS_4.toRawOuterFromOuter outer
 
 type Model = Model Shape Mapping Memo
 
@@ -68,10 +81,11 @@ emptyMapping : Mapping
 emptyMapping = Mapping Dict.empty
 
 getMapping : List Int -> Mapping -> Maybe String
-getMapping k (Mapping dict) = Dict.get k dict
+getMapping k (Mapping dict) = Dict.get (canonicalize k) dict
 
 insertMapping : List Int -> String -> Mapping -> Mapping
-insertMapping k v (Mapping dict) = Mapping (Dict.insert k v dict)
+insertMapping k v (Mapping dict)
+  = Mapping (Dict.insert (canonicalize k) v dict)
 
 type Memo = Memo (Dict (List Int) String)
 
