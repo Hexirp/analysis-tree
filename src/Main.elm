@@ -54,7 +54,11 @@ retractShape_helper_1 xp xs shape
           if xp == 0
             then
               case xs of
-                [] -> shape_s
+                []
+                  ->
+                    case shape_s of
+                      [] -> shape_s
+                      _ :: _ -> retractShape xs shape_p :: shape_s
                 _ :: _ -> retractShape xs shape_p :: shape_s
             else shape_p :: retractShape_helper_1 (xp - 1) xs shape_s
 
