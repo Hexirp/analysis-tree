@@ -24,6 +24,32 @@ canonicalize x
             Nothing -> x
             Just outer -> BMS_4.toRawOuterFromOuter outer
 
+show : List Int -> String
+show x
+  =
+    case BMS_4.toMatrixFromRawOuter x of
+      ImpossibleCase
+        ->
+          "Fatal Error: "
+            ++ List.foldl (\i s -> s ++ " " ++ String.fromInt i) "" x
+      PossibleCase m_m_matrix
+        ->
+          case m_m_matrix of
+            Nothing
+              ->
+                "Error: "
+                  ++ List.foldl (\i s -> s ++ " " ++ String.fromInt i) "" x
+            Just m_matrix
+              ->
+                case m_matrix of
+                  Nothing -> "B"
+                  Just matrix
+                    ->
+                      BMS_4.Parsing.toStringFromAst
+                        (BMS_4.toListFromRawMatrix
+                          (BMS_4.toRawMatrixFromMatrix
+                            matrix))
+
 type Model = Model Shape Mapping Memo
 
 type Shape = Shape (List Shape)
@@ -170,11 +196,13 @@ view_helper_2 mapping memo x nodes
   =
     div [ class "node" ]
       [
-        div [ class "node-button" ]
+        div [ class "node-header" ]
           [
+            text (show x)
+          ,
             button
               [
-                class "node-button-expand"
+                class "node-header-expand"
               ,
                 onClick (Expand x)
               ]
@@ -184,7 +212,7 @@ view_helper_2 mapping memo x nodes
           ,
             button
               [
-                class "node-button-retract"
+                class "node-header-retract"
               ,
                 onClick (Retract x)
               ]
