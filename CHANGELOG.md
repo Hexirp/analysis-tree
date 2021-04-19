@@ -2,6 +2,11 @@
 
 ## not yet released
 
+https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/8 により次の変更が行われた。
+
+* 木構造を表示して操作する機能を実装した。
+* それぞれのノードに解析の記録とメモを書き込む機能を実装した。
+
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/7 により次の変更が行われた。
 
 * `fromAlphaToBeta` を `toBetaFromAlpha` へ改名する。たとえば、 `fromSyntaxTreeToAst` を `toAstFromSyntaxTree` へ改名する。
