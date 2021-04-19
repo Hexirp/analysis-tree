@@ -2,6 +2,8 @@
 
 ## not yet released
 
+## 0.4.0
+
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/8 により次の変更が行われた。
 
 * 木構造を表示して操作する機能を実装した。
