@@ -2,6 +2,8 @@ module BMS_4_Tests exposing (test_Matrix, test_Patrix)
 
 import Case exposing (Case (..))
 
+import Notation exposing (Nat (..))
+
 import BMS_4 exposing (..)
 
 import Random
