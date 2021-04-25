@@ -11,6 +11,10 @@ module Notation
     ,
       isLessThanCoftype
     ,
+      IsLessThanCoftypeError (..)
+    ,
+      Notation (..)
+    ,
       RawOuter
     ,
       toMatrixFromRawOuter
@@ -58,6 +62,15 @@ isLessThanCoftype nat coftype
           case nat of
             Nat int -> int < 1
       Omega -> True
+
+type IsLessThanCoftypeError a = IsLessThanCoftypeError a Nat Coftype
+
+type Notation a
+  =
+    Notation
+      (a -> a -> Order)
+      (a -> Nat -> Case (Result (IsLessThanCoftypeError a) a))
+      a
 
 {-| バシク行列システム 4 の生の外表記です。
 -}
