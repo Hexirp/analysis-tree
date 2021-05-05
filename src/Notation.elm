@@ -62,12 +62,15 @@ isLessThanCoftype nat coftype
 
 type IsLessThanCoftypeError a = IsLessThanCoftypeError a Nat Coftype
 
-type Notation a
+type alias Notation a
   =
-    Notation
-      (a -> a -> Order)
-      (a -> Nat -> Case (Result (IsLessThanCoftypeError a) a))
-      a
+    {
+      compare : a -> a -> Order
+    ,
+      expand : a -> Nat -> Case (Result (IsLessThanCoftypeError a) a)
+    ,
+      maximum : a
+    }
 
 {-| バシク行列システム 4 の生の外表記です。
 -}
