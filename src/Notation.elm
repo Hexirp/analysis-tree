@@ -57,10 +57,7 @@ isLessThanCoftype nat coftype
   =
     case coftype of
       Zero -> False
-      One
-        ->
-          case nat of
-            Nat int -> int < 1
+      One -> toIntFromNat nat < 1
       Omega -> True
 
 type IsLessThanCoftypeError a = IsLessThanCoftypeError a Nat Coftype
