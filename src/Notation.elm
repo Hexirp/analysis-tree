@@ -30,6 +30,8 @@ module Notation
       toRawOuterFromOuter
     )
 
+import Array exposing (Array)
+
 import Case exposing (Case (..))
 
 {-| これは自然数です。
@@ -74,7 +76,7 @@ type alias Notation a
 
 {-| バシク行列システム 4 の生の外表記です。
 -}
-type alias RawOuter = List Int
+type alias RawOuter = Array Int
 
 {-| 生の外表記から行列へ変換します。
 -}
