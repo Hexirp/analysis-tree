@@ -84,19 +84,20 @@ toTermFromRawOuter : Notation a -> RawOuter -> Maybe (Case (Result (IsLessThanCo
 toTermFromRawOuter notation outer
   =
     let
-      func int maybe_case_result_x
+      func int maybe_case_result_term
         =
           case toNatFromInt int of
             Just nat ->
-              case maybe_case_result_x of
-                Just case_result_x
+              case maybe_case_result_term of
+                Just case_result_term
                   ->
-                    PossibleCase result_x
-                      ->
-                        case result_x of
-                          Ok x -> Just (notation.expand x nat)
-                          Err e -> Just (PossibleCase (Err e))
-                    ImpossibleCase -> Just ImpossibleCase
+                    case case_result_term of
+                      PossibleCase result_term
+                        ->
+                          case result_term of
+                            Ok term -> Just (notation.expand term nat)
+                            Err e -> Just (PossibleCase (Err e))
+                      ImpossibleCase -> Just ImpossibleCase
                 Nothing -> Nothing
             Nothing -> Nothing
     in
