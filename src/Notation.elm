@@ -74,7 +74,7 @@ type alias Notation a
       maximum : a
     }
 
-{-| バシク行列システム 4 の生の外表記です。
+{-| 生の外表記です。
 -}
 type alias RawOuter = Array Int
 
@@ -103,7 +103,7 @@ toTermFromRawOuter notation outer
     in
       Array.foldl func (Just (PossibleCase (Ok notation.maximum))) outer
 
-{-| バシク行列システム 4 の外表記です。
+{-| 外表記です。
 -}
 type Outer = Outer RawOuter
 
