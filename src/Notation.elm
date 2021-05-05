@@ -78,56 +78,29 @@ type alias Notation a
 -}
 type alias RawOuter = Array Int
 
-{-| 生の外表記から行列へ変換します。
+{-| 生の外表記から表記の項へ変換します。
 -}
-toMatrixFromRawOuter : RawOuter -> Case (Maybe (Maybe Matrix))
-toMatrixFromRawOuter outer
+toTermFromRawOuter : Notation a -> RawOuter -> Maybe (Case (Result (IsLessThanCoftypeError a) a))
+toTermFromRawOuter notation outer
   =
     let
-      f int c_m_m_matrix
+      func int maybe_case_result_x
         =
-          case c_m_m_matrix of
-            ImpossibleCase -> ImpossibleCase
-            PossibleCase m_m_matrix
-              ->
-                case m_m_matrix of
-                  Nothing -> PossibleCase Nothing
-                  Just m_matrix
-                    ->
-                      case m_matrix of
-                        Nothing
-                          ->
-                            if 0 <= int
-                              then
-                                PossibleCase
-                                  (Just
-                                    (Just
-                                      (toMatrixFromRawMatrix
-                                        (toRawMatrixFromList
-                                          [
-                                            List.repeat int 0
-                                          ,
-                                            List.repeat int 1
-                                          ]))))
-                              else
-                                PossibleCase Nothing
-                        Just matrix
-                          ->
-                            case toNatFromInt int of
-                              Nothing -> PossibleCase Nothing
-                              Just nat
-                                ->
-                                  case expandMatrix matrix nat of
-                                    ImpossibleCase -> ImpossibleCase
-                                    PossibleCase m_matrix_
-                                      ->
-                                        case m_matrix_ of
-                                          Nothing -> PossibleCase Nothing
-                                          Just matrix_
-                                            ->
-                                              PossibleCase (Just (Just matrix_))
+          case toNatFromInt int of
+            Just nat ->
+              case maybe_case_result_x of
+                Just case_result_x
+                  ->
+                    PossibleCase result_x
+                      ->
+                        case result_x of
+                          Ok x -> Just (notation.expand x nat)
+                          Err e -> Just (PossibleCase (Err e))
+                    ImpossibleCase -> Just ImpossibleCase
+                Nothing -> Nothing
+            Nothing -> Nothing
     in
-      List.foldl f (PossibleCase (Just Nothing)) outer
+      Array.foldl func (Just (PossibleCase (Ok notation.maximum))) outer
 
 {-| バシク行列システム 4 の外表記です。
 -}
