@@ -107,14 +107,45 @@ toTermFromRawOuter notation outer
 -}
 type Outer = Outer RawOuter
 
-{-| 行列から外表記へ変換します。
+{-| 表記の項から外表記へ変換します。
 -}
-toOuterFromMatrix : Maybe Matrix -> Case (Maybe Outer)
-toOuterFromMatrix m_matrix
+toOuterFromTerm : Notation a -> a -> Case (Maybe Outer)
+toOuterFromTerm notation term
   =
-    case m_matrix of
-      Nothing -> PossibleCase (Just (Outer []))
-      Just matrix -> toOuterFromMatrix_helper_1 matrix []
+    toOuterFromTerm_helper_1 notation term Array.empty notation.maximum
+
+toOuterFromTerm_helper_1 : Notation a -> a -> Array Int -> a -> Case (Maybe Outer)
+toOuterFromTerm_helper_1 notation term x_int term_
+  =
+    case notation.compare term term_ of
+      LT
+        ->
+          toOuterFromTerm_helper_2 notation term x_int term_ 0
+      EQ -> PossibleCase (Just (Outer x_int))
+      GT -> PossibleCase Nothing
+
+toOuterFromTerm_helper_2 : Notation a -> a -> Array Int -> a -> Int -> Case (Maybe Outer)
+toOuterFromTerm_helper_2 notation term x_int term_ int
+  =
+    case toNatFromInt int of
+      Just nat
+        ->
+          case notation.expand term_ nat of
+            PossibleCase result_term__
+              ->
+                case result_term__ of
+                  Ok term__
+                    ->
+                  Err e
+                    ->
+                      if 0 <= int
+                        then
+                          if 1 <= int
+                            then toOuterFromTerm_helper_1 notation term (Array.push 0 x_int)
+                            else PossibleCase (Just (Outer x_int))
+                        else ImpossibleCase
+            ImpossibleCase -> ImpossibleCase
+      Nothing -> ImpossibleCase
 
 toOuterFromMatrix_helper_1 : Matrix -> List Int -> Case (Maybe Outer)
 toOuterFromMatrix_helper_1 matrix x
