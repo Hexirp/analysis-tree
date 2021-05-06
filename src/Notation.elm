@@ -148,35 +148,6 @@ toOuterFromTerm_helper_2 notation term x_int term_ int
             ImpossibleCase -> ImpossibleCase
       Nothing -> ImpossibleCase
 
-toOuterFromMatrix_helper_1 : Matrix -> List Int -> Case (Maybe Outer)
-toOuterFromMatrix_helper_1 matrix x
-  =
-    toOuterFromMatrix_helper_2 matrix x 0
-
-toOuterFromMatrix_helper_2 : Matrix -> List Int -> Int -> Case (Maybe Outer)
-toOuterFromMatrix_helper_2 matrix x n
-  =
-    case toMatrixFromRawOuter (x ++ [n]) of
-      ImpossibleCase -> ImpossibleCase
-      PossibleCase m_m_matrix_
-        ->
-          case m_m_matrix_ of
-            Nothing
-              ->
-                if n == 0
-                  then PossibleCase Nothing
-                  else toOuterFromMatrix_helper_1 matrix (x ++ [n - 1])
-            Just m_matrix_
-              ->
-                case m_matrix_ of
-                  Nothing -> ImpossibleCase
-                  Just matrix_
-                    ->
-                      case compareMatrix matrix matrix_ of
-                        LT -> toOuterFromMatrix_helper_1 matrix (x ++ [n - 1])
-                        EQ -> PossibleCase (Just (Outer (x ++ [n])))
-                        GT -> toOuterFromMatrix_helper_2 matrix x (n + 1)
-
 {-| 外表記から行列へ変換します。
 -}
 toMatrixFromOuter : Outer -> Case (Maybe (Maybe Matrix))
