@@ -7,7 +7,7 @@ module Notation
     ,
       succ
     ,
-      IsNegativeError
+      IsNegativeError (..)
     ,
       toNatFromInt
     ,
@@ -29,7 +29,7 @@ module Notation
     ,
       toOuterFromTerm
     ,
-      toMatrixFromOuter
+      toTermFromOuter
     ,
       toOuterFromRawOuter
     ,
