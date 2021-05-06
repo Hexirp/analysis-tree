@@ -25,7 +25,7 @@ import Array exposing (Array)
     Nothing -> ImpossibleCase
     Just int -> PossibleCase int
 -}
-type Case a = ImpossibleCase | PossibleCase a
+type Case a = PossibleCase a | ImpossibleCase
 
 {-| 或る `Case` 型の値が妥当であることを確かめます。 -}
 isValid : Case a -> Bool

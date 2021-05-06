@@ -3,6 +3,8 @@ module Notation
     (
       Nat
     ,
+      zero
+    ,
       toNatFromInt
     ,
       toIntFromNat
@@ -17,11 +19,11 @@ module Notation
     ,
       RawOuter
     ,
-      toMatrixFromRawOuter
+      toTermFromRawOuter
     ,
       Outer (..)
     ,
-      toOuterFromMatrix
+      toOuterFromTerm
     ,
       toMatrixFromOuter
     ,
