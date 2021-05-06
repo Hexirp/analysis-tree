@@ -5,6 +5,8 @@ module Notation
     ,
       zero
     ,
+      succ
+    ,
       toNatFromInt
     ,
       toIntFromNat
@@ -43,6 +45,9 @@ type Nat = Nat Int
 zero : Nat
 zero = Nat 0
 
+succ : Nat -> Nat
+succ (Nat int) = Nat (int + 1)
+
 {-| 或る整数から或る自然数へ変換します。
 -}
 toNatFromInt : Int -> Maybe Nat
@@ -79,11 +84,11 @@ type alias Notation a
       maximum : a
     }
 
-{-| 生の外表記です。
+{-| 生の外表記の項です。
 -}
 type alias RawOuter = Array Int
 
-{-| 生の外表記から表記の項へ変換します。
+{-| 生の外表記の項から表記の項へ変換します。
 -}
 toTermFromRawOuter : Notation a -> RawOuter -> Maybe (Case (Result (IsLessThanCoftypeError a) a))
 toTermFromRawOuter notation outer
@@ -109,11 +114,11 @@ toTermFromRawOuter notation outer
     in
       Array.foldl func (Just (PossibleCase (Ok notation.maximum))) outer
 
-{-| 外表記です。
+{-| 外表記の項です。
 -}
 type Outer = Outer RawOuter
 
-{-| 表記の項から外表記へ変換します。
+{-| 表記の項から外表記の項へ変換します。
 -}
 toOuterFromTerm : Notation a -> a -> Case (Maybe Outer)
 toOuterFromTerm notation term
@@ -137,6 +142,7 @@ toOuterFromTerm_helper_1 notation term x_int term_
                   EQ -> PossibleCase (Just (Array.push 0 x_int))
                   GT -> PossibleCase Nothing
             Err _ -> PossibleCase Nothing
+      ImpossibleCase -> ImpossibleCase
 
 toOuterFromTerm_helper_2 : Notation a -> a -> Array Int -> a -> Int -> Case (Maybe Outer)
 toOuterFromTerm_helper_2 notation term x_int term_ int
@@ -165,26 +171,32 @@ toOuterFromTerm_helper_2 notation term x_int term_ int
             ImpossibleCase -> ImpossibleCase
       Nothing -> ImpossibleCase
 
-{-| 外表記から行列へ変換します。
+{-| 外表記の項から表記の項へ変換します。
 -}
-toMatrixFromOuter : Outer -> Case (Maybe (Maybe Matrix))
-toMatrixFromOuter (Outer outer) = toMatrixFromRawOuter outer
+toTermFromOuter : Notation a -> Outer -> Maybe (Case (Result (IsLessThanCoftypeError a) a))
+toTermFromOuter outer = toTermFromRawOuter (toOuterFromRawOuter outer)
 
-{-| 生の外表記から外表記へ変換します。
+{-| 生の外表記の項から外表記の項へ変換します。
 -}
-toOuterFromRawOuter : RawOuter -> Case (Maybe Outer)
-toOuterFromRawOuter x
+toOuterFromRawOuter : Notation a -> RawOuter -> Maybe (Case (Result (IsLessThanCoftypeError a) (Case (Maybe Outer))))
+toOuterFromRawOuter notation x_int
   =
-    case toMatrixFromRawOuter x of
-      ImpossibleCase -> ImpossibleCase
-      PossibleCase m_m_matrix
-        ->
-          case m_m_matrix of
-            Nothing -> PossibleCase Nothing
-            Just m_matrix
-              -> toOuterFromMatrix m_matrix
+    let
+      maybe_case_result_term = toTermFromRawOuter notation x_int
+    in
+      case maybe_case_result_term of
+        Just case_result_term
+          ->
+            case case_result_term of
+              PossibleCase result_term
+                ->
+                  case result_term of
+                    Ok term -> Just (PossibleCase (Ok (toOuterFromTerm notation term)))
+                    Err e -> Just (PossibleCase (Err e))
+              ImpossibleCase -> Just ImpossibleCase
+        Nothing -> Nothing
 
-{-| 外表記から生の外表記へ変換します。
+{-| 外表記の項から生の外表記の項へ変換します。
 -}
 toRawOuterFromOuter : Outer -> RawOuter
 toRawOuterFromOuter (Outer x) = x
