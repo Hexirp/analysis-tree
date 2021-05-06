@@ -124,7 +124,7 @@ toRawOuterFromTerm_helper_2 : Notation a -> a -> Array Int -> a -> Int -> Case (
 toRawOuterFromTerm_helper_2 notation term x_int term_ int
   =
     case toNatFromInt (int + 1) of
-      Just nat
+      Ok nat
         ->
           case notation.expand term_ nat of
             PossibleCase result_term__
@@ -145,7 +145,7 @@ toRawOuterFromTerm_helper_2 notation term x_int term_ int
                             else PossibleCase Nothing
                         else ImpossibleCase
             ImpossibleCase -> ImpossibleCase
-      Nothing -> ImpossibleCase
+      Err e -> ImpossibleCase
 
 {-| 生の外表記の項から表記の項へ変換します。
 -}
@@ -201,11 +201,11 @@ toOuterFromTerm notation term
 {-| 外表記の項から表記の項へ変換します。
 -}
 toTermFromOuter : Notation a -> Outer -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError a) a))
-toTermFromOuter outer = toTermFromRawOuter (toOuterFromRawOuter outer)
+toTermFromOuter notation outer = toTermFromRawOuter notation (toRawOuterFromOuter outer)
 
 {-| 生の外表記の項から外表記の項へ変換します。
 -}
-toOuterFromRawOuter : Notation a -> RawOuter -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError a) (Maybe a)))
+toOuterFromRawOuter : Notation a -> RawOuter -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError a) (Maybe Outer)))
 toOuterFromRawOuter notation x_int
   =
     let
