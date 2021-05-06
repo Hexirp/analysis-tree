@@ -87,18 +87,19 @@ toTermFromRawOuter notation outer
       func int maybe_case_result_term
         =
           case toNatFromInt int of
-            Just nat ->
-              case maybe_case_result_term of
-                Just case_result_term
-                  ->
-                    case case_result_term of
-                      PossibleCase result_term
-                        ->
-                          case result_term of
-                            Ok term -> Just (notation.expand term nat)
-                            Err e -> Just (PossibleCase (Err e))
-                      ImpossibleCase -> Just ImpossibleCase
-                Nothing -> Nothing
+            Just nat
+              ->
+                case maybe_case_result_term of
+                  Just case_result_term
+                    ->
+                      case case_result_term of
+                        PossibleCase result_term
+                          ->
+                            case result_term of
+                              Ok term -> Just (notation.expand term nat)
+                              Err e -> Just (PossibleCase (Err e))
+                        ImpossibleCase -> Just ImpossibleCase
+                  Nothing -> Nothing
             Nothing -> Nothing
     in
       Array.foldl func (Just (PossibleCase (Ok notation.maximum))) outer
