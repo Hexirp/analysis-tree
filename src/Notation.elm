@@ -7,6 +7,8 @@ module Notation
     ,
       succ
     ,
+      IsNegativeError
+    ,
       toNatFromInt
     ,
       toIntFromNat
@@ -48,10 +50,12 @@ zero = Nat 0
 succ : Nat -> Nat
 succ (Nat int) = Nat (int + 1)
 
+type IsNegativeError = IsNegativeError Int
+
 {-| 或る整数から或る自然数へ変換します。
 -}
-toNatFromInt : Int -> Maybe Nat
-toNatFromInt x = if 0 <= x then Just (Nat x) else Nothing
+toNatFromInt : Int -> Result IsNegativeError Nat
+toNatFromInt x = if 0 <= x then Ok (Nat x) else Err (IsNegativeError x)
 
 {-| 或る自然数から或る整数へ変換します。
 -}
@@ -90,29 +94,37 @@ type alias RawOuter = Array Int
 
 {-| 生の外表記の項から表記の項へ変換します。
 -}
-toTermFromRawOuter : Notation a -> RawOuter -> Maybe (Case (Result (IsLessThanCoftypeError a) a))
+toTermFromRawOuter : Notation a -> RawOuter -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError a) a))
 toTermFromRawOuter notation outer
   =
     let
-      func int maybe_case_result_term
+      func int case_result_result_term
         =
           case toNatFromInt int of
-            Just nat
+            Ok nat
               ->
-                case maybe_case_result_term of
-                  Just case_result_term
+                case case_result_result_term of
+                  PossibleCase result_result_term
                     ->
-                      case case_result_term of
-                        PossibleCase result_term
+                      case result_result_term of
+                        Ok result_term
                           ->
                             case result_term of
-                              Ok term -> Just (notation.expand term nat)
-                              Err e -> Just (PossibleCase (Err e))
-                        ImpossibleCase -> Just ImpossibleCase
-                  Nothing -> Nothing
-            Nothing -> Nothing
+                              Ok term
+                                ->
+                                  case notation.expand term nat of
+                                    PossibleCase result_term_
+                                      ->
+                                        case result_term_ of
+                                          Ok term_ -> PossibleCase (Ok (Ok term_))
+                                          Err e -> PossibleCase (Ok (Err e))
+                                    ImpossibleCase -> ImpossibleCase
+                              Err e -> PossibleCase (Ok (Err e))
+                        Err e -> PossibleCase (Err e)
+                  ImpossibleCase -> ImpossibleCase
+            Err e -> PossibleCase (Err e)
     in
-      Array.foldl func (Just (PossibleCase (Ok notation.maximum))) outer
+      Array.foldl func (PossibleCase (Ok (Ok notation.maximum))) outer
 
 {-| 外表記の項です。
 -}
