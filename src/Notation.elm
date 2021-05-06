@@ -78,16 +78,16 @@ isLessThanCoftype nat coftype
       One -> toIntFromNat nat < 1
       Omega -> True
 
-type IsLessThanCoftypeError a = IsLessThanCoftypeError a Nat Coftype
+type IsLessThanCoftypeError term = IsLessThanCoftypeError term Nat Coftype
 
-type alias Notation a
+type alias Notation term
   =
     {
-      compare : a -> a -> Order
+      compare : term -> term -> Order
     ,
-      expand : a -> Nat -> Case (Result (IsLessThanCoftypeError a) a)
+      expand : term -> Nat -> Case (Result (IsLessThanCoftypeError term) term)
     ,
-      maximum : a
+      maximum : term
     }
 
 {-| 生の外表記の項です。
@@ -96,7 +96,7 @@ type alias RawOuter = Array Int
 
 {-| 表記の項から生の外表記の項へ変換します。
 -}
-toRawOuterFromTerm : Notation a -> a -> Case (Maybe RawOuter)
+toRawOuterFromTerm : Notation term -> term -> Case (Maybe RawOuter)
 toRawOuterFromTerm notation term
   =
     case notation.compare term notation.maximum of
@@ -104,7 +104,7 @@ toRawOuterFromTerm notation term
       EQ -> PossibleCase (Just Array.empty)
       GT -> PossibleCase Nothing
 
-toRawOuterFromTerm_helper_1 : Notation a -> a -> Array Int -> a -> Case (Maybe RawOuter)
+toRawOuterFromTerm_helper_1 : Notation term -> term -> Array Int -> term -> Case (Maybe RawOuter)
 toRawOuterFromTerm_helper_1 notation term x_int term_
   =
     case notation.expand term_ zero of
@@ -120,7 +120,7 @@ toRawOuterFromTerm_helper_1 notation term x_int term_
             Err _ -> PossibleCase Nothing
       ImpossibleCase -> ImpossibleCase
 
-toRawOuterFromTerm_helper_2 : Notation a -> a -> Array Int -> a -> Int -> Case (Maybe RawOuter)
+toRawOuterFromTerm_helper_2 : Notation term -> term -> Array Int -> term -> Int -> Case (Maybe RawOuter)
 toRawOuterFromTerm_helper_2 notation term x_int term_ int
   =
     case toNatFromInt (int + 1) of
@@ -149,7 +149,7 @@ toRawOuterFromTerm_helper_2 notation term x_int term_ int
 
 {-| 生の外表記の項から表記の項へ変換します。
 -}
-toTermFromRawOuter : Notation a -> RawOuter -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError a) a))
+toTermFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError term) term))
 toTermFromRawOuter notation outer
   =
     let
@@ -187,7 +187,7 @@ type Outer = Outer RawOuter
 
 {-| 表記の項から外表記の項へ変換します。
 -}
-toOuterFromTerm : Notation a -> a -> Case (Maybe Outer)
+toOuterFromTerm : Notation term -> term -> Case (Maybe Outer)
 toOuterFromTerm notation term
   =
     case toRawOuterFromTerm notation term of
@@ -200,12 +200,12 @@ toOuterFromTerm notation term
 
 {-| 外表記の項から表記の項へ変換します。
 -}
-toTermFromOuter : Notation a -> Outer -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError a) a))
+toTermFromOuter : Notation term -> Outer -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError term) term))
 toTermFromOuter notation outer = toTermFromRawOuter notation (toRawOuterFromOuter outer)
 
 {-| 生の外表記の項から外表記の項へ変換します。
 -}
-toOuterFromRawOuter : Notation a -> RawOuter -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError a) (Maybe Outer)))
+toOuterFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError term) (Maybe Outer)))
 toOuterFromRawOuter notation x_int
   =
     let
