@@ -38,6 +38,9 @@ import Case exposing (Case (..))
 -}
 type Nat = Nat Int
 
+zero : Nat
+zero = Nat 0
+
 {-| 或る整数から或る自然数へ変換します。
 -}
 toNatFromInt : Int -> Maybe Nat
@@ -113,22 +116,30 @@ type Outer = Outer RawOuter
 toOuterFromTerm : Notation a -> a -> Case (Maybe Outer)
 toOuterFromTerm notation term
   =
-    toOuterFromTerm_helper_1 notation term Array.empty notation.maximum
+    case notation.compare term notation.maximum of
+      LT -> toOuterFromTerm_helper_1 notation term Array.empty notation.maximum
+      EQ -> PossibleCase (Just Array.empty)
+      GT -> PossibleCase Nothing
 
 toOuterFromTerm_helper_1 : Notation a -> a -> Array Int -> a -> Case (Maybe Outer)
 toOuterFromTerm_helper_1 notation term x_int term_
   =
-    case notation.compare term term_ of
-      LT
+    case notation.expand term_ zero of
+      PossibleCase result_term__
         ->
-          toOuterFromTerm_helper_2 notation term x_int term_ 0
-      EQ -> PossibleCase (Just (Outer x_int))
-      GT -> PossibleCase Nothing
+          case result_term__ of
+            Ok term__
+              ->
+                case notation.compare term term__ of
+                  LT -> toOuterFromTerm_helper_2 notation term x_int term__ 0
+                  EQ -> PossibleCase (Just (Array.push 0 x_int))
+                  GT -> PossibleCase Nothing
+            Err _ -> PossibleCase Nothing
 
 toOuterFromTerm_helper_2 : Notation a -> a -> Array Int -> a -> Int -> Case (Maybe Outer)
 toOuterFromTerm_helper_2 notation term x_int term_ int
   =
-    case toNatFromInt int of
+    case toNatFromInt (int + 1) of
       Just nat
         ->
           case notation.expand term_ nat of
@@ -137,13 +148,17 @@ toOuterFromTerm_helper_2 notation term x_int term_ int
                 case result_term__ of
                   Ok term__
                     ->
+                      case notation.compare term term__ of
+                        LT -> toOuterFromTerm_helper_2 notation term x_int term__ (int + 1)
+                        EQ -> PossibleCase (Just (Array.push (int + 1) x_int))
+                        GT -> toOuterFromTerm_helper_1 notation term (Array.push i x_int) term_
                   Err e
                     ->
                       if 0 <= int
                         then
                           if 1 <= int
-                            then toOuterFromTerm_helper_1 notation term (Array.push 0 x_int)
-                            else PossibleCase (Just (Outer x_int))
+                            then toOuterFromTerm_helper_1 notation term (Array.push 0 x_int) term_
+                            else PossibleCase Nothing
                         else ImpossibleCase
             ImpossibleCase -> ImpossibleCase
       Nothing -> ImpossibleCase
