@@ -159,7 +159,7 @@ toOuterFromTerm_helper_2 notation term x_int term_ int
                       case notation.compare term term__ of
                         LT -> toOuterFromTerm_helper_2 notation term x_int term__ (int + 1)
                         EQ -> PossibleCase (Just (Array.push (int + 1) x_int))
-                        GT -> toOuterFromTerm_helper_1 notation term (Array.push i x_int) term_
+                        GT -> toOuterFromTerm_helper_1 notation term (Array.push int x_int) term_
                   Err e
                     ->
                       if 0 <= int
