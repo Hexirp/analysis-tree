@@ -1,7 +1,7 @@
 module Notation
   exposing
     (
-      Nat
+      Nat (..)
     ,
       zero
     ,
@@ -15,13 +15,17 @@ module Notation
     ,
       Coftype (..)
     ,
-      isLessThanCoftype
+      isGeCoftype
     ,
-      IsLessThanCoftypeError (..)
+      IsGeCoftypeError (..)
     ,
       Notation
     ,
       RawOuter
+    ,
+      toRawOuterFromList
+    ,
+      toListFromRawOuter
     ,
       toRawOuterFromTerm
     ,
@@ -38,6 +42,21 @@ module Notation
       toRawOuterFromOuter
     )
 
+{-| 基本列付きの順序数表記です。
+
+# 自然数
+@docs Nat, zero, succ, IsNegativeError, toNatFromInt, toIntFromNat
+
+# 共終タイプ
+@docs Coftype, isGeCoftype
+
+# 順序数表記
+@docs IsGeCoftypeError, Notation
+
+# 外表記
+@docs RawOuter, toRawOuterFromList, toListFromRawOuter, toRawOuterFromTerm, toTermFromRawOuter, Outer, toOuterFromTerm, toTermFromOuter, toOuterFromRawOuter, toRawOuterFromOuter
+-}
+
 import Array exposing (Array)
 
 import Case exposing (Case (..))
@@ -46,15 +65,23 @@ import Case exposing (Case (..))
 -}
 type Nat = Nat Int
 
+{-| 自然数の `0` です。
+-}
 zero : Nat
 zero = Nat 0
 
+{-| 或る自然数を取り、其の後者を返します。
+-}
 succ : Nat -> Nat
 succ (Nat int) = Nat (int + 1)
 
+{-| 或る整数から或る自然数に変換する時に、其の整数が負であると発生するエラーです。
+-}
 type IsNegativeError = IsNegativeError Int
 
 {-| 或る整数から或る自然数へ変換します。
+
+其の整数が負だと `IsNegativeError` となります。
 -}
 toNatFromInt : Int -> Result IsNegativeError Nat
 toNatFromInt x = if 0 <= x then Ok (Nat x) else Err (IsNegativeError x)
@@ -68,24 +95,38 @@ toIntFromNat (Nat int) = int
 -}
 type Coftype = Zero | One | Omega
 
-{-| 或る自然数が、或る共終タイプよりも小さいかどうか判定します。
+{-| 或る自然数が、或る共終タイプ以上であるかどうか判定します。
 -}
-isLessThanCoftype : Nat -> Coftype -> Bool
-isLessThanCoftype nat coftype
+isGeCoftype : Nat -> Coftype -> Bool
+isGeCoftype nat coftype
   =
     case coftype of
-      Zero -> False
-      One -> toIntFromNat nat < 1
-      Omega -> True
+      Zero -> 0 <= toIntFromNat nat
+      One -> 1 <= toIntFromNat nat
+      Omega -> False
 
-type IsLessThanCoftypeError term = IsLessThanCoftypeError term Nat Coftype
+{-| 或る表記の項を或る自然数で展開する時に、其の自然数が大きすぎると発生するエラーです。
 
+たとえば、原始数列システムを順序数の表記として見なしたとき、 `(0,1,0)` を `2` で展開しようとすると、基本列の長さが足りないので、展開できません。そのような時のエラーです。
+-}
+type IsGeCoftypeError term = IsGeCoftypeError term Nat Coftype
+
+{-| 基本列付きの順序数表記です。
+
+`compare` は、或る二つの項を比較します。これは全順序でなければなりません。
+
+`expand` は、或る項を或る自然数で展開します。其の自然数が其の基本列の長さよりも大きい時は `IsGeCoftypeError` となります。これは `x[n] < x` でなければなりません。これは `x[n] < x[n+1]` でなければなりません。
+
+`maximum` は、表記の限界を表す項です。これが必要なのは、アプリケーションで利用する外表記が、表記の限界を表す項を必要とするからです。これは `a ≤ x → a = x` でなければなりません。
+
+余談として、これは真の順序数表記であることを必要としませんが、もし `compare` が整礎であるならば真の順序数表記になります。
+-}
 type alias Notation term
   =
     {
       compare : term -> term -> Order
     ,
-      expand : term -> Nat -> Case (Result (IsLessThanCoftypeError term) term)
+      expand : term -> Nat -> Case (Result (IsGeCoftypeError term) term)
     ,
       maximum : term
     }
@@ -93,6 +134,16 @@ type alias Notation term
 {-| 生の外表記の項です。
 -}
 type alias RawOuter = Array Int
+
+{-| リストから生の外表記の項へ変換します。
+-}
+toRawOuterFromList : List Int -> RawOuter
+toRawOuterFromList list = Array.fromList list
+
+{-| 生の外表記の項からリストへ変換します。
+-}
+toListFromRawOuter : RawOuter -> List Int
+toListFromRawOuter x_int = Array.toList x_int
 
 {-| 表記の項から生の外表記の項へ変換します。
 -}
@@ -149,7 +200,7 @@ toRawOuterFromTerm_helper_2 notation term x_int term_ int
 
 {-| 生の外表記の項から表記の項へ変換します。
 -}
-toTermFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError term) term))
+toTermFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (IsGeCoftypeError term) term))
 toTermFromRawOuter notation outer
   =
     let
@@ -200,12 +251,12 @@ toOuterFromTerm notation term
 
 {-| 外表記の項から表記の項へ変換します。
 -}
-toTermFromOuter : Notation term -> Outer -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError term) term))
+toTermFromOuter : Notation term -> Outer -> Case (Result IsNegativeError (Result (IsGeCoftypeError term) term))
 toTermFromOuter notation outer = toTermFromRawOuter notation (toRawOuterFromOuter outer)
 
 {-| 生の外表記の項から外表記の項へ変換します。
 -}
-toOuterFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (IsLessThanCoftypeError term) (Maybe Outer)))
+toOuterFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (IsGeCoftypeError term) (Maybe Outer)))
 toOuterFromRawOuter notation x_int
   =
     let
