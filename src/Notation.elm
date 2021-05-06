@@ -19,7 +19,7 @@ module Notation
     ,
       IsLessThanCoftypeError (..)
     ,
-      Notation (..)
+      Notation
     ,
       RawOuter
     ,
