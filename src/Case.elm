@@ -104,7 +104,5 @@ initializeArrayWithCaseWithState int f s
                 ImpossibleCase -> ImpossibleCase
     in
       case func 0 s of
-        PossibleCase (list, s_)
-          ->
-            PossibleCase (Array.fromList list, s_)
+        PossibleCase (list, s_) -> PossibleCase (Array.fromList list, s_)
         ImpossibleCase -> ImpossibleCase
