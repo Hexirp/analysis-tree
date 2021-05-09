@@ -9,6 +9,8 @@ module Case
     ,
       sequenceArray
     ,
+      sequenceArrayWithState
+    ,
       initializeArrayWithCase
     ,
       initializeArrayWithCaseWithState
@@ -24,7 +26,7 @@ module Case
 
 # 関数たち
 
-@docs isValid, traverseArray, sequenceArray, initializeArrayWithCase, initializeArrayWithCaseWithState
+@docs isValid, traverseArray, sequenceArray, sequenceArrayWithState, initializeArrayWithCase, initializeArrayWithCaseWithState
 -}
 
 import Array exposing (Array)
@@ -54,11 +56,13 @@ traverseArray f int_x
     let
       func x case_int_x_
         =
-          case f x of
-            PossibleCase y
+          case case_int_x_ of
+            PossibleCase int_x_
               ->
-                case case_int_x_ of
-                  PossibleCase int_x_ -> PossibleCase (Array.push y int_x_)
+                case f x of
+                  PossibleCase y
+                    ->
+                      PossibleCase (Array.push y int_x_)
                   ImpossibleCase -> ImpossibleCase
             ImpossibleCase -> ImpossibleCase
     in
@@ -71,15 +75,34 @@ sequenceArray int_x
     let
       func case_x case_int_x_
         =
-          case case_x of
-            PossibleCase x
+          case case_int_x_ of
+            PossibleCase int_x_
               ->
-                case case_int_x_ of
-                  PossibleCase int_x_ -> PossibleCase (Array.push x int_x_)
+                case case_x of
+                  PossibleCase x
+                    ->
+                      PossibleCase (Array.push x int_x_)
                   ImpossibleCase -> ImpossibleCase
             ImpossibleCase -> ImpossibleCase
     in
       Array.foldl func (PossibleCase Array.empty) int_x
+
+{-| 或る配列を其の恒等関数によってトラバースします。状態の作用が加わっています。 -}
+sequenceArrayWithState : Array (state -> Case (a, state)) -> state -> Case (Array a, state)
+sequenceArrayWithState int_x
+  =
+    let
+      func case_x case_int_x_
+        =
+          case case_int_x_ of
+            PossibleCase (int_x_, s)
+              ->
+                case case_x s of
+                  PossibleCase (x, s_) -> PossibleCase (Array.push x int_x_, s_)
+                  ImpossibleCase -> ImpossibleCase
+            ImpossibleCase -> ImpossibleCase
+    in
+      \s -> Array.foldl func (PossibleCase (Array.empty, s)) int_x
 
 {-| 或る配列を或る関数により生成します。 `initializeArrayWithCase int func` は、その長さが `int` でインデックス `i` の要素が `f i` である配列を返します。 `Case` の作用が加わっています。 -}
 initializeArrayWithCase : Int -> (Int -> Case a) -> Case (Array a)
@@ -87,22 +110,4 @@ initializeArrayWithCase int f = sequenceArray (Array.initialize int f)
 
 {-| 或る配列を或る関数により生成します。 `initializeArrayWithCaseWithState int func state` は、その長さが `int` でインデックス `i` の要素が `f i` である配列を返します。 `Case` と状態の作用が加わっています。 -}
 initializeArrayWithCaseWithState : Int -> (Int -> state -> Case (a, state)) -> state -> Case (Array a, state)
-initializeArrayWithCaseWithState int f s
-  =
-    let
-      func n s_
-        =
-          if int <= n
-            then PossibleCase ([], s_)
-            else
-              case f n s_ of
-                PossibleCase (xp, s__)
-                  ->
-                    case func (n + 1) s__ of
-                      PossibleCase (xs, s___) -> PossibleCase (xp :: xs, s___)
-                      ImpossibleCase -> ImpossibleCase
-                ImpossibleCase -> ImpossibleCase
-    in
-      case func 0 s of
-        PossibleCase (list, s_) -> PossibleCase (Array.fromList list, s_)
-        ImpossibleCase -> ImpossibleCase
+initializeArrayWithCaseWithState int f = sequenceArrayWithState (Array.initialize int f)
