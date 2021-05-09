@@ -15,7 +15,7 @@ module Notation
     ,
       Coftype (..)
     ,
-      isGeCoftype
+      compareNat
     ,
       IsGeCoftypeError (..)
     ,
@@ -48,7 +48,7 @@ module Notation
 @docs Nat, zero, succ, IsNegativeError, toNatFromInt, toIntFromNat
 
 # 共終タイプ
-@docs Coftype, isGeCoftype
+@docs Coftype, compareNat
 
 # 順序数表記
 @docs IsGeCoftypeError, Notation
@@ -95,15 +95,15 @@ toIntFromNat (Nat int) = int
 -}
 type Coftype = Zero | One | Omega
 
-{-| 或る自然数が、或る共終タイプ以上であるかどうか判定します。
+{-| 或る共終タイプを、或る自然数と比較します。
 -}
-isGeCoftype : Nat -> Coftype -> Bool
-isGeCoftype nat coftype
+compareNat : Coftype -> Nat -> Order
+compareNat coftype nat
   =
     case coftype of
-      Zero -> 0 <= toIntFromNat nat
-      One -> 1 <= toIntFromNat nat
-      Omega -> False
+      Zero -> compare 0 (toIntFromNat nat)
+      One -> compare 1 (toIntFromNat nat)
+      Omega -> GT
 
 {-| 或る表記の項を或る自然数で展開する時に、其の自然数が大きすぎると発生するエラーです。
 
