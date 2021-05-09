@@ -17,7 +17,7 @@ module Notation
     ,
       compareNat
     ,
-      IsGeCoftypeError (..)
+      OutOfIndexError (..)
     ,
       Notation
     ,
@@ -51,7 +51,7 @@ module Notation
 @docs Coftype, compareNat
 
 # 順序数表記
-@docs IsGeCoftypeError, Notation
+@docs OutOfIndexError, Notation
 
 # 外表記
 @docs RawOuter, toRawOuterFromList, toListFromRawOuter, toRawOuterFromTerm, toTermFromRawOuter, Outer, toOuterFromTerm, toTermFromOuter, toOuterFromRawOuter, toRawOuterFromOuter
@@ -109,13 +109,13 @@ compareNat coftype nat
 
 たとえば、原始数列システムを順序数の表記として見なしたとき、 `(0,1,0)` を `2` で展開しようとすると、基本列の長さが足りないので、展開できません。そのような時のエラーです。
 -}
-type IsGeCoftypeError term = IsGeCoftypeError term Nat Coftype
+type OutOfIndexError term = OutOfIndexError term Nat Coftype
 
 {-| 基本列付きの順序数表記です。
 
 `compare` は、或る二つの項を比較します。これは全順序でなければなりません。
 
-`expand` は、或る項を或る自然数で展開します。其の自然数が其の基本列の長さよりも大きい時は `IsGeCoftypeError` となります。これは `x[n] < x` でなければなりません。これは `x[n] < x[n+1]` でなければなりません。
+`expand` は、或る項を或る自然数で展開します。其の自然数が其の基本列の長さよりも大きい時は `OutOfIndexError` となります。これは `x[n] < x` でなければなりません。これは `x[n] < x[n+1]` でなければなりません。
 
 `maximum` は、表記の限界を表す項です。これが必要なのは、アプリケーションで利用する外表記が、表記の限界を表す項を必要とするからです。これは `a ≤ x → a = x` でなければなりません。
 
@@ -126,7 +126,7 @@ type alias Notation term
     {
       compare : term -> term -> Order
     ,
-      expand : term -> Nat -> Case (Result (IsGeCoftypeError term) term)
+      expand : term -> Nat -> Case (Result (OutOfIndexError term) term)
     ,
       maximum : term
     }
@@ -200,7 +200,7 @@ toRawOuterFromTerm_helper_2 notation term x_int term_ int
 
 {-| 生の外表記の項から表記の項へ変換します。
 -}
-toTermFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (IsGeCoftypeError term) term))
+toTermFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (OutOfIndexError term) term))
 toTermFromRawOuter notation outer
   =
     let
@@ -251,12 +251,12 @@ toOuterFromTerm notation term
 
 {-| 外表記の項から表記の項へ変換します。
 -}
-toTermFromOuter : Notation term -> Outer -> Case (Result IsNegativeError (Result (IsGeCoftypeError term) term))
+toTermFromOuter : Notation term -> Outer -> Case (Result IsNegativeError (Result (OutOfIndexError term) term))
 toTermFromOuter notation outer = toTermFromRawOuter notation (toRawOuterFromOuter outer)
 
 {-| 生の外表記の項から外表記の項へ変換します。
 -}
-toOuterFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (IsGeCoftypeError term) (Maybe Outer)))
+toOuterFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (OutOfIndexError term) (Maybe Outer)))
 toOuterFromRawOuter notation x_int
   =
     let
