@@ -293,6 +293,7 @@ calcParentOnPatrixFromRawMatrixWithMemo x_y_int x y memo
     let
       get = getMemoCalcParentOnPatrixFromRawMatrix memo (x, y)
       set = insertMemoCalcParentOnPatrixFromRawMatrix memo (x, y)
+      parent_0 = calcParentOnPatrixFromRawMatrixWithMemo_helper_1
     in
       case get of
         Just pindex -> PossibleCase (pindex, memo)
@@ -302,7 +303,7 @@ calcParentOnPatrixFromRawMatrixWithMemo x_y_int x y memo
               Just y_int
                 ->
                   case Array.get y y_int of
-                    Just int -> calcParentOnPatrixFromRawMatrixWithMemo_helper_1 x_y_int x y y_int int (x - 1) memo
+                    Just int -> parent_0 x_y_int x y y_int int (x - 1) memo
                     Nothing ->
                       if 0 <= y
                         then
@@ -332,6 +333,8 @@ calcParentOnPatrixFromRawMatrixWithMemo_helper_1 x_y_int x y y_int int p memo
   =
     let
       set = insertMemoCalcParentOnPatrixFromRawMatrix memo (x, y)
+      parent = calcAncestorSetOnPatrixFromRawMatrixWithMemo
+      parent_0 = calcParentOnPatrixFromRawMatrixWithMemo_helper_1
     in
       case Array.get p x_y_int of
         Just y_int_
@@ -339,24 +342,24 @@ calcParentOnPatrixFromRawMatrixWithMemo_helper_1 x_y_int x y y_int int p memo
             case Array.get y y_int_ of
               Just int_
                 ->
-                  case calcAncestorSetOnPatrixFromRawMatrixWithMemo x_y_int x (y - 1) memo of
+                  case parent x_y_int x (y - 1) memo of
                     PossibleCase (is_ancestor, memo_)
                       ->
                         if int_ < int && is_ancestor p
                           then PossibleCase (Pindex p, set (Pindex p))
-                          else calcParentOnPatrixFromRawMatrixWithMemo_helper_1 x_y_int x y y_int int (p - 1) memo_
+                          else parent_0 x_y_int x y y_int int (p - 1) memo_
                     ImpossibleCase -> ImpossibleCase
               Nothing
                 ->
                   if 0 <= y && y < Array.length y_int_
                     then ImpossibleCase
                     else
-                      case calcAncestorSetOnPatrixFromRawMatrixWithMemo x_y_int x (y - 1) memo of
+                      case parent x_y_int x (y - 1) memo of
                         PossibleCase (is_ancestor, memo_)
                           ->
                             if is_ancestor p
                               then PossibleCase (Pindex p, set (Pindex p))
-                              else calcParentOnPatrixFromRawMatrixWithMemo_helper_1 x_y_int x y y_int int (p - 1) memo_
+                              else parent_0 x_y_int x y y_int int (p - 1) memo_
                         ImpossibleCase -> ImpossibleCase
         Nothing -> PossibleCase (Null, set Null)
 
@@ -368,22 +371,38 @@ calcAncestorSetOnPatrixFromRawMatrixWithMemo x_y_int x y memo
     let
       get = getMemoCalcAncestorSetOnPatrixFromRawMatrix memo (x, y)
       set = insertMemoCalcAncestorSetOnPatrixFromRawMatrix memo (x, y)
+      parent = calcParentOnPatrixFromRawMatrixWithMemo
+      ancestorSet = calcAncestorSetOnPatrixFromRawMatrixWithMemo
     in
       case get of
         Just is_ancestor -> PossibleCase (is_ancestor, memo)
         Nothing
           ->
-            case calcParentOnPatrixFromRawMatrixWithMemo x_y_int x y memo of
+            case parent x_y_int x y memo of
               PossibleCase (xp, memo_) -> case xp of
-                Null -> PossibleCase (\x__ -> x == x__, set (\x__ -> x == x__))
+                Null
+                  ->
+                    let
+                      v = \x__ -> x == x__
+                    in
+                      PossibleCase (v, set v)
                 Pindex x_
                   ->
                     if x_ < x
                       then
-                        case calcAncestorSetOnPatrixFromRawMatrixWithMemo x_y_int x_ y memo_ of
-                          PossibleCase (is_ancestor, memo__) -> PossibleCase (\x__ -> x == x__ || is_ancestor x__, set (\x__ -> x == x__ || is_ancestor x__))
+                        case ancestorSet x_y_int x_ y memo_ of
+                          PossibleCase (v, memo__)
+                            ->
+                              let
+                                v_ = \x__ -> x == x__ || v x__
+                              in
+                                PossibleCase (v_, set v_)
                           ImpossibleCase -> ImpossibleCase
-                      else PossibleCase (\x__ -> x == x__, set (\x__ -> x == x__))
+                      else
+                        let
+                          v = \x__ -> x == x__
+                        in
+                          PossibleCase (v, set v)
               ImpossibleCase -> ImpossibleCase
 
 {-| 或るパトリックスから或る行列を計算します。
