@@ -40,6 +40,8 @@ module Notation
       toOuterFromRawOuter
     ,
       toRawOuterFromOuter
+    ,
+      canonicalize
     )
 
 {-| 基本列付きの順序数表記です。
@@ -54,7 +56,7 @@ module Notation
 @docs OutOfIndexError, Notation
 
 # 外表記
-@docs RawOuter, toRawOuterFromList, toListFromRawOuter, toRawOuterFromTerm, toTermFromRawOuter, Outer, toOuterFromTerm, toTermFromOuter, toOuterFromRawOuter, toRawOuterFromOuter
+@docs RawOuter, toRawOuterFromList, toListFromRawOuter, toRawOuterFromTerm, toTermFromRawOuter, Outer, toOuterFromTerm, toTermFromOuter, toOuterFromRawOuter, toRawOuterFromOuter, canonicalize
 -}
 
 import Array exposing (Array)
@@ -278,3 +280,8 @@ toOuterFromRawOuter notation x_int
 -}
 toRawOuterFromOuter : Outer -> RawOuter
 toRawOuterFromOuter (Outer x) = x
+
+{-| 外表記の項を正規化します。
+-}
+canonicalize : Notation term -> Outer -> Case (Result IsNegativeError (Result (OutOfIndexError term) (Maybe Outer)))
+canonicalize notation outer = toOuterFromRawOuter notation (toRawOuterFromOuter outer)
