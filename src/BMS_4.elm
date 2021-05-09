@@ -82,7 +82,7 @@ import Notation
     ,
       Coftype (..)
     ,
-      isLessThanCoftype
+      compareNat
     )
 
 {-| これはバシク行列システムの行列を表す生の型です。
@@ -761,15 +761,17 @@ expandPatrix patrix n
       Zero -> PossibleCase Nothing
       One
         ->
-          if isLessThanCoftype n One
-            then
-              case patrix of
-                Patrix x y x_y_pindex
-                  ->
-                    PossibleCase
-                      (Just
-                        (Patrix (x - 1) y (Array.slice 0 -1 x_y_pindex)))
-            else PossibleCase Nothing
+          case compareNat One n of
+            LT -> PossibleCase Nothing
+            EQ -> PossibleCase Nothing
+            GT
+              ->
+                case patrix of
+                  Patrix x y x_y_pindex
+                    ->
+                      PossibleCase
+                        (Just
+                          (Patrix (x - 1) y (Array.slice 0 -1 x_y_pindex)))
       Omega
         ->
           case calcBadRootOfPatrix patrix of
