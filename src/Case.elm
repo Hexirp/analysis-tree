@@ -9,6 +9,8 @@ module Case
     ,
       sequenceArray
     ,
+      initializeArrayWithCase
+    ,
       initializeArrayWithCaseWithState
     )
 
@@ -22,7 +24,7 @@ module Case
 
 # 関数たち
 
-@docs isValid, traverseArray, sequenceArray, initializeArrayWithCaseWithState
+@docs isValid, traverseArray, sequenceArray, initializeArrayWithCase, initializeArrayWithCaseWithState
 -}
 
 import Array exposing (Array)
@@ -79,7 +81,11 @@ sequenceArray int_x
     in
       Array.foldl func (PossibleCase Array.empty) int_x
 
-{-| 或る配列を或る関数により生成します。 `initializeArrayWithCaseWithState int func state` は、その長さが `int` でインデックスが `i` の要素を `f i` である配列を返します。 `Case` と状態の作用が加わっています。 -}
+{-| 或る配列を或る関数により生成します。 `initializeArrayWithCase int func` は、その長さが `int` でインデックス `i` の要素が `f i` である配列を返します。 `Case` の作用が加わっています。 -}
+initializeArrayWithCase : Int -> (Int -> Case a) -> Case (Array a)
+initializeArrayWithCase int f = sequenceArray (Array.initialize int f)
+
+{-| 或る配列を或る関数により生成します。 `initializeArrayWithCaseWithState int func state` は、その長さが `int` でインデックス `i` の要素が `f i` である配列を返します。 `Case` と状態の作用が加わっています。 -}
 initializeArrayWithCaseWithState : Int -> (Int -> state -> Case (a, state)) -> state -> Case (Array a, state)
 initializeArrayWithCaseWithState int f s
   =

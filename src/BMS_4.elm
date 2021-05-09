@@ -380,10 +380,7 @@ calcMatrixFromPatrix (Patrix x y x_y_pindex)
       ImpossibleCase -> ImpossibleCase
 
 calcMatrixFromPatrix_helper_1 : Int -> Int -> RawPatrix -> Case RawMatrix
-calcMatrixFromPatrix_helper_1 x y x_y_pindex = Case.sequenceArray (Array.map Case.sequenceArray (calcMatrixFromPatrix_helper_2 x y x_y_pindex))
-
-calcMatrixFromPatrix_helper_2 : Int -> Int -> RawPatrix -> Array (Array (Case Int))
-calcMatrixFromPatrix_helper_2 x y x_y_pindex = Array.initialize x (\x_ -> Array.initialize y (\y_ -> calcElementOnMatrixFromRawPatrix x_y_pindex x_ y_))
+calcMatrixFromPatrix_helper_1 x y x_y_pindex = Case.initializeArrayWithCase x (\x_ -> Case.initializeArrayWithCase y (\y_ -> calcElementOnMatrixFromRawPatrix x_y_pindex x_ y_))
 
 {-| 或る `RawPatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、其の `RawPatrix` に対応する行列の、その要素に対応する要素を表す、或る `Int` を計算し、それを返します。
 
@@ -504,13 +501,10 @@ expandPatrix patrix n
             Nothing -> ImpossibleCase
 
 expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Case RawPatrix
-expandPatrix_helper_1 x y x_y_pindex n xr yr = Case.sequenceArray (Array.map Case.sequenceArray (expandPatrix_helper_2 x y x_y_pindex n xr yr))
+expandPatrix_helper_1 x y x_y_pindex n xr yr = Case.initializeArrayWithCase (xr + (((x - 1) - xr) * (toIntFromNat n + 1))) (\x_ -> Case.initializeArrayWithCase y (\y_ -> expandPatrix_helper_2 x_y_pindex xr yr x_ y_))
 
-expandPatrix_helper_2 : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Array (Array (Case Pindex))
-expandPatrix_helper_2 x y x_y_pindex n xr yr = Array.initialize (xr + (((x - 1) - xr) * (toIntFromNat n + 1))) (\x_ -> Array.initialize y (\y_ -> expandPatrix_helper_3 x_y_pindex xr yr x_ y_))
-
-expandPatrix_helper_3 : RawPatrix -> Int -> Int -> Int -> Int -> Case Pindex
-expandPatrix_helper_3 x_y_pindex xr yr x_ y_
+expandPatrix_helper_2 : RawPatrix -> Int -> Int -> Int -> Int -> Case Pindex
+expandPatrix_helper_2 x_y_pindex xr yr x_ y_
   =
     if x_ < xr
       then
