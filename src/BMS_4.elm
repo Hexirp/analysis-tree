@@ -249,7 +249,14 @@ calcPatrixFromMatrix_helper_1 x y x_y_int
       ImpossibleCase -> ImpossibleCase
 
 calcPatrixFromMatrix_helper_2 : Int -> Int -> RawMatrix -> MemoCalcPatrixFromMatrix -> Case (Array (Array Pindex), MemoCalcPatrixFromMatrix)
-calcPatrixFromMatrix_helper_2 x y x_y_int = Case.initializeArrayWithCaseWithState x (\x_ -> Case.initializeArrayWithCaseWithState y (\y_ -> calcParentOnPatrixFromRawMatrixWithMemo x_y_int x_ y_))
+calcPatrixFromMatrix_helper_2 x y x_y_int
+  =
+    let
+      pindex x_ y_ = calcParentOnPatrixFromRawMatrixWithMemo x_y_int x_ y_
+      y_pindex x_ = Case.initializeArrayWithCaseWithState y (\y_ -> pindex x_ y_)
+      x_y_pindex = Case.initializeArrayWithCaseWithState x (\x_ -> y_pindex x_)
+    in
+      x_y_pindex
 
 {-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の親を表す或る `Pindex` を計算し、それを返します。
 
