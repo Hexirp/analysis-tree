@@ -165,38 +165,34 @@ toRawOuterFromTerm_helper_1 notation term x_int term_
             Ok term__
               ->
                 case notation.compare term term__ of
-                  LT -> toRawOuterFromTerm_helper_2 notation term x_int term__ 0
+                  LT -> toRawOuterFromTerm_helper_2 notation term x_int term__ zero
                   EQ -> PossibleCase (Just (Array.push 0 x_int))
                   GT -> PossibleCase Nothing
             Err _ -> PossibleCase Nothing
       ImpossibleCase -> ImpossibleCase
 
-toRawOuterFromTerm_helper_2 : Notation term -> term -> Array Int -> term -> Int -> Case (Maybe RawOuter)
-toRawOuterFromTerm_helper_2 notation term x_int term_ int
+toRawOuterFromTerm_helper_2 : Notation term -> term -> Array Int -> term -> Nat -> Case (Maybe RawOuter)
+toRawOuterFromTerm_helper_2 notation term x_int term_ nat
   =
-    case toNatFromInt (int + 1) of
-      Ok nat
+    case notation.expand term_ (succ nat) of
+      PossibleCase result_term__
         ->
-          case notation.expand term_ nat of
-            PossibleCase result_term__
+          case result_term__ of
+            Ok term__
               ->
-                case result_term__ of
-                  Ok term__
-                    ->
-                      case notation.compare term term__ of
-                        LT -> toRawOuterFromTerm_helper_2 notation term x_int term__ (int + 1)
-                        EQ -> PossibleCase (Just (Array.push (int + 1) x_int))
-                        GT -> toRawOuterFromTerm_helper_1 notation term (Array.push int x_int) term_
-                  Err e
-                    ->
-                      if 0 <= int
-                        then
-                          if 1 <= int
-                            then toRawOuterFromTerm_helper_1 notation term (Array.push 0 x_int) term_
-                            else PossibleCase Nothing
-                        else ImpossibleCase
-            ImpossibleCase -> ImpossibleCase
-      Err e -> ImpossibleCase
+                case notation.compare term term__ of
+                  LT -> toRawOuterFromTerm_helper_2 notation term x_int term__ (succ nat)
+                  EQ -> PossibleCase (Just (Array.push (toIntFromNat (succ nat)) x_int))
+                  GT -> toRawOuterFromTerm_helper_1 notation term (Array.push (toIntFromNat nat) x_int) term_
+            Err e
+              ->
+                if 0 <= toIntFromNat nat
+                  then
+                    if 1 <= toIntFromNat nat
+                      then toRawOuterFromTerm_helper_1 notation term (Array.push 0 x_int) term_
+                      else PossibleCase Nothing
+                  else ImpossibleCase
+      ImpossibleCase -> ImpossibleCase
 
 {-| 生の外表記の項から表記の項へ変換します。
 -}
