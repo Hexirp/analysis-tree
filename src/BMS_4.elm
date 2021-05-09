@@ -1,36 +1,66 @@
 module BMS_4
   exposing
     (
-      RawMatrix,
-      toRawMatrixFromList,
-      toListFromRawMatrix,
-      Matrix (..),
-      compareMatrix,
-      verifyMatrix,
-      toMatrixFromRawMatrix,
-      toRawMatrixFromMatrix,
-      calcCoftypeOfMatrix,
-      expandMatrix,
-      Pindex (..),
-      RawPatrix,
-      toRawPatrixFromList,
-      toListFromRawPatrix,
-      Patrix (..),
-      calcPatrixFromMatrix,
-      MemoCalcPatrixFromMatrix,
-      emptyMemoCalcPatrixFromMatrix,
-      getMemoCalcParentOnPatrixFromRawMatrix,
-      getMemoCalcAncestorSetOnPatrixFromRawMatrix,
-      insertMemoCalcParentOnPatrixFromRawMatrix,
-      insertMemoCalcAncestorSetOnPatrixFromRawMatrix,
-      calcParentOnPatrixFromRawMatrix,
-      calcAncestorSetOnPatrixFromRawMatrix,
-      calcParentOnPatrixFromRawMatrixWithMemo,
-      calcAncestorSetOnPatrixFromRawMatrixWithMemo,
-      calcMatrixFromPatrix,
-      calcElementOnMatrixFromRawPatrix,
-      calcCoftypeOfPatrix,
-      calcBadRootOfPatrix,
+      RawMatrix
+    ,
+      toRawMatrixFromList
+    ,
+      toListFromRawMatrix
+    ,
+      Matrix (..)
+    ,
+      compareMatrix
+    ,
+      verifyMatrix
+    ,
+      toMatrixFromRawMatrix
+    ,
+      toRawMatrixFromMatrix
+    ,
+      calcCoftypeOfMatrix
+    ,
+      expandMatrix
+    ,
+      Pindex (..)
+    ,
+      RawPatrix
+    ,
+      toRawPatrixFromList
+    ,
+      toListFromRawPatrix
+    ,
+      Patrix (..)
+    ,
+      calcPatrixFromMatrix
+    ,
+      MemoCalcPatrixFromMatrix
+    ,
+      emptyMemoCalcPatrixFromMatrix
+    ,
+      getMemoCalcParentOnPatrixFromRawMatrix
+    ,
+      getMemoCalcAncestorSetOnPatrixFromRawMatrix
+    ,
+      insertMemoCalcParentOnPatrixFromRawMatrix
+    ,
+      insertMemoCalcAncestorSetOnPatrixFromRawMatrix
+    ,
+      calcParentOnPatrixFromRawMatrix
+    ,
+      calcAncestorSetOnPatrixFromRawMatrix
+    ,
+      calcParentOnPatrixFromRawMatrixWithMemo
+    ,
+      calcAncestorSetOnPatrixFromRawMatrixWithMemo
+    ,
+      calcMatrixFromPatrix
+    ,
+      calcElementOnMatrixFromRawPatrix
+    ,
+      calcCoftypeOfPatrix
+    ,
+      calcBadRootOfPatrix
+    ,
       expandPatrix
     )
 
