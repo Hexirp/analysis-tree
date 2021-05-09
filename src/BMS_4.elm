@@ -537,18 +537,21 @@ expandPatrix patrix n
                 case patrix of
                   Patrix x y x_y_pindex
                     ->
-                      case expandPatrix_helper_1 x y x_y_pindex n xr yr of
-                        PossibleCase x_y_pindex_ -> PossibleCase (Just (Patrix (xr + (((x - 1) - xr) * (toIntFromNat n + 1))) y x_y_pindex_))
-                        ImpossibleCase -> ImpossibleCase
+                      let
+                        ex = xr + (((x - 1) - xr) * (toIntFromNat n + 1))
+                      in
+                        case expandPatrix_helper_1 x y x_y_pindex n xr yr ex of
+                          PossibleCase x_y_pindex_ -> PossibleCase (Just (Patrix ex y x_y_pindex_))
+                          ImpossibleCase -> ImpossibleCase
             Nothing -> ImpossibleCase
 
-expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Case RawPatrix
-expandPatrix_helper_1 x y x_y_pindex n xr yr
+expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Int -> Case RawPatrix
+expandPatrix_helper_1 x y x_y_pindex n xr yr ex
   =
     let
       pindex_ x_ y_ = expandPatrix_helper_2 x_y_pindex xr yr x_ y_
       y_pindex_ x_ = Case.initializeArrayWithCase y (\y_ -> pindex_ x_ y_)
-      x_y_pindex_ = Case.initializeArrayWithCase (xr + (((x - 1) - xr) * (toIntFromNat n + 1))) (\x_ -> y_pindex_ x_)
+      x_y_pindex_ = Case.initializeArrayWithCase ex (\x_ -> y_pindex_ x_)
     in
       x_y_pindex_
 
