@@ -373,7 +373,7 @@ calcMatrixFromPatrix (Patrix x y x_y_pindex)
       ImpossibleCase -> ImpossibleCase
 
 calcMatrixFromPatrix_helper_1 : Int -> Int -> RawPatrix -> Case RawMatrix
-calcMatrixFromPatrix_helper_1 x y x_y_pindex = Case.traverseArray (\case_x -> case_x) (Array.map (Case.traverseArray (\case_x -> case_x)) (calcMatrixFromPatrix_helper_2 x y x_y_pindex))
+calcMatrixFromPatrix_helper_1 x y x_y_pindex = Case.sequenceArray (Array.map Case.sequenceArray (calcMatrixFromPatrix_helper_2 x y x_y_pindex))
 
 calcMatrixFromPatrix_helper_2 : Int -> Int -> RawPatrix -> Array (Array (Case Int))
 calcMatrixFromPatrix_helper_2 x y x_y_pindex = Array.initialize x (\x_ -> Array.initialize y (\y_ -> calcElementOnMatrixFromRawPatrix x_y_pindex x_ y_))
@@ -497,7 +497,7 @@ expandPatrix patrix n
             Nothing -> ImpossibleCase
 
 expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Case RawPatrix
-expandPatrix_helper_1 x y x_y_pindex n xr yr = Case.traverseArray (\case_x -> case_x) (Array.map (Case.traverseArray (\case_x -> case_x)) (expandPatrix_helper_2 x y x_y_pindex n xr yr))
+expandPatrix_helper_1 x y x_y_pindex n xr yr = Case.sequenceArray (Array.map Case.sequenceArray (expandPatrix_helper_2 x y x_y_pindex n xr yr))
 
 expandPatrix_helper_2 : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Array (Array (Case Pindex))
 expandPatrix_helper_2 x y x_y_pindex n xr yr = Array.initialize (xr + (((x - 1) - xr) * (toIntFromNat n + 1))) (\x_ -> Array.initialize y (\y_ -> expandPatrix_helper_3 x_y_pindex xr yr x_ y_))

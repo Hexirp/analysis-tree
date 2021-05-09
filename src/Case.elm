@@ -7,6 +7,8 @@ module Case
     ,
       traverseArray
     ,
+      sequenceArray
+    ,
       initializeArrayWithCaseWithState
     )
 
@@ -20,7 +22,7 @@ module Case
 
 # 関数たち
 
-@docs isValid, traverseArray
+@docs isValid, traverseArray, sequenceArray, initializeArrayWithCaseWithState
 -}
 
 import Array exposing (Array)
@@ -55,6 +57,23 @@ traverseArray f int_x
               ->
                 case case_int_x_ of
                   PossibleCase int_x_ -> PossibleCase (Array.push y int_x_)
+                  ImpossibleCase -> ImpossibleCase
+            ImpossibleCase -> ImpossibleCase
+    in
+      Array.foldl func (PossibleCase Array.empty) int_x
+
+{-| 或る配列を其の恒等関数によってトラバースします。 -}
+sequenceArray : Array (Case a) -> Case (Array a)
+sequenceArray int_x
+  =
+    let
+      func case_x case_int_x_
+        =
+          case case_x of
+            PossibleCase x
+              ->
+                case case_int_x_ of
+                  PossibleCase int_x_ -> PossibleCase (Array.push x int_x_)
                   ImpossibleCase -> ImpossibleCase
             ImpossibleCase -> ImpossibleCase
     in
