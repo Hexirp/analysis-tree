@@ -34,20 +34,52 @@ type Shape = Shape (Array Shape)
 initialShape : Shape
 initialShape = Shape Array.empty
 
-expandShape : Notation term -> Array Int -> Shape -> Maybe Shape
-expandShape notation x_int shape
+-- 指定された所が丁度いい所なら追加する。具体的には、
+-- 配列の末尾だけ。それ以外は Nothing である。
+-- あ、でも、そこが既に指定されている箇所なら何もしない。
+-- expandShape では Notation 的に正しくない所にも
+-- 木を生やしてしまう可能性があるけど、そこは
+-- 表示の所でボタンを無効化することで対応する。
+expandShape : Array Int -> Shape -> Maybe Shape
+expandShape x_int shape
   =
-    case Notation.toTermFromRawOuter notation x_int of
-      PossibleCase result_result_term
+    case Array.toList x_int of
+      [] -> Nothing
+      xp :: xs -> expandShape_helper_1 xp xs shape
+
+expandShape_helper_1 : Int -> List Int -> Shape -> Maybe Shape
+expandShape_helper_1 xp xs (Shape shape)
+  =
+    case xs of
+      []
         ->
-          case result_result_term of
-            Ok result_term
-              ->
-                case result_term of
-                  Ok term -> True
-                  Err r -> False
-            Err e -> False
-      ImpossibleCase -> False
+          if 0 <= xp
+            then
+              if Array.length shape <= xp
+                then
+                  if Array.length shape < xp
+                    then Nothing
+                    else Just (Shape (Array.push (Shape Array.empty) shape))
+                else Just (Shape shape)
+            else Nothing
+      xsp :: xss
+        ->
+          if 0 <= xp
+            then
+              if Array.length shape <= xp
+                then Nothing
+                else
+                  case Array.get xp shape of
+                    Just shape_
+                      ->
+                        let
+                          maybe_shape__ = expandShape_helper_1 xsp xss shape_
+                        in
+                          case maybe_shape__ of
+                            Just shape__ -> Just (Shape (Array.set xp shape__ shape))
+                            Nothing -> Nothing
+                    Nothing -> Nothing
+            else Nothing
 
 type Mapping = Mapping (Dict (List Int) String)
 
