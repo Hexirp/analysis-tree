@@ -44,7 +44,7 @@ expandShape : Array Int -> Shape -> Maybe Shape
 expandShape x_int shape
   =
     case Array.toList x_int of
-      [] -> Nothing
+      [] -> Just shape
       xp :: xs -> expandShape_helper_1 xp xs shape
 
 expandShape_helper_1 : Int -> List Int -> Shape -> Maybe Shape
