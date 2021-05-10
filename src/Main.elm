@@ -40,6 +40,8 @@ initialShape = Shape Array.empty
 -- expandShape では Notation 的に正しくない所にも
 -- 木を生やしてしまう可能性があるけど、そこは
 -- 表示の所でボタンを無効化することで対応する。
+-- たとえば、 [1,2] のノードの所には、 [1,2,0] の Expand がある。
+-- [1] のノードの所には、 [1,3] の Expand がある。
 expandShape : Array Int -> Shape -> Maybe Shape
 expandShape x_int shape
   =
