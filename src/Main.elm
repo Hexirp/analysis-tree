@@ -34,10 +34,20 @@ type Shape = Shape (Array Shape)
 initialShape : Shape
 initialShape = Shape Array.empty
 
-expandShape : Notation term -> Array Int -> Shape -> Shape
+expandShape : Notation term -> Array Int -> Shape -> Maybe Shape
 expandShape notation x_int shape
   =
-    Debug.todo ""
+    case Notation.toTermFromRawOuter notation x_int of
+      PossibleCase result_result_term
+        ->
+          case result_result_term of
+            Ok result_term
+              ->
+                case result_term of
+                  Ok term -> True
+                  Err r -> False
+            Err e -> False
+      ImpossibleCase -> False
 
 type Mapping = Mapping (Dict (List Int) String)
 
