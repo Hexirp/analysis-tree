@@ -62,7 +62,7 @@ module Notation
 # 外表記
 @docs RawOuter, toRawOuterFromList, toListFromRawOuter, toRawOuterFromTerm, toTermFromRawOuter, Outer, toOuterFromTerm, toTermFromOuter, toOuterFromRawOuter, toRawOuterFromOuter, canonicalize
 
-# 最大限の添加
+# 最大元の添加
 @docs Maxipointed, compareMaxipointed
 -}
 
