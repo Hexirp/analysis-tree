@@ -62,7 +62,15 @@ module BMS_4
       calcBadRootOfPatrix
     ,
       expandPatrix
+    ,
+      Maxipointed (..)
+    ,
+      compareMaxipointedMatrix
+    ,
+      expandMaxipointedMatrix
     )
+
+import Result exposing (Result)
 
 import Case exposing (Case (..))
 
@@ -84,6 +92,10 @@ import Notation
       Coftype (..)
     ,
       compareNat
+    ,
+      OutOfIndexError (..)
+    ,
+      Notation
     )
 
 {-| これはバシク行列システムの行列を表す生の型です。
@@ -153,22 +165,26 @@ calcCoftypeOfMatrix matrix
 
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
-expandMatrix : Matrix -> Nat -> Case (Maybe Matrix)
+expandMatrix : Matrix -> Nat -> Case (Result (OutOfIndexError Matrix) Matrix)
 expandMatrix matrix n
   =
     case calcPatrixFromMatrix matrix of
       PossibleCase patrix
         ->
           case expandPatrix patrix n of
-            PossibleCase m_patrix_
+            PossibleCase result_patrix_
               ->
-                case m_patrix_ of
-                  Just patrix_
+                case result_patrix_ of
+                  Ok patrix_
                     ->
                       case calcMatrixFromPatrix patrix_ of
-                        PossibleCase matrix_ -> PossibleCase (Just matrix_)
+                        PossibleCase matrix_ -> PossibleCase (Ok matrix_)
                         ImpossibleCase -> ImpossibleCase
-                  Nothing -> PossibleCase Nothing
+                  Err (OutOfIndexError patrix_ n_ coftype)
+                    ->
+                      case calcMatrixFromPatrix patrix_ of
+                        PossibleCase matrix_ -> PossibleCase (Err (OutOfIndexError matrix_ n_ coftype))
+                        ImpossibleCase -> ImpossibleCase
             ImpossibleCase -> ImpossibleCase
       ImpossibleCase -> ImpossibleCase
 
@@ -516,20 +532,20 @@ calcBadRootOfPatrix patrix
 
 {-| 或るパトリックスを或る係数で展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
-expandPatrix : Patrix -> Nat -> Case (Maybe Patrix)
+expandPatrix : Patrix -> Nat -> Case (Result (OutOfIndexError Patrix) Patrix)
 expandPatrix patrix n
   =
     case calcCoftypeOfPatrix patrix of
-      Zero -> PossibleCase Nothing
+      Zero -> PossibleCase (Err (OutOfIndexError patrix n Zero))
       One
         ->
           case compareNat One n of
-            LT -> PossibleCase Nothing
-            EQ -> PossibleCase Nothing
+            LT -> PossibleCase (Err (OutOfIndexError patrix n One))
+            EQ -> PossibleCase (Err (OutOfIndexError patrix n One))
             GT
               ->
                 case patrix of
-                  Patrix x y x_y_pindex -> PossibleCase (Just (Patrix (x - 1) y (Array.pop x_y_pindex)))
+                  Patrix x y x_y_pindex -> PossibleCase (Ok (Patrix (x - 1) y (Array.pop x_y_pindex)))
       Omega
         ->
           case calcBadRootOfPatrix patrix of
@@ -542,7 +558,7 @@ expandPatrix patrix n
                         ex = xr + (((x - 1) - xr) * (toIntFromNat n + 1))
                       in
                         case expandPatrix_helper_1 x y x_y_pindex n xr yr ex of
-                          PossibleCase x_y_pindex_ -> PossibleCase (Just (Patrix ex y x_y_pindex_))
+                          PossibleCase x_y_pindex_ -> PossibleCase (Ok (Patrix ex y x_y_pindex_))
                           ImpossibleCase -> ImpossibleCase
             Nothing -> ImpossibleCase
 
@@ -677,3 +693,52 @@ expandPatrix_helper_2 x_y_pindex xr yr x_ y_
                                         then PossibleCase Null
                                         else PossibleCase (Pindex (x_ - 1))
                         Nothing -> ImpossibleCase
+
+type Maxipointed a =  Lower a | Maximum
+
+compareMaxipointedMatrix : Maxipointed Matrix -> Maxipointed Matrix -> Order
+compareMaxipointedMatrix m_x m_y
+  =
+    case m_x of
+      Lower x
+        ->
+          case m_y of
+            Lower y -> compareMatrix x y
+            Maximum -> LT
+      Maximum
+        ->
+          case m_y of
+            Lower y -> GT
+            Maximum -> EQ
+
+expandMaxipointedMatrix : Maxipointed Matrix -> Nat -> Case (Result (OutOfIndexError (Maxipointed Matrix)) (Maxipointed Matrix))
+expandMaxipointedMatrix m_matrix nat
+  =
+    case m_matrix of
+      Lower matrix
+        ->
+          case expandMatrix matrix nat of
+            PossibleCase result_matrix_
+              ->
+                case result_matrix_ of
+                  Ok matrix_ -> PossibleCase (Ok (Lower matrix))
+                  Err (OutOfIndexError matrix_ nat_ coftype) -> PossibleCase (Err (OutOfIndexError (Lower matrix_) nat_ coftype))
+            ImpossibleCase -> ImpossibleCase
+      Maximum
+        ->
+          let
+            int = toIntFromNat nat
+            m_matrix_ = Lower (Matrix 2 int (Array.fromList [Array.repeat int 0, Array.repeat int 1]))
+          in
+            PossibleCase (Ok m_matrix_)
+
+notation : Notation (Maxipointed Matrix)
+notation
+  =
+    {
+      compare = compareMaxipointedMatrix
+    ,
+      expand = expandMaxipointedMatrix
+    ,
+      maximum = Maximum
+    }

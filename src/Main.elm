@@ -1,13 +1,13 @@
 module Main exposing (Model, Message, initialize, view, update, main)
 
-import Array exposing (Array)
-import Array.Extra as Array
+import Case exposing (Case (..))
 
 import Dict exposing (Dict)
 
-import Case exposing (Case (..))
+import Array exposing (Array)
+import Array.Extra as Array
 
-import Notation exposing (Notation)
+import Notation
 
 import BMS_4
 import BMS_4.Parsing
