@@ -63,11 +63,9 @@ module BMS_4
     ,
       expandPatrix
     ,
-      Maxipointed (..)
-    ,
-      compareMaxipointedMatrix
-    ,
       expandMaxipointedMatrix
+    ,
+      notation
     )
 
 import Result exposing (Result)
@@ -96,6 +94,10 @@ import Notation
       OutOfIndexError (..)
     ,
       Notation
+    ,
+      Maxipointed (..)
+    ,
+      compareMaxipointed
     )
 
 {-| これはバシク行列システムの行列を表す生の型です。
@@ -694,23 +696,6 @@ expandPatrix_helper_2 x_y_pindex xr yr x_ y_
                                         else PossibleCase (Pindex (x_ - 1))
                         Nothing -> ImpossibleCase
 
-type Maxipointed a =  Lower a | Maximum
-
-compareMaxipointedMatrix : Maxipointed Matrix -> Maxipointed Matrix -> Order
-compareMaxipointedMatrix m_x m_y
-  =
-    case m_x of
-      Lower x
-        ->
-          case m_y of
-            Lower y -> compareMatrix x y
-            Maximum -> LT
-      Maximum
-        ->
-          case m_y of
-            Lower y -> GT
-            Maximum -> EQ
-
 expandMaxipointedMatrix : Maxipointed Matrix -> Nat -> Case (Result (OutOfIndexError (Maxipointed Matrix)) (Maxipointed Matrix))
 expandMaxipointedMatrix m_matrix nat
   =
@@ -736,7 +721,7 @@ notation : Notation (Maxipointed Matrix)
 notation
   =
     {
-      compare = compareMaxipointedMatrix
+      compare = compareMaxipointed compareMatrix
     ,
       expand = expandMaxipointedMatrix
     ,

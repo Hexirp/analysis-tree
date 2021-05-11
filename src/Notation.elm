@@ -42,6 +42,10 @@ module Notation
       toRawOuterFromOuter
     ,
       canonicalize
+    ,
+      Maxipointed (..)
+    ,
+      compareMaxipointed
     )
 
 {-| 基本列付きの順序数表記です。
@@ -57,6 +61,9 @@ module Notation
 
 # 外表記
 @docs RawOuter, toRawOuterFromList, toListFromRawOuter, toRawOuterFromTerm, toTermFromRawOuter, Outer, toOuterFromTerm, toTermFromOuter, toOuterFromRawOuter, toRawOuterFromOuter, canonicalize
+
+# 最大限の添加
+@docs Maxipointed, compareMaxipointed
 -}
 
 import Array exposing (Array)
@@ -285,3 +292,24 @@ toRawOuterFromOuter (Outer x) = x
 -}
 canonicalize : Notation term -> Outer -> Case (Result IsNegativeError (Result (OutOfIndexError term) (Maybe Outer)))
 canonicalize notation outer = toOuterFromRawOuter notation (toRawOuterFromOuter outer)
+
+{-| 最大元が加えられた表記です。
+-}
+type Maxipointed a =  Lower a | Maximum
+
+{-| `Maxipointed` 型の比較を或る元々の表記の比較から作ります。
+-}
+compareMaxipointed : (a -> a -> Order) -> Maxipointed a -> Maxipointed a -> Order
+compareMaxipointed f m_x m_y
+  =
+    case m_x of
+      Lower x
+        ->
+          case m_y of
+            Lower y -> f x y
+            Maximum -> LT
+      Maximum
+        ->
+          case m_y of
+            Lower y -> GT
+            Maximum -> EQ
