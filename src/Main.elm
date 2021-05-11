@@ -89,6 +89,47 @@ expandShape_helper_1 xp xs (Shape shape)
                     Nothing -> Nothing
             else Nothing
 
+retractShape : Array Int -> Shape -> Maybe Shape
+retractShape x_int shape
+  =
+    case Array.toList x_int of
+      [] -> Nothing
+      xp :: xs -> retractShape_helper_1 xp xs shape
+
+retractShape_helper_1 : Int -> List Int -> Shape -> Maybe Shape
+retractShape_helper_1 xp xs (Shape shape)
+  =
+    case xs of
+      []
+        ->
+          if 0 <= xp
+            then
+              if Array.length shape - 1 <= xp
+                then
+                  if Array.length shape - 1 < xp
+                    then Just (Shape shape)
+                    else Just (Shape (Array.slice 0 -1 shape))
+                else Nothing
+            else Nothing
+      xsp :: xss
+        ->
+          if 0 <= xp
+            then
+              if Array.length shape <= xp
+                then Nothing
+                else
+                  case Array.get xp shape of
+                    Just shape_
+                      ->
+                        let
+                          maybe_shape__ = retractShape_helper_1 xsp xss shape_
+                        in
+                          case maybe_shape__ of
+                            Just shape__ -> Just (Shape (Array.set xp shape__ shape))
+                            Nothing -> Nothing
+                    Nothing -> Nothing
+            else Nothing
+
 type Mapping = Mapping (Dict (List Int) String)
 
 emptyMapping : Mapping
