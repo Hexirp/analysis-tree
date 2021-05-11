@@ -63,8 +63,6 @@ module BMS_4
     ,
       expandPatrix
     ,
-      expandMaxipointedMatrix
-    ,
       notation
     )
 
@@ -98,6 +96,8 @@ import Notation
       Maxipointed (..)
     ,
       compareMaxipointed
+    ,
+      expandMaxipointed
     )
 
 {-| これはバシク行列システムの行列を表す生の型です。
@@ -541,28 +541,34 @@ expandPatrix patrix n
       Zero -> PossibleCase (Err (OutOfIndexError patrix n Zero))
       One
         ->
-          case compareNat One n of
-            LT -> PossibleCase (Err (OutOfIndexError patrix n One))
-            EQ -> PossibleCase (Err (OutOfIndexError patrix n One))
-            GT
-              ->
-                case patrix of
-                  Patrix x y x_y_pindex -> PossibleCase (Ok (Patrix (x - 1) y (Array.pop x_y_pindex)))
+          if 0 <= toIntFromNat n
+            then PossibleCase (Err (OutOfIndexError patrix n One))
+            else
+              case compareNat One n of
+                LT -> PossibleCase (Err (OutOfIndexError patrix n One))
+                EQ -> PossibleCase (Err (OutOfIndexError patrix n One))
+                GT
+                  ->
+                    case patrix of
+                      Patrix x y x_y_pindex -> PossibleCase (Ok (Patrix (x - 1) y (Array.pop x_y_pindex)))
       Omega
         ->
-          case calcBadRootOfPatrix patrix of
-            Just (xr, yr)
-              ->
-                case patrix of
-                  Patrix x y x_y_pindex
-                    ->
-                      let
-                        ex = xr + (((x - 1) - xr) * (toIntFromNat n + 1))
-                      in
-                        case expandPatrix_helper_1 x y x_y_pindex n xr yr ex of
-                          PossibleCase x_y_pindex_ -> PossibleCase (Ok (Patrix ex y x_y_pindex_))
-                          ImpossibleCase -> ImpossibleCase
-            Nothing -> ImpossibleCase
+          if 0 <= toIntFromNat n
+            then PossibleCase (Err (OutOfIndexError patrix n One))
+            else
+              case calcBadRootOfPatrix patrix of
+                Just (xr, yr)
+                  ->
+                    case patrix of
+                      Patrix x y x_y_pindex
+                        ->
+                          let
+                            ex = xr + (((x - 1) - xr) * (toIntFromNat n + 1))
+                          in
+                            case expandPatrix_helper_1 x y x_y_pindex n xr yr ex of
+                              PossibleCase x_y_pindex_ -> PossibleCase (Ok (Patrix ex y x_y_pindex_))
+                              ImpossibleCase -> ImpossibleCase
+                Nothing -> ImpossibleCase
 
 expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Int -> Case RawPatrix
 expandPatrix_helper_1 x y x_y_pindex n xr yr ex
@@ -696,34 +702,25 @@ expandPatrix_helper_2 x_y_pindex xr yr x_ y_
                                         else PossibleCase (Pindex (x_ - 1))
                         Nothing -> ImpossibleCase
 
-expandMaxipointedMatrix : Maxipointed Matrix -> Nat -> Case (Result (OutOfIndexError (Maxipointed Matrix)) (Maxipointed Matrix))
-expandMaxipointedMatrix m_matrix nat
-  =
-    case m_matrix of
-      Lower matrix
-        ->
-          case expandMatrix matrix nat of
-            PossibleCase result_matrix_
-              ->
-                case result_matrix_ of
-                  Ok matrix_ -> PossibleCase (Ok (Lower matrix))
-                  Err (OutOfIndexError matrix_ nat_ coftype) -> PossibleCase (Err (OutOfIndexError (Lower matrix_) nat_ coftype))
-            ImpossibleCase -> ImpossibleCase
-      Maximum
-        ->
-          let
-            int = toIntFromNat nat
-            m_matrix_ = Lower (Matrix 2 int (Array.fromList [Array.repeat int 0, Array.repeat int 1]))
-          in
-            PossibleCase (Ok m_matrix_)
-
 notation : Notation (Maxipointed Matrix)
 notation
   =
     {
       compare = compareMaxipointed compareMatrix
     ,
-      expand = expandMaxipointedMatrix
+      expand
+        =
+          let
+            f nat
+              =
+                let
+                  int = toIntFromNat nat
+                in
+                  if 0 <= int
+                    then Just (Matrix 2 int (Array.fromList [Array.repeat int 0, Array.repeat int 1]))
+                    else Nothing
+          in
+            expandMaxipointed expandMatrix f
     ,
       maximum = Maximum
     }

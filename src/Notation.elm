@@ -46,6 +46,8 @@ module Notation
       Maxipointed (..)
     ,
       compareMaxipointed
+    ,
+      expandMaxipointed
     )
 
 {-| 基本列付きの順序数表記です。
@@ -63,7 +65,7 @@ module Notation
 @docs RawOuter, toRawOuterFromList, toListFromRawOuter, toRawOuterFromTerm, toTermFromRawOuter, Outer, toOuterFromTerm, toTermFromOuter, toOuterFromRawOuter, toRawOuterFromOuter, canonicalize
 
 # 最大元の添加
-@docs Maxipointed, compareMaxipointed
+@docs Maxipointed, compareMaxipointed, expandMaxipointed
 -}
 
 import Array exposing (Array)
@@ -313,3 +315,24 @@ compareMaxipointed f m_x m_y
           case m_y of
             Lower y -> GT
             Maximum -> EQ
+
+{-| `Maxipointed` 型の展開を或る元々の表記の展開から作ります。
+-}
+expandMaxipointed : (a -> Nat -> Case (Result (OutOfIndexError a) a)) -> (Nat -> Maybe a) -> Maxipointed a -> Nat -> Case (Result (OutOfIndexError (Maxipointed a)) (Maxipointed a))
+expandMaxipointed f g m_term nat
+  =
+    case m_term of
+      Lower term
+        ->
+          case f term nat of
+            PossibleCase result_term_
+              ->
+                case result_term_ of
+                  Ok term_ -> PossibleCase (Ok (Lower term))
+                  Err (OutOfIndexError term_ nat_ coftype) -> PossibleCase (Err (OutOfIndexError (Lower term_) nat_ coftype))
+            ImpossibleCase -> ImpossibleCase
+      Maximum
+        ->
+          case g nat of
+            Just term_ -> PossibleCase (Ok (Lower term_))
+            Nothing -> PossibleCase (Err (OutOfIndexError Maximum nat Omega))
