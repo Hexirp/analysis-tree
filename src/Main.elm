@@ -1,6 +1,7 @@
 module Main exposing (Model, Message, initialize, view, update, main)
 
 import Array exposing (Array)
+import Array.Extra as Array
 
 import Dict exposing (Dict)
 
@@ -108,7 +109,7 @@ retractShape_helper_1 xp xs (Shape shape)
                 then
                   if Array.length shape - 1 < xp
                     then Just (Shape shape)
-                    else Just (Shape (Array.slice 0 -1 shape))
+                    else Just (Shape (Array.pop shape))
                 else Nothing
             else Nothing
       xsp :: xss

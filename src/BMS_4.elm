@@ -69,6 +69,7 @@ import Case exposing (Case (..))
 import Dict exposing (Dict)
 
 import Array exposing (Array)
+import Array.Extra as Array
 import Array.Extra.Folding as Array
 
 import Notation
@@ -528,7 +529,7 @@ expandPatrix patrix n
             GT
               ->
                 case patrix of
-                  Patrix x y x_y_pindex -> PossibleCase (Just (Patrix (x - 1) y (Array.slice 0 -1 x_y_pindex)))
+                  Patrix x y x_y_pindex -> PossibleCase (Just (Patrix (x - 1) y (Array.pop x_y_pindex)))
       Omega
         ->
           case calcBadRootOfPatrix patrix of
