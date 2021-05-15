@@ -277,7 +277,7 @@ test_expandMatrix
                   |>
                     Expect.equal
                       (PossibleCase
-                        (Just
+                        (Ok
                           (Matrix 16 3
                             (toRawMatrixFromList
                               [
