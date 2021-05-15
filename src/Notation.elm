@@ -299,7 +299,7 @@ canonicalize notation outer = toOuterFromRawOuter notation (toRawOuterFromOuter 
 -}
 type Maxipointed a =  Lower a | Maximum
 
-{-| `Maxipointed` 型の比較を或る元々の表記の比較から作ります。
+{-| `Maxipointed` 型の比較関数を或る元々の表記の比較関数から作ります。
 -}
 compareMaxipointed : (a -> a -> Order) -> Maxipointed a -> Maxipointed a -> Order
 compareMaxipointed f m_x m_y
@@ -316,7 +316,9 @@ compareMaxipointed f m_x m_y
             Lower y -> GT
             Maximum -> EQ
 
-{-| `Maxipointed` 型の展開を或る元々の表記の展開から作ります。
+{-| `Maxipointed` 型の展開関数を或る元々の表記の展開関数から作ります。
+
+一つ目の引数は、元々の表記における展開関数です。二つ目の引数は、 `Maximum` の基本列を与える関数です。
 -}
 expandMaxipointed : (a -> Nat -> Case (Result (OutOfIndexError a) a)) -> (Nat -> Maybe a) -> Maxipointed a -> Nat -> Case (Result (OutOfIndexError (Maxipointed a)) (Maxipointed a))
 expandMaxipointed f g m_term nat
