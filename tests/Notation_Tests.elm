@@ -12,6 +12,8 @@ import Notation exposing (..)
 
 import Test exposing (Test, describe, test)
 
+import Expect
+
 -- Nat
 
 test_Nat : Test
