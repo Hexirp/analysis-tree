@@ -14,7 +14,7 @@ import Test exposing (Test, describe, test)
 
 -- Nat
 
-test_Nat :: Test
+test_Nat : Test
 test_Nat
   =
     describe "Nat"
@@ -28,7 +28,7 @@ test_Nat
         test_toIntFromNat
       ]
 
-test_zero :: Test
+test_zero : Test
 test_zero
   =
     describe "zero"
