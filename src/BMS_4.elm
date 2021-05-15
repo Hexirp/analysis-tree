@@ -606,7 +606,7 @@ expandPatrix_helper_2 x_y_pindex xr yr x_ y_
         let
           x = Array.length x_y_pindex
           m = (x_ - xr) // ((x - 1) - xr)
-          n = modBy ((x - 1) - xr) (x_ - xr)
+          n = (x_ - xr) |> modBy ((x - 1) - xr)
         in
           if m == 0
             then
