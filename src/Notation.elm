@@ -19,6 +19,8 @@ module Notation
     ,
       OutOfIndexError (..)
     ,
+      Expander
+    ,
       Notation
     ,
       RawOuter
@@ -59,7 +61,7 @@ module Notation
 @docs Coftype, compareNat
 
 # 順序数表記
-@docs OutOfIndexError, Notation
+@docs OutOfIndexError, Expander, Notation
 
 # 外表記
 @docs RawOuter, toRawOuterFromList, toListFromRawOuter, toRawOuterFromTerm, toTermFromRawOuter, Outer, toOuterFromTerm, toTermFromOuter, toOuterFromRawOuter, toRawOuterFromOuter, canonicalize
@@ -122,6 +124,10 @@ compareNat coftype nat
 -}
 type OutOfIndexError term = OutOfIndexError term Nat Coftype
 
+{-| 展開関数の型です。
+-}
+type alias Expander term = term -> Nat -> Case (Result (OutOfIndexError term) term)
+
 {-| 基本列付きの順序数表記です。
 
 `compare` は、或る二つの項を比較します。これは全順序でなければなりません。
@@ -137,7 +143,7 @@ type alias Notation term
     {
       compare : term -> term -> Order
     ,
-      expand : term -> Nat -> Case (Result (OutOfIndexError term) term)
+      expand : Expander term
     ,
       maximum : term
     }
@@ -320,7 +326,7 @@ compareMaxipointed f m_x m_y
 
 一つ目の引数は、元々の表記における展開関数です。二つ目の引数は、 `Maximum` の基本列を与える関数です。
 -}
-expandMaxipointed : (a -> Nat -> Case (Result (OutOfIndexError a) a)) -> (Nat -> Maybe a) -> Maxipointed a -> Nat -> Case (Result (OutOfIndexError (Maxipointed a)) (Maxipointed a))
+expandMaxipointed : Expander a -> (Nat -> Maybe a) -> Expander (Maxipointed a)
 expandMaxipointed f g m_term nat
   =
     case m_term of
