@@ -36,13 +36,13 @@ test_zero
     describe "zero"
       [
         let
-          func _
+          expect _
             =
               let
                 target = zero
-                expect = Nat 0
+                result = Nat 0
               in
-                target |> Expect.equal expect
+                target |> Expect.equal result
         in
-          test "normal case" func
+          test "normal case" expect
       ]
