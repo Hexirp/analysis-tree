@@ -46,3 +46,31 @@ test_zero
         in
           test "normal case" expect
       ]
+
+test_succ : Test
+test_succ
+  =
+    describe "succ"
+      [
+        let
+          expect _
+            =
+              let
+                target = succ (Nat 100)
+                result = Nat 101
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = succ (Nat -100)
+                result = Nat -99
+              in
+                target |> Expect.equal result
+        in
+          test "abnormal case" expect
+      ]
