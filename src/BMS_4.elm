@@ -554,8 +554,7 @@ expandPatrix patrix n
       Omega
         ->
           if 0 <= toIntFromNat n
-            then PossibleCase (Err (OutOfIndexError patrix n One))
-            else
+            then
               case calcBadRootOfPatrix patrix of
                 Just (xr, yr)
                   ->
@@ -569,6 +568,7 @@ expandPatrix patrix n
                               PossibleCase x_y_pindex_ -> PossibleCase (Ok (Patrix ex y x_y_pindex_))
                               ImpossibleCase -> ImpossibleCase
                 Nothing -> ImpossibleCase
+            else PossibleCase (Err (OutOfIndexError patrix n Omega))
 
 expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Int -> Case RawPatrix
 expandPatrix_helper_1 x y x_y_pindex n xr yr ex
