@@ -1,4 +1,10 @@
-module BMS_4_Tests exposing (test_Matrix, test_Patrix)
+module BMS_4_Tests
+  exposing
+    (
+      test_Matrix
+    ,
+      test_Patrix
+    )
 
 import Case exposing (Case (..))
 
@@ -133,8 +139,10 @@ test_Matrix
   =
     describe "Matrix"
       [
-        test_toMatrixFromRawMatrix,
-        test_toRawMatrixFromMatrix,
+        test_toMatrixFromRawMatrix
+      ,
+        test_toRawMatrixFromMatrix
+      ,
         test_expandMatrix
       ]
 
@@ -303,15 +311,20 @@ test_expandMatrix
 test_Patrix : Test
 test_Patrix
   =
-    describe
-      "Pindex"
+    describe "Pindex"
       [
-        test_calcPatrixFromMatrix,
-        test_calcParentOnPatrixFromRawMatrix,
-        test_calcAncestorSetOnPatrixFromRawMatrix,
-        test_calcMatrixFromPatrix,
-        test_calcElementOnMatrixFromRawPatrix,
-        test_calcBadRootOfPatrix,
+        test_calcPatrixFromMatrix
+      ,
+        test_calcParentOnPatrixFromRawMatrix
+      ,
+        test_calcAncestorSetOnPatrixFromRawMatrix
+      ,
+        test_calcMatrixFromPatrix
+      ,
+        test_calcElementOnMatrixFromRawPatrix
+      ,
+        test_calcBadRootOfPatrix
+      ,
         test_expandPatrix
       ]
 
