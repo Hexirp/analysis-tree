@@ -2,6 +2,8 @@ module Notation_Tests
   exposing
     (
       test_Nat
+    ,
+      test_Coftype
     )
 
 import Case exposing (Case (..))
@@ -153,4 +155,95 @@ test_toIntFromNat
                 target |> Expect.equal result
         in
           fuzz Fuzz.int "fuzzing" expect
+      ]
+
+test_Coftype : Test
+test_Coftype
+  =
+    describe "Coftype"
+      [
+        test_compareNat
+      ]
+
+test_compareNat : Test
+test_compareNat
+  =
+    describe "compareNat"
+      [
+        let
+          expect _
+            =
+              let
+                target = compareNat Zero (Nat 0)
+                result = EQ
+              in
+                target |> Expect.equal result
+        in
+          test "normal case with 0 and 0" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = compareNat Zero (Nat 3)
+                result = LT
+              in
+                target |> Expect.equal result
+        in
+          test "normal case with 0 and 3" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = compareNat One (Nat 0)
+                result = GT
+              in
+                target |> Expect.equal result
+        in
+          test "normal case with 1 and 0" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = compareNat One (Nat 1)
+                result = EQ
+              in
+                target |> Expect.equal result
+        in
+          test "normal case with 1 and 1" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = compareNat One (Nat 3)
+                result = LT
+              in
+                target |> Expect.equal result
+        in
+          test "normal case with 1 and 3" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = compareNat Omega (Nat 100)
+                result = GT
+              in
+                target |> Expect.equal result
+        in
+          test "normal case with ω with 100" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = compateNat Zero (Nat -1)
+                result = GT
+              in
+                target |> Expect.equal result
+        in
+          test "abnormal case" expect
       ]
