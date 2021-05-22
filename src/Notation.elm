@@ -162,17 +162,29 @@ toRawOuterFromList list = Array.fromList list
 toListFromRawOuter : RawOuter -> List Int
 toListFromRawOuter x_int = Array.toList x_int
 
+{-| 表記の項から生の外表記の項へ変換する時に、それが不可能だと発生するエラーです。
+
+`IsGreaterThanMaximumError` は、其の表記の項が `notation.maximum` より大きいと判定された時に発生するエラーです。
+
+`IsLessThanZeroError` は、其の表記の項が共終タイプが `Zero` となる項より小さいと判定された時に発生するエラーです。
+
+`IsSkeppedError` は、何だろう？ なんか飛ばされた感じの？
+
+`IsIrregularSequenceError` は、基本列の長さが 3 になっていたりという時に発生するエラーです。
+-}
+type IsNotConvertOuterError term = IsGreaterThanMaximumError term term | IsLessThanZeroError term term | IsSkeppedError term term term | IsIrregularSequenceError term term
+
 {-| 表記の項から生の外表記の項へ変換します。
 -}
-toRawOuterFromTerm : Notation term -> term -> Case (Maybe RawOuter)
+toRawOuterFromTerm : Notation term -> term -> Case (Result (IsNotConvertOuterError term) RawOuter)
 toRawOuterFromTerm notation term
   =
     case notation.compare term notation.maximum of
       LT -> toRawOuterFromTerm_helper_1 notation term Array.empty notation.maximum
-      EQ -> PossibleCase (Just Array.empty)
-      GT -> PossibleCase Nothing
+      EQ -> PossibleCase (Ok Array.empty)
+      GT -> PossibleCase (Err (IsGreaterThanMaximumError term notation.maximum))
 
-toRawOuterFromTerm_helper_1 : Notation term -> term -> Array Int -> term -> Case (Maybe RawOuter)
+toRawOuterFromTerm_helper_1 : Notation term -> term -> Array Int -> term -> Case (Result (IsNotConvertOuterError term) RawOuter)
 toRawOuterFromTerm_helper_1 notation term x_int term_
   =
     case notation.expand term_ zero of
@@ -183,12 +195,12 @@ toRawOuterFromTerm_helper_1 notation term x_int term_
               ->
                 case notation.compare term term__ of
                   LT -> toRawOuterFromTerm_helper_2 notation term x_int term__ zero
-                  EQ -> PossibleCase (Just (Array.push 0 x_int))
-                  GT -> PossibleCase Nothing
-            Err _ -> PossibleCase Nothing
+                  EQ -> PossibleCase (Ok (Array.push 0 x_int))
+                  GT -> PossibleCase (Err (IsSkeppedError term term_ term__))
+            Err _ -> PossibleCase (Err (IsLessThanZeroError term term_))
       ImpossibleCase -> ImpossibleCase
 
-toRawOuterFromTerm_helper_2 : Notation term -> term -> Array Int -> term -> Nat -> Case (Maybe RawOuter)
+toRawOuterFromTerm_helper_2 : Notation term -> term -> Array Int -> term -> Nat -> Case (Result (IsNotConvertOuterError term) RawOuter)
 toRawOuterFromTerm_helper_2 notation term x_int term_ nat
   =
     case notation.expand term_ (succ nat) of
@@ -199,7 +211,7 @@ toRawOuterFromTerm_helper_2 notation term x_int term_ nat
               ->
                 case notation.compare term term__ of
                   LT -> toRawOuterFromTerm_helper_2 notation term x_int term__ (succ nat)
-                  EQ -> PossibleCase (Just (Array.push (toIntFromNat (succ nat)) x_int))
+                  EQ -> PossibleCase (Ok (Array.push (toIntFromNat (succ nat)) x_int))
                   GT -> toRawOuterFromTerm_helper_1 notation term (Array.push (toIntFromNat nat) x_int) term_
             Err e
               ->
@@ -207,7 +219,7 @@ toRawOuterFromTerm_helper_2 notation term x_int term_ nat
                   then
                     if 1 <= toIntFromNat nat
                       then toRawOuterFromTerm_helper_1 notation term (Array.push 0 x_int) term_
-                      else PossibleCase Nothing
+                      else PossibleCase (Err (IsIrregularSequenceError term term_))
                   else ImpossibleCase
       ImpossibleCase -> ImpossibleCase
 
