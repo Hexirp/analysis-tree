@@ -210,9 +210,9 @@ toRawOuterFromTerm_helper_2 notation term x_int term_ nat
             Ok term__
               ->
                 case notation.compare term term__ of
-                  LT -> toRawOuterFromTerm_helper_2 notation term x_int term__ (succ nat)
+                  LT -> toRawOuterFromTerm_helper_1 notation term (Array.push (toIntFromNat nat) x_int) term_
                   EQ -> PossibleCase (Ok (Array.push (toIntFromNat (succ nat)) x_int))
-                  GT -> toRawOuterFromTerm_helper_1 notation term (Array.push (toIntFromNat nat) x_int) term_
+                  GT -> toRawOuterFromTerm_helper_2 notation term x_int term__ (succ nat)
             Err e
               ->
                 if 0 <= toIntFromNat nat
