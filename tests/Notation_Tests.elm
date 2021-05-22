@@ -142,4 +142,15 @@ test_toIntFromNat
                 target |> Expect.equal result
         in
           test "abnormal case" expect
+      ,
+        let
+          expect int
+            =
+              let
+                target = toIntFromNat (Nat int)
+                result = int
+              in
+                target |> Expect.equal result
+        in
+          fuzz Fuzz.int "fuzzing" expect
       ]
