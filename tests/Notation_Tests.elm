@@ -2,8 +2,6 @@ module Notation_Tests
   exposing
     (
       test_Nat
-    ,
-      test_Coftype
     )
 
 import Case exposing (Case (..))
