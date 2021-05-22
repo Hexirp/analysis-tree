@@ -194,9 +194,9 @@ toRawOuterFromTerm_helper_1 notation term x_int term_
             Ok term__
               ->
                 case notation.compare term term__ of
-                  LT -> PossibleCase (Err (IsSkeppedError term term_ term__))
+                  LT -> toRawOuterFromTerm_helper_2 notation term x_int term__ zero
                   EQ -> PossibleCase (Ok (Array.push 0 x_int))
-                  GT -> toRawOuterFromTerm_helper_2 notation term x_int term__ zero
+                  GT -> PossibleCase (Err (IsSkeppedError term term_ term__))
             Err _ -> PossibleCase (Err (IsLessThanZeroError term term_))
       ImpossibleCase -> ImpossibleCase
 
