@@ -22,20 +22,10 @@ import Fuzz exposing (Fuzzer)
 
 import Test exposing (Test, describe, test, fuzz, fuzz2, fuzz3)
 
+import Notation_Util exposing (fuzzer_Nat)
+
 expect_notImpossibleCase : Case a -> Expectation
 expect_notImpossibleCase = Expect.notEqual ImpossibleCase
-
-fuzzer_Nat : Fuzzer Nat
-fuzzer_Nat
-  =
-    let
-      generator = Random.map Nat (Random.int -100 100)
-      shrinker nat
-        =
-          case nat of
-            Nat int -> Shrink.map Nat (Shrink.int <| int)
-    in
-      Fuzz.custom generator shrinker
 
 fuzzer_RawMatrix : Fuzzer RawMatrix
 fuzzer_RawMatrix = Fuzz.array (Fuzz.array Fuzz.int)
