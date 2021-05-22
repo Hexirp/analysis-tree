@@ -225,7 +225,7 @@ test_calcPatrixFromMatrix
               in
                 target |> expect_notImpossibleCase
         in
-          fuzz fuzz_matrix "follow the rule of the type `Case`" expect
+          fuzz fuzz_matrix_e "follow the rule of the type `Case`" expect
       ]
 
 test_calcParentOnPatrixFromRawMatrix : Test
@@ -295,7 +295,7 @@ test_calcMatrixFromPatrix
                 target |> expect_notImpossibleCase
 
         in
-          fuzz fuzz_patrix "follow the rule of the type `Case`" expect
+          fuzz fuzz_patrix_e "follow the rule of the type `Case`" expect
       ]
 
 test_calcElementOnMatrixFromRawPatrix : Test
@@ -344,5 +344,5 @@ test_expandPatrix
               in
                 target |> expect_notImpossibleCase
         in
-          fuzz2 fuzz_patrix fuzz_nat_e "follow the rule of the type `Case`" expect
+          fuzz2 fuzz_patrix_e fuzz_nat_e "follow the rule of the type `Case`" expect
       ]

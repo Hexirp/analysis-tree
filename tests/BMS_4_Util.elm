@@ -3,13 +3,13 @@ module BMS_4_Util
     (
       fuzz_rawMatrix
     ,
-      fuzz_matrix
+      fuzz_matrix_e
     ,
       fuzz_pindex
     ,
       fuzz_rawPatrix
     ,
-      fuzz_patrix
+      fuzz_patrix_e
     )
 
 import BMS_4 exposing (..)
@@ -21,8 +21,8 @@ import Fuzz exposing (Fuzzer)
 fuzz_rawMatrix : Fuzzer RawMatrix
 fuzz_rawMatrix = Fuzz.array (Fuzz.array Fuzz.int)
 
-fuzz_matrix : Fuzzer Matrix
-fuzz_matrix
+fuzz_matrix_e : Fuzzer Matrix
+fuzz_matrix_e
   =
     let
       generator
@@ -72,8 +72,8 @@ fuzz_pindex
 fuzz_rawPatrix : Fuzzer RawPatrix
 fuzz_rawPatrix = Fuzz.array (Fuzz.array fuzz_pindex)
 
-fuzz_patrix : Fuzzer Patrix
-fuzz_patrix
+fuzz_patrix_e : Fuzzer Patrix
+fuzz_patrix_e
   =
     let
       generator_Pindex
