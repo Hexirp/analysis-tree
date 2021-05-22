@@ -10,9 +10,9 @@ import Case exposing (Case (..))
 
 import Notation exposing (..)
 
-import Test exposing (Test, describe, test)
-
 import Expect
+import Fuzz
+import Test exposing (Test, describe, test, fuzz)
 
 -- Nat
 
@@ -73,4 +73,47 @@ test_succ
                 target |> Expect.equal result
         in
           test "abnormal case" expect
+      ]
+
+test_toNatFromInt : Test
+test_toNatFromInt
+  =
+    describe "toNatFromInt"
+      [
+        let
+          expect _
+            =
+              let
+                target = toNatFromInt 10
+                result = Ok (Nat 10)
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = toNatFromInt -10
+                result = Err (IsNegativeError -10)
+              in
+                target |> Expect.equal result
+        in
+          test "negative value" expect
+      ,
+        let
+          expect int
+            =
+              let
+                target = toNatFromInt int
+                result
+                  =
+                    if 0 <= int
+                      then Ok (Nat int)
+                      else Err (IsNegativeError int)
+              in
+                target |> Expect.equal result
+        in
+          fuzz Fuzz.int "fuzzing" expect
       ]
