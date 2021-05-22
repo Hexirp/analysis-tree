@@ -180,7 +180,7 @@ toRawOuterFromTerm : Notation term -> term -> Case (Result (IsNotConvertOuterErr
 toRawOuterFromTerm notation term
   =
     case notation.compare term notation.maximum of
-      LT -> toRawOuterFromTerm_helper_1 notation term Array.empty notation.maximum
+      LT -> toRawOuterFromTerm_helper_2 notation term Array.empty notation.maximum zero
       EQ -> PossibleCase (Ok Array.empty)
       GT -> PossibleCase (Err (IsGreaterThanMaximumError term notation.maximum))
 
