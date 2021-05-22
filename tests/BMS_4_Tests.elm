@@ -4,6 +4,8 @@ module BMS_4_Tests
       test_Matrix
     ,
       test_Patrix
+    ,
+      test_Notation
     )
 
 import Case exposing (Case (..))
@@ -345,4 +347,29 @@ test_expandPatrix
                 target |> expect_notImpossibleCase
         in
           fuzz2 fuzz_patrix_e fuzz_nat_e "follow the rule of the type `Case`" expect
+      ]
+
+test_Notation : Test
+test_Notation
+  =
+    describe "Notation"
+      [
+        test_toRawOuterFromTerm
+      ]
+
+test_toRawOuterFromTerm : Test
+test_toRawOuterFromTerm
+  =
+    describe "toRawOuterFromTerm"
+      [
+        let
+          expect _
+            =
+              let
+                target = Notation.toRawOuterFromTerm notation (Notation.Lower (toMatrixFromRawMatrix (toRawMatrixFromList [[0, 0], [1, 1], [2, 0], [3, 1], [1, 1]])))
+                result = PossibleCase (Just (Notation.toRawOuterFromList [3, 2, 1, 2, 0, 1, 1, 0, 1, 0, 1, 0, 0]))
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
       ]
