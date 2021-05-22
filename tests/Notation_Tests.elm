@@ -117,3 +117,31 @@ test_toNatFromInt
         in
           fuzz Fuzz.int "fuzzing" expect
       ]
+
+test_toIntFromNat : Test
+test_toIntFromNat
+  =
+    describe "toIntFromNat"
+      [
+        let
+          expect _
+            =
+              let
+                target = toIntFromNat (Nat 10)
+                result = 10
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = toIntFromNat (Nat -10)
+                result = -10
+              in
+                target |> Expect.equal result
+        in
+          test "abnormal case" expect
+      ]
