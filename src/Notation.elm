@@ -263,15 +263,15 @@ type Outer = Outer RawOuter
 
 {-| 表記の項から外表記の項へ変換します。
 -}
-toOuterFromTerm : Notation term -> term -> Case (Maybe Outer)
+toOuterFromTerm : Notation term -> term -> Case (Result (IsNotConvertOuterError term) Outer)
 toOuterFromTerm notation term
   =
     case toRawOuterFromTerm notation term of
-      PossibleCase maybe_x_int
+      PossibleCase result_x_int
         ->
-          case maybe_x_int of
-            Just x_int -> PossibleCase (Just (Outer x_int))
-            Nothing -> PossibleCase Nothing
+          case result_x_int of
+            Ok x_int -> PossibleCase (Ok (Outer x_int))
+            Err e -> PossibleCase (Err e)
       ImpossibleCase -> ImpossibleCase
 
 {-| 外表記の項から表記の項へ変換します。
@@ -281,7 +281,7 @@ toTermFromOuter notation outer = toTermFromRawOuter notation (toRawOuterFromOute
 
 {-| 生の外表記の項から外表記の項へ変換します。
 -}
-toOuterFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (OutOfIndexError term) (Maybe Outer)))
+toOuterFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (OutOfIndexError term) (Result (IsNotConvertOuterError term) Outer)))
 toOuterFromRawOuter notation x_int
   =
     let
@@ -297,7 +297,7 @@ toOuterFromRawOuter notation x_int
                     Ok term
                       ->
                         case toOuterFromTerm notation term of
-                          PossibleCase maybe_outer -> PossibleCase (Ok (Ok maybe_outer))
+                          PossibleCase result_outer -> PossibleCase (Ok (Ok result_outer))
                           ImpossibleCase -> ImpossibleCase
                     Err e -> PossibleCase (Ok (Err e))
               Err e -> PossibleCase (Err e)
@@ -310,7 +310,7 @@ toRawOuterFromOuter (Outer x) = x
 
 {-| 外表記の項を正規化します。
 -}
-canonicalize : Notation term -> Outer -> Case (Result IsNegativeError (Result (OutOfIndexError term) (Maybe Outer)))
+canonicalize : Notation term -> Outer -> Case (Result IsNegativeError (Result (OutOfIndexError term) (Result (IsNotConvertOuterError term) Outer)))
 canonicalize notation outer = toOuterFromRawOuter notation (toRawOuterFromOuter outer)
 
 {-| 最大元が加えられた表記です。
