@@ -7,25 +7,15 @@ module BMS_4_Tests
     )
 
 import Case exposing (Case (..))
-
 import Notation exposing (Nat (..))
-
 import BMS_4 exposing (..)
 
-import Random
-
-import Expect exposing (Expectation)
-
-import Shrink
-
-import Fuzz exposing (Fuzzer)
-
+import Expect
+import Fuzz
 import Test exposing (Test, describe, test, fuzz, fuzz2, fuzz3)
 
 import Case_Util exposing (..)
-
-import Notation_Util exposing (fuzzer_Nat)
-
+import Notation_Util exposing (..)
 import BMS_4_Util exposing (..)
 
 test_Matrix : Test
