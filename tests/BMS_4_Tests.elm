@@ -344,5 +344,5 @@ test_expandPatrix
               in
                 target |> expect_notImpossibleCase
         in
-          fuzz2 fuzz_patrix fuzz_nat "follow the rule of the type `Case`" expect
+          fuzz2 fuzz_patrix fuzz_nat_e "follow the rule of the type `Case`" expect
       ]
