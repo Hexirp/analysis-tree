@@ -240,7 +240,7 @@ test_compareNat
           expect _
             =
               let
-                target = compateNat Zero (Nat -1)
+                target = compareNat Zero (Nat -1)
                 result = GT
               in
                 target |> Expect.equal result
