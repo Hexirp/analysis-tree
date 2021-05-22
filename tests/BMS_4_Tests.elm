@@ -367,7 +367,7 @@ test_toRawOuterFromTerm
             =
               let
                 target = Notation.toRawOuterFromTerm notation (Notation.Lower (toMatrixFromRawMatrix (toRawMatrixFromList [[0, 0], [1, 1], [2, 0], [3, 1], [1, 1]])))
-                result = PossibleCase (Just (Notation.toRawOuterFromList [3, 2, 1, 2, 0, 1, 1, 0, 1, 0, 1, 0, 0]))
+                result = PossibleCase (Ok (Notation.toRawOuterFromList [3, 2, 1, 2, 0, 1, 1, 0, 1, 0, 1, 0, 0]))
               in
                 target |> Expect.equal result
         in
