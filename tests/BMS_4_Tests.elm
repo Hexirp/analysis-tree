@@ -22,12 +22,11 @@ import Fuzz exposing (Fuzzer)
 
 import Test exposing (Test, describe, test, fuzz, fuzz2, fuzz3)
 
+import Case_Util exposing (..)
+
 import Notation_Util exposing (fuzzer_Nat)
 
 import BMS_4_Util exposing (..)
-
-expect_notImpossibleCase : Case a -> Expectation
-expect_notImpossibleCase = Expect.notEqual ImpossibleCase
 
 test_Matrix : Test
 test_Matrix
