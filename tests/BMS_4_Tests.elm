@@ -225,7 +225,7 @@ test_calcPatrixFromMatrix
               in
                 target |> expect_notImpossibleCase
         in
-          fuzz fuzzer_Matrix "follow the rule of the type `Case`" expect
+          fuzz fuzz_matrix "follow the rule of the type `Case`" expect
       ]
 
 test_calcParentOnPatrixFromRawMatrix : Test
@@ -252,7 +252,7 @@ test_calcParentOnPatrixFromRawMatrix
               in
                 target |> expect_notImpossibleCase
         in
-        fuzz3 fuzzer_RawMatrix Fuzz.int Fuzz.int "follow the rule of the type `Case`" expect
+        fuzz3 fuzz_rawMatrix Fuzz.int Fuzz.int "follow the rule of the type `Case`" expect
       ]
 
 test_calcAncestorSetOnPatrixFromRawMatrix : Test
@@ -278,7 +278,7 @@ test_calcAncestorSetOnPatrixFromRawMatrix
               in
                 target |> expect_notImpossibleCase
         in
-          fuzz3 fuzzer_RawMatrix Fuzz.int Fuzz.int "follow the rule of the type `Case`" expect
+          fuzz3 fuzz_rawMatrix Fuzz.int Fuzz.int "follow the rule of the type `Case`" expect
       ]
 
 test_calcMatrixFromPatrix : Test
@@ -295,7 +295,7 @@ test_calcMatrixFromPatrix
                 target |> expect_notImpossibleCase
 
         in
-          fuzz fuzzer_Patrix "follow the rule of the type `Case`" expect
+          fuzz fuzz_patrix "follow the rule of the type `Case`" expect
       ]
 
 test_calcElementOnMatrixFromRawPatrix : Test
@@ -311,7 +311,7 @@ test_calcElementOnMatrixFromRawPatrix
               in
                 target |> expect_notImpossibleCase
         in
-          fuzz3 fuzzer_RawPatrix Fuzz.int Fuzz.int "follow the rule of the type `Case`" expect
+          fuzz3 fuzz_rawPatrix Fuzz.int Fuzz.int "follow the rule of the type `Case`" expect
       ]
 
 test_calcBadRootOfPatrix : Test
@@ -344,5 +344,5 @@ test_expandPatrix
               in
                 target |> expect_notImpossibleCase
         in
-          fuzz2 fuzzer_Patrix fuzzer_Nat "follow the rule of the type `Case`" expect
+          fuzz2 fuzz_patrix fuzz_nat "follow the rule of the type `Case`" expect
       ]

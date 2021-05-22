@@ -1,15 +1,15 @@
 module BMS_4_Util
   exposing
     (
-      fuzzer_RawMatrix
+      fuzz_rawMatrix
     ,
-      fuzzer_Matrix
+      fuzz_matrix
     ,
-      fuzzer_Pindex
+      fuzz_pindex
     ,
-      fuzzer_RawPatrix
+      fuzz_rawPatrix
     ,
-      fuzzer_Patrix
+      fuzz_patrix
     )
 
 import BMS_4 exposing (..)
@@ -18,11 +18,11 @@ import Random
 import Shrink
 import Fuzz exposing (Fuzzer)
 
-fuzzer_RawMatrix : Fuzzer RawMatrix
-fuzzer_RawMatrix = Fuzz.array (Fuzz.array Fuzz.int)
+fuzz_rawMatrix : Fuzzer RawMatrix
+fuzz_rawMatrix = Fuzz.array (Fuzz.array Fuzz.int)
 
-fuzzer_Matrix : Fuzzer Matrix
-fuzzer_Matrix
+fuzz_matrix : Fuzzer Matrix
+fuzz_matrix
   =
     let
       generator
@@ -47,8 +47,8 @@ fuzzer_Matrix
     in
       Fuzz.custom generator shrinker
 
-fuzzer_Pindex : Fuzzer Pindex
-fuzzer_Pindex
+fuzz_pindex : Fuzzer Pindex
+fuzz_pindex
   =
     let
       generator
@@ -69,11 +69,11 @@ fuzzer_Pindex
     in
       Fuzz.custom generator shrinker
 
-fuzzer_RawPatrix : Fuzzer RawPatrix
-fuzzer_RawPatrix = Fuzz.array (Fuzz.array fuzzer_Pindex)
+fuzz_rawPatrix : Fuzzer RawPatrix
+fuzz_rawPatrix = Fuzz.array (Fuzz.array fuzz_pindex)
 
-fuzzer_Patrix : Fuzzer Patrix
-fuzzer_Patrix
+fuzz_patrix : Fuzzer Patrix
+fuzz_patrix
   =
     let
       generator_Pindex

@@ -1,7 +1,7 @@
 module Notation_Util
   exposing
     (
-      fuzzer_Nat
+      fuzz_nat
     )
 
 import Notation exposing (..)
@@ -10,8 +10,8 @@ import Random
 import Shrink
 import Fuzz exposing (Fuzzer)
 
-fuzzer_Nat : Fuzzer Nat
-fuzzer_Nat
+fuzz_nat : Fuzzer Nat
+fuzz_nat
   =
     let
       generator = Random.map Nat (Random.int -100 100)
