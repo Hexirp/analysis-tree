@@ -1,4 +1,12 @@
-module Array.Extra.Folding exposing (all, maximum, minimum)
+module Array.Extra.Folding
+  exposing
+    (
+      all
+    ,
+      maximum
+    ,
+      minimum
+    )
 
 {-| 配列についての便利な折り畳み系の関数たちです。
 
