@@ -8,9 +8,9 @@ module Notation_Tests
       test_RawOuter
     )
 
-import Case exposing (Case (..))
-
 import Array exposing (Array)
+
+import Case exposing (Case (..))
 
 import Notation exposing (..)
 
