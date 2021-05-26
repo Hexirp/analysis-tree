@@ -99,7 +99,7 @@ test_toMatrixFromRawMatrix
             =
               let
                 target = toMatrixFromRawMatrix (Array.fromList [Array.fromList [], Array.fromList [], Array.fromList []])
-                result = Matrix 3 0 (Array.fromList [Array.fromList [], Array.fromList [], Array.fromList []])
+                result = Matrix 0 0 (Array.fromList [])
               in
                 target |> Expect.equal result
         in
