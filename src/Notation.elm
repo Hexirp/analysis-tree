@@ -202,8 +202,8 @@ toRawOuterFromTerm_helper_2 notation term x_int term_ nat
                     EQ -> True
                     GT -> False
                 of
-                  False -> toRawOuterFromTerm_helper_2 notation term x_int term__ (succ nat)
                   True -> toRawOuterFromTerm_helper_1 notation term (Array.push (toIntFromNat nat) x_int) term__
+                  False -> toRawOuterFromTerm_helper_2 notation term x_int term__ (succ nat)
             Err e
               ->
                 if 0 <= toIntFromNat nat
