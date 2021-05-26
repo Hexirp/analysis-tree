@@ -145,7 +145,7 @@ toMatrixFromRawMatrix x_y_int
     let
       e = toMatrixFromRawMatrix_helper_1 x_y_int
       x = toMatrixFromRawMatrix_helper_2 x_y_int
-      y = toMatrixFromRawMatrix_helper_3 x_y_int 0
+      y = toMatrixFromRawMatrix_helper_3 x_y_int e
     in
       Matrix x y (toMatrixFromRawMatrix_helper_4 x_y_int e x y)
 
@@ -168,8 +168,8 @@ toMatrixFromRawMatrix_helper_3 x_y_int e
                   then
                     if e + 1 <= int
                       then (i_0 + 1, i_0 + 1)
-                      else (i_0 + 1, int)
-                  else (i_0 + 1, int)
+                      else (i_0 + 1, i_1)
+                  else (i_0 + 1, i_1)
           in
             case Array.foldl func_1 (0, 0) y_int of
               (i_0, i_1) -> i_1
