@@ -183,9 +183,9 @@ toRawOuterFromTerm_helper_1 : Notation term -> term -> Array Int -> term -> Case
 toRawOuterFromTerm_helper_1 notation term x_int term_
   =
     case notation.compare term term_ of
-      LT -> PossibleCase (Err (IsGreaterThanMaximumError term x_int term_))
+      LT -> toRawOuterFromTerm_helper_2 notation term x_int term_ zero
       EQ -> PossibleCase (Ok x_int)
-      GT -> toRawOuterFromTerm_helper_2 notation term x_int term_ zero
+      GT -> PossibleCase (Err (IsGreaterThanMaximumError term x_int term_))
 
 toRawOuterFromTerm_helper_2 : Notation term -> term -> Array Int -> term -> Nat -> Case (Result (IsNotConvertOuterError term) RawOuter)
 toRawOuterFromTerm_helper_2 notation term x_int term_ nat
