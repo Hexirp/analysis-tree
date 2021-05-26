@@ -86,7 +86,7 @@ test_toMatrixFromRawMatrix
             =
               let
                 target = toMatrixFromRawMatrix (toRawMatrixFromList [[], [0, 0, -1]])
-                result = Matrix 2 3 (toRawMatrixFromList [[-1,-1,-1],[0,0,-1]])
+                result = Matrix 2 3 (toRawMatrixFromList [[-1, -1, -1], [0, 0, -1]])
               in
                 target |> Expect.equal result
         in
