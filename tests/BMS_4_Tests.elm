@@ -76,8 +76,8 @@ test_toMatrixFromRawMatrix
           expect _
             =
               let
-                target = toMatrixFromRawMatrix (Array.fromList [Array.fromList [], Array.fromList [1, 1, 1]])
-                result = Matrix 2 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1]])
+                target = toMatrixFromRawMatrix (Array.fromList [Array.fromList [], Array.fromList [1, 1, 1], Array.fromList []])
+                result = Matrix 3 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1], Array.fromList [0, 0, 0]])
               in
                 target |> Expect.equal result
         in
@@ -93,6 +93,17 @@ test_toMatrixFromRawMatrix
                 target |> Expect.equal result
         in
           test "column truncation" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = toMatrixFromRawMatrix (Array.fromList [Array.fromList [0], Array.fromList [0, 0], Array.fromList [0, 0, 0]])
+                result = Matrix 3 0 (Array.fromList [Array.fromList [], Array.fromList [], Array.fromList []])
+              in
+                target |> Expect.equal result
+        in
+          test "all zero rows" expect
       ,
         let
           expect _
