@@ -143,33 +143,41 @@ toMatrixFromRawMatrix : RawMatrix -> Matrix
 toMatrixFromRawMatrix x_y_int
   =
     let
-      x = toMatrixFromRawMatrix_helper_1 x_y_int
-      y = toMatrixFromRawMatrix_helper_2 x_y_int
-      e = toMatrixFromRawMatrix_helper_3 x_y_int
+      e = toMatrixFromRawMatrix_helper_1 x_y_int
+      x = toMatrixFromRawMatrix_helper_2 x_y_int
+      y = toMatrixFromRawMatrix_helper_3 x_y_int 0
     in
-      Matrix x y (toMatrixFromRawMatrix_helper_4 x_y_int x y e)
+      Matrix x y (toMatrixFromRawMatrix_helper_4 x_y_int e x y)
 
 toMatrixFromRawMatrix_helper_1 : Array (Array Int) -> Int
-toMatrixFromRawMatrix_helper_1 x_y_int
-  =
-    let
-      func y_int (i, int)
-        =
-          if Array.isEmpty y_int
-            then (i + 1, int)
-            else (i + 1, i + 1)
-    in
-      case Array.foldl func (0, 0) x_y_int of
-        (i, int) -> int
+toMatrixFromRawMatrix_helper_1 x_y_int = Maybe.withDefault 0 (Array.minimum (Array.map (\y_int -> Maybe.withDefault 0 (Array.minimum y_int)) x_y_int))
 
 toMatrixFromRawMatrix_helper_2 : Array (Array Int) -> Int
-toMatrixFromRawMatrix_helper_2 x_y_int = Maybe.withDefault 0 (Array.maximum (Array.map Array.length x_y_int))
+toMatrixFromRawMatrix_helper_2 x_y_int = Array.length x_y_int
 
-toMatrixFromRawMatrix_helper_3 : Array (Array Int) -> Int
-toMatrixFromRawMatrix_helper_3 x_y_int = Maybe.withDefault 0 (Array.minimum (Array.map (\y_int -> Maybe.withDefault 0 (Array.minimum y_int)) x_y_int))
+toMatrixFromRawMatrix_helper_3 : Array (Array Int) -> Int -> Int
+toMatrixFromRawMatrix_helper_3 x_y_int e
+  =
+    let
+      func_0 y_int
+        =
+          let
+            func_1 int (i_0, i_1)
+              =
+                if e <= int
+                  then
+                    if e + 1 <= int
+                      then (i_0 + 1, i_0 + 1)
+                      else (i_0 + 1, int)
+                  else (i_0 + 1, int)
+          in
+            case Array.foldl func_1 (0, 0) y_int of
+              (i_0, i_1) -> i_1
+    in
+      Maybe.withDefault 0 (Array.maximum (Array.map func_0 x_y_int))
 
 toMatrixFromRawMatrix_helper_4 : Array (Array Int) -> Int -> Int -> Int -> Array (Array Int)
-toMatrixFromRawMatrix_helper_4 x_y_int x y e
+toMatrixFromRawMatrix_helper_4 x_y_int e x y
   =
     let
       int_ x_ y_ = toMatrixFromRawMatrix_helper_5 x_y_int e x_ y_
