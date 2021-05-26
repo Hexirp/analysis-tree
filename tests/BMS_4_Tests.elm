@@ -8,6 +8,8 @@ module BMS_4_Tests
       test_Notation
     )
 
+import Array exposing (Array)
+
 import Case exposing (Case (..))
 import Notation exposing (Nat (..))
 import BMS_4 exposing (..)
@@ -41,8 +43,8 @@ test_toMatrixFromRawMatrix
           expect _
             =
               let
-                target = toMatrixFromRawMatrix (toRawMatrixFromList [[0, 0, 0], [1, 1, 1], [2, 2, 0]])
-                result = Matrix 3 3 (toRawMatrixFromList [[0, 0, 0], [1, 1, 1], [2, 2, 0]])
+                target = toMatrixFromRawMatrix (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1], Array.fromList [2, 2, 0]])
+                result = Matrix 3 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1], Array.fromList [2, 2, 0]])
               in
                 target |> Expect.equal result
         in
@@ -52,8 +54,8 @@ test_toMatrixFromRawMatrix
           expect _
             =
               let
-                target = toMatrixFromRawMatrix (toRawMatrixFromList [[0], [1, 1, 1], [2, 2]])
-                result = Matrix 3 3 (toRawMatrixFromList [[0, 0, 0], [1, 1, 1], [2, 2, 0]])
+                target = toMatrixFromRawMatrix (Array.fromList [Array.fromList [0], Array.fromList [1, 1, 1], Array.fromList [2, 2]])
+                result = Matrix 3 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1], Array.fromList [2, 2, 0]])
               in
                 target |> Expect.equal result
         in
@@ -63,8 +65,8 @@ test_toMatrixFromRawMatrix
           expect _
             =
               let
-                target = toMatrixFromRawMatrix (toRawMatrixFromList [[-1], [0, 0, 0], [1, 1]])
-                result = Matrix 3 3 (toRawMatrixFromList [[-1, -1, -1], [0, 0, 0], [1, 1, -1]])
+                target = toMatrixFromRawMatrix (Array.fromList [Array.fromList [-1], Array.fromList [0, 0, 0], Array.fromList [1, 1]])
+                result = Matrix 3 3 (Array.fromList [Array.fromList [-1, -1, -1], Array.fromList [0, 0, 0], Array.fromList [1, 1, -1]])
               in
                 target |> Expect.equal result
         in
@@ -74,8 +76,8 @@ test_toMatrixFromRawMatrix
           expect _
             =
               let
-                target = toMatrixFromRawMatrix (toRawMatrixFromList [[], [1, 1, 1]])
-                result = Matrix 2 3 (toRawMatrixFromList [[0, 0, 0], [1, 1, 1]])
+                target = toMatrixFromRawMatrix (Array.fromList [Array.fromList [], Array.fromList [1, 1, 1]])
+                result = Matrix 2 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1]])
               in
                 target |> Expect.equal result
         in
@@ -85,8 +87,8 @@ test_toMatrixFromRawMatrix
           expect _
             =
               let
-                target = toMatrixFromRawMatrix (toRawMatrixFromList [[], [0, 0, -1]])
-                result = Matrix 2 3 (toRawMatrixFromList [[-1, -1, -1], [0, 0, -1]])
+                target = toMatrixFromRawMatrix (Array.fromList [Array.fromList [], Array.fromList [0, 0, -1]])
+                result = Matrix 2 3 (Array.fromList [Array.fromList [-1, -1, -1], Array.fromList [0, 0, -1]])
               in
                 target |> Expect.equal result
         in
@@ -96,8 +98,8 @@ test_toMatrixFromRawMatrix
           expect _
             =
               let
-                target = toMatrixFromRawMatrix (toRawMatrixFromList [[], [], []])
-                result = Matrix 3 0 (toRawMatrixFromList [[], [], []])
+                target = toMatrixFromRawMatrix (Array.fromList [Array.fromList [], Array.fromList [], Array.fromList []])
+                result = Matrix 3 0 (Array.fromList [Array.fromList [], Array.fromList [], Array.fromList []])
               in
                 target |> Expect.equal result
         in
@@ -107,8 +109,8 @@ test_toMatrixFromRawMatrix
           expect _
             =
               let
-                target = toMatrixFromRawMatrix (toRawMatrixFromList [])
-                result = Matrix 0 0 (toRawMatrixFromList [])
+                target = toMatrixFromRawMatrix (Array.fromList [])
+                result = Matrix 0 0 (Array.fromList [])
               in
                 target |> Expect.equal result
 
