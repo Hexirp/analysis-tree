@@ -4,6 +4,8 @@ module Notation_Tests
       test_Nat
     ,
       test_Coftype
+    ,
+      test_RawOuter
     )
 
 import Case exposing (Case (..))
@@ -246,4 +248,11 @@ test_compareNat
                 target |> Expect.equal result
         in
           test "abnormal case" expect
+      ]
+
+test_RawOuter : Test
+test_RawOuter
+  =
+    describe "RawOuter"
+      [
       ]
