@@ -256,6 +256,8 @@ test_RawOuter
     describe "RawOuter"
       [
         test_toRawOuterFromList
+      ,
+        test_toListFromRawOuter
       ]
 
 test_toRawOuterFromList : Test
@@ -280,6 +282,34 @@ test_toRawOuterFromList
               let
                 target = toRawOuterFromList [3, -3, 1, 0]
                 result = Array.fromList [3, -3, 1, 0]
+              in
+                target |> Expect.equal result
+        in
+          test "abnormal case" expect
+      ]
+
+test_toListFromRawOuter : Test
+test_toListFromRawOuter
+  =
+    describe "toListFromRawOuter"
+      [
+        let
+          expect _
+            =
+              let
+                target = toListFromRawOuter (Array.fromList [2, 2, 0])
+                result = [2, 2, 0]
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = toListFromRawOuter (Array.fromList [-2, 2, 0])
+                result = [-2, 2, 0]
               in
                 target |> Expect.equal result
         in
