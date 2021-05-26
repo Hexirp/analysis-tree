@@ -166,60 +166,54 @@ toListFromRawOuter x_int = Array.toList x_int
 
 `IsGreaterThanMaximumError` は、其の表記の項が `notation.maximum` より大きいと判定された時に発生するエラーです。
 
-`IsLessThanZeroError` は、其の表記の項が共終タイプが `Zero` となる項より小さいと判定された時に発生するエラーです。
+`IsLessThanZeroError` は、其の表記の項が、共終タイプが `Zero` となる項より小さいと判定された時に発生するエラーです。
 
-`IsSkeppedError` は、何だろう？ なんか飛ばされた感じの？
+`IsSkeppedError` は、探索において、其の表記の項に辿り着く前に共終タイプが `One` となる項に辿り着いてしまった時に発生するエラーです。
 
-`IsIrregularSequenceError` は、基本列の長さが 3 になっていたりという時に発生するエラーです。
+`IsIrregularSequenceError` は、探索において、共終タイプが `Omega` であるにも関わらず `2` 以上の係数による展開がエラーになる項に辿り着いてしまった時に発生するエラーです。
 -}
-type IsNotConvertOuterError term = IsGreaterThanMaximumError term term | IsLessThanZeroError term term | IsSkeppedError term term term | IsIrregularSequenceError term term
+type IsNotConvertOuterError term = IsGreaterThanMaximumError term (Array Int) term | IsLessThanZeroError term (Array Int) term Nat (OutOfIndexError term) | IsSkeppedError term (Array Int) term Nat (OutOfIndexError term) | IsIrregularSequenceError term (Array Int) term Nat (OutOfIndexError term)
 
 {-| 表記の項から生の外表記の項へ変換します。
 -}
 toRawOuterFromTerm : Notation term -> term -> Case (Result (IsNotConvertOuterError term) RawOuter)
-toRawOuterFromTerm notation term
-  =
-    case notation.compare term notation.maximum of
-      LT -> toRawOuterFromTerm_helper_1 notation term Array.empty notation.maximum
-      EQ -> PossibleCase (Ok Array.empty)
-      GT -> PossibleCase (Err (IsGreaterThanMaximumError term notation.maximum))
+toRawOuterFromTerm notation term = toRawOuterFromTerm_helper_1 notation term Array.empty notation.maximum
 
 toRawOuterFromTerm_helper_1 : Notation term -> term -> Array Int -> term -> Case (Result (IsNotConvertOuterError term) RawOuter)
 toRawOuterFromTerm_helper_1 notation term x_int term_
   =
-    case notation.expand term_ zero of
-      PossibleCase result_term__
-        ->
-          case result_term__ of
-            Ok term__
-              ->
-                case notation.compare term term__ of
-                  LT -> toRawOuterFromTerm_helper_2 notation term x_int term__ zero
-                  EQ -> PossibleCase (Ok (Array.push 0 x_int))
-                  GT -> PossibleCase (Err (IsSkeppedError term term_ term__))
-            Err _ -> PossibleCase (Err (IsLessThanZeroError term term_))
-      ImpossibleCase -> ImpossibleCase
+    case notation.compare term term_ of
+      LT -> PossibleCase (Err (IsGreaterThanMaximumError term x_int term_))
+      EQ -> PossibleCase (Ok x_int)
+      GT -> toRawOuterFromTerm_helper_2 notation term x_int term_ zero
 
 toRawOuterFromTerm_helper_2 : Notation term -> term -> Array Int -> term -> Nat -> Case (Result (IsNotConvertOuterError term) RawOuter)
 toRawOuterFromTerm_helper_2 notation term x_int term_ nat
   =
-    case notation.expand term_ (succ nat) of
+    case notation.expand term_ nat of
       PossibleCase result_term__
         ->
           case result_term__ of
             Ok term__
               ->
-                case notation.compare term term__ of
-                  LT -> toRawOuterFromTerm_helper_2 notation term x_int term__ (succ nat)
-                  EQ -> PossibleCase (Ok (Array.push (toIntFromNat (succ nat)) x_int))
-                  GT -> toRawOuterFromTerm_helper_1 notation term (Array.push (toIntFromNat nat) x_int) term_
+                case
+                  case notation.compare term term__ of
+                    LT -> False
+                    EQ -> True
+                    GT -> True
+                of
+                  False -> toRawOuterFromTerm_helper_2 notation term x_int term__ (succ nat)
+                  True -> toRawOuterFromTerm_helper_1 notation term (Array.push (toIntFromNat nat) x_int) term__
             Err e
               ->
                 if 0 <= toIntFromNat nat
                   then
                     if 1 <= toIntFromNat nat
-                      then toRawOuterFromTerm_helper_1 notation term (Array.push 0 x_int) term_
-                      else PossibleCase (Err (IsIrregularSequenceError term term_))
+                      then
+                        if 2 <= toIntFromNat nat
+                          then PossibleCase (Err (IsIrregularSequenceError term x_int term_ nat e))
+                          else PossibleCase (Err (IsSkeppedError term x_int term_ nat e))
+                      else PossibleCase (Err (IsLessThanZeroError term x_int term_ nat e))
                   else ImpossibleCase
       ImpossibleCase -> ImpossibleCase
 
