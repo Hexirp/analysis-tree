@@ -199,7 +199,7 @@ toRawOuterFromTerm_helper_2 notation term x_int term_ nat
                 case
                   case notation.compare term term__ of
                     LT -> False
-                    EQ -> False
+                    EQ -> True
                     GT -> True
                 of
                   True -> toRawOuterFromTerm_helper_1 notation term (Array.push (toIntFromNat nat) x_int) term__
