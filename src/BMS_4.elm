@@ -230,7 +230,10 @@ expandMatrix matrix n
                   Ok patrix_
                     ->
                       case calcMatrixFromPatrix patrix_ of
-                        PossibleCase matrix_ -> PossibleCase (Ok matrix_)
+                        PossibleCase matrix_
+                          ->
+                            case matrix_ of
+                              Matrix _ _ x_y_int -> PossibleCase (Ok (toMatrixFromRawMatrix x_y_int))
                         ImpossibleCase -> ImpossibleCase
                   Err (OutOfIndexError patrix_ n_ coftype)
                     ->
