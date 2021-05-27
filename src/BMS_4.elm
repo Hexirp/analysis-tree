@@ -126,7 +126,12 @@ type Matrix = Matrix Int Int RawMatrix
 
 {-| 行列同士を比較します。 -}
 compareMatrix : Matrix -> Matrix -> Order
-compareMatrix (Matrix _ _ x) (Matrix _ _ y) = compare (toListFromRawMatrix x) (toListFromRawMatrix y)
+compareMatrix (Matrix _ _ x) (Matrix _ _ y)
+  =
+    let
+      func (Matrix _ _ x_) (Matrix _ _ y_) = compare (toListFromRawMatrix x_) (toListFromRawMatrix y_)
+    in
+      func (toMatrixFromRawMatrix x) (toMatrixFromRawMatrix y)
 
 {-| 或る値が `Matrix` 型の規約を満たしているか検証します。
 -}
