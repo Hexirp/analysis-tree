@@ -196,7 +196,18 @@ test_expandMatrix
               in
                 target |> Expect.equal result
         in
-          test "normal case" expect
+          test "normal case 1" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = expandMatrix (Matrix 2 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1]])) (Nat 0)
+                result = PossibleCase (Ok (Matrix 1 0 (Array.fromList [Array.fromList []])))
+              in
+                target |> Expect.equal result
+        in
+          test "normal case 2" expect
       ]
 
 test_Patrix : Test
