@@ -182,10 +182,13 @@ toRawOuterFromTerm notation term = toRawOuterFromTerm_helper_1 notation term Arr
 toRawOuterFromTerm_helper_1 : Notation term -> term -> Array Int -> term -> Case (Result (IsNotConvertOuterError term) RawOuter)
 toRawOuterFromTerm_helper_1 notation term x_int term_
   =
-    case notation.compare term term_ of
-      LT -> toRawOuterFromTerm_helper_2 notation term x_int term_ zero
-      EQ -> PossibleCase (Ok x_int)
-      GT -> PossibleCase (Err (IsGreaterThanMaximumError term x_int term_))
+    let
+      _ = Debug.log "toRawOuterFromTerm_helper_1" (Debug.toString x_int, Debug.toString term_)
+    in
+      case notation.compare term term_ of
+        LT -> toRawOuterFromTerm_helper_2 notation term x_int term_ zero
+        EQ -> PossibleCase (Ok x_int)
+        GT -> PossibleCase (Err (IsGreaterThanMaximumError term x_int term_))
 
 toRawOuterFromTerm_helper_2 : Notation term -> term -> Array Int -> term -> Nat -> Case (Result (IsNotConvertOuterError term) RawOuter)
 toRawOuterFromTerm_helper_2 notation term x_int term_ nat
