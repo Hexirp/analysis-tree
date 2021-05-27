@@ -57,6 +57,23 @@ test_compareMatrix
                 target |> Expect.equal result
         in
           test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target
+                  =
+                    let
+                      lhs = Matrix 5 2 (Array.fromList [Array.fromList [0, 0], Array.fromList [1, 1], Array.fromList [2, 0], Array.fromList [3, 1], Array.fromList [1, 1]])
+                      rhs = Matrix 1 3 (Array.fromList [Array.fromList [0, 0, 0]])
+                    in
+                      compareMatrix lhs rhs
+                result = GT
+              in
+                target |> Expect.equal result
+        in
+          test "abnormal case" expect
       ]
 
 test_toMatrixFromRawMatrix : Test
