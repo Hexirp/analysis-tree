@@ -27,11 +27,36 @@ test_Matrix
   =
     describe "Matrix"
       [
+        test_compareMatrix
+      ,
         test_toMatrixFromRawMatrix
       ,
         test_toRawMatrixFromMatrix
       ,
         test_expandMatrix
+      ]
+
+test_compareMatrix : Test
+test_compareMatrix
+  =
+    describe "compareMatrix"
+      [
+        let
+          expect _
+            =
+              let
+                target
+                  =
+                    let
+                      lhs = Matrix 5 2 (Array.fromList [Array.fromList [0, 0], Array.fromList [1, 1], Array.fromList [2, 0], Array.fromList [3, 1], Array.fromList [1, 1]])
+                      rhs = Matrix 2 0 (Array.fromList [Array.fromList [], Array.fromList []])
+                    in
+                      compareMatrix lhs rhs
+                result = GT
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
       ]
 
 test_toMatrixFromRawMatrix : Test
