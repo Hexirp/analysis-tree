@@ -348,7 +348,7 @@ expandMaxipointed f g m_term nat
             PossibleCase result_term_
               ->
                 case result_term_ of
-                  Ok term_ -> PossibleCase (Ok (Lower term))
+                  Ok term_ -> PossibleCase (Ok (Lower term_))
                   Err (OutOfIndexError term_ nat_ coftype) -> PossibleCase (Err (OutOfIndexError (Lower term_) nat_ coftype))
             ImpossibleCase -> ImpossibleCase
       Maximum
