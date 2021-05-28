@@ -7,7 +7,6 @@ To add packages that contain rules, add them to this review project using
   `elm install author/packagename`
 
 when inside the directory containing this file.
-
 -}
 
 import NoUnused.CustomTypeConstructorArgs
