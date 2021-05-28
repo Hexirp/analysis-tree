@@ -1,4 +1,18 @@
-module Main exposing (Model, Message, initialize, view, update, main)
+module Main
+  exposing
+    (
+      Model
+    ,
+      Message
+    ,
+      initialize
+    ,
+      view
+    ,
+      update
+    ,
+      main
+    )
 
 import Case exposing (Case (..))
 
@@ -156,7 +170,15 @@ insertMemo k v (Memo dict) = Memo (Dict.insert k v dict)
 type Message = Edit_Mapping (Array Int) String | Edit_Memo (Array Int) String | Expand (Array Int) | Retract (Array Int)
 
 initialize : Model
-initialize = { shape = initialShape, mapping = emptyMapping, memo = emptyMemo }
+initialize
+  =
+    {
+      shape = initialShape
+    ,
+      mapping = emptyMapping
+    ,
+      memo = emptyMemo
+    }
 
 update : Message -> Model -> Model
 update message model = model
@@ -165,4 +187,13 @@ view : Model -> Html Message
 view model = div [] [ text "TODO!" ]
 
 main : Program () Model Message
-main = Browser.sandbox { init = initialize, view = view, update = update }
+main
+  =
+    Browser.sandbox
+      {
+        init = initialize
+      ,
+        view = view
+      ,
+        update = update
+      }
