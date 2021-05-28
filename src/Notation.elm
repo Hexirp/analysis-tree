@@ -29,6 +29,8 @@ module Notation
     ,
       toListFromRawOuter
     ,
+      IsNotConvertOuterError (..)
+    ,
       toRawOuterFromTerm
     ,
       toTermFromRawOuter
@@ -64,7 +66,7 @@ module Notation
 @docs OutOfIndexError, Expander, Notation
 
 # 外表記
-@docs RawOuter, toRawOuterFromList, toListFromRawOuter, toRawOuterFromTerm, toTermFromRawOuter, Outer, toOuterFromTerm, toTermFromOuter, toOuterFromRawOuter, toRawOuterFromOuter, canonicalize
+@docs RawOuter, toRawOuterFromList, toListFromRawOuter, IsNotConvertOuterError, toRawOuterFromTerm, toTermFromRawOuter, Outer, toOuterFromTerm, toTermFromOuter, toOuterFromRawOuter, toRawOuterFromOuter, canonicalize
 
 # 最大元の添加
 @docs Maxipointed, compareMaxipointed, expandMaxipointed
