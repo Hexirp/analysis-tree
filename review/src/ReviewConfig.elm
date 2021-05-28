@@ -25,8 +25,6 @@ config =
   [
     NoUnused.CustomTypeConstructors.rule []
   ,
-    NoUnused.CustomTypeConstructorArgs.rule
-  ,
     NoUnused.Dependencies.rule
   ,
     NoUnused.Modules.rule
