@@ -13,7 +13,6 @@ module Array.Extra.Folding
 ## 関数たち
 
 @docs all, maximum, minimum
-
 -}
 
 import Array exposing (..)

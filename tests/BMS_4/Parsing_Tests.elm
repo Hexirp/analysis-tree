@@ -2,13 +2,9 @@ module BMS_4.Parsing_Tests
   exposing (test_parse, test_toAstFromString, test_toStringFromAst)
 
 import Parser
-
 import BMS_4.Parsing exposing (..)
 
-import Expect exposing (Expectation)
-
-import Fuzz exposing (Fuzzer)
-
+import Expect
 import Test exposing (..)
 
 test_parse : Test

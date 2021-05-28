@@ -138,12 +138,11 @@ module BMS_4.Parsing
 # 文字列から構文木への変換
 
 @docs parse, parseExpression, parseMatrix, parseMatrix0, parseMatrix00, parseMatrix01, parseRow, parseRow0, parseRow00, parseRow01, parseNaturalNumber, parseDigit, parseNonZeroDigit, parseSpacesAndBreaks, parseSpaces, parseSpaceOrBreak, parseBreak, parseSpace, parseSymbol_09, parseSymbol_0A, parseSymbol_0D, parseSymbol_0D0A, parseSymbol_20, parseSymbol_28, parseSymbol_29, parseSymbol_2C, parseSymbol_30, parseSymbol_31, parseSymbol_32, parseSymbol_33, parseSymbol_34, parseSymbol_35, parseSymbol_36, parseSymbol_37, parseSymbol_38, parseSymbol_39
-
 -}
 
 import Parser
   exposing (Parser, succeed, (|=), (|.), oneOf, symbol)
-import Parser.Extra as Parser exposing (brackets, braces)
+import Parser.Extra exposing (brackets, braces)
 
 -- 抽象構文木
 

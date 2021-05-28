@@ -66,6 +66,27 @@ module BMS_4
       notation
     )
 
+{-| バシク行列システム 4 です。
+
+# 生の行列
+@docs RawMatrix, toRawMatrixFromList, toListFromRawMatrix
+
+# 行列
+@docs Matrix, compareMatrix, verifyMatrix, toMatrixFromRawMatrix, toRawMatrixFromMatrix, calcCoftypeOfMatrix, expandMatrix
+
+# ピンデックス
+@docs Pindex
+
+# 生のパトリックス
+@docs RawPatrix, toRawPatrixFromList, toListFromRawPatrix
+
+# パトリックス
+@docs Patrix (..), calcPatrixFromMatrix, MemoCalcPatrixFromMatrix, emptyMemoCalcPatrixFromMatrix, getMemoCalcParentOnPatrixFromRawMatrix, getMemoCalcAncestorSetOnPatrixFromRawMatrix, insertMemoCalcParentOnPatrixFromRawMatrix, insertMemoCalcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrix, calcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrixWithMemo, calcAncestorSetOnPatrixFromRawMatrixWithMemo, calcMatrixFromPatrix, calcElementOnMatrixFromRawPatrix, calcCoftypeOfPatrix, calcBadRootOfPatrix, expandPatrix
+
+# 基本列付きの順序数表記
+@docs notations
+-}
+
 import Result exposing (Result)
 
 import Case exposing (Case (..))
@@ -80,8 +101,6 @@ import Notation
   exposing
     (
       Nat (..)
-    ,
-      toNatFromInt
     ,
       toIntFromNat
     ,
@@ -126,12 +145,7 @@ type Matrix = Matrix Int Int RawMatrix
 
 {-| 行列同士を比較します。 -}
 compareMatrix : Matrix -> Matrix -> Order
-compareMatrix (Matrix _ _ x) (Matrix _ _ y)
-  =
-    let
-      func (Matrix _ _ x_) (Matrix _ _ y_) = compare (toListFromRawMatrix x_) (toListFromRawMatrix y_)
-    in
-      func (toMatrixFromRawMatrix x) (toMatrixFromRawMatrix y)
+compareMatrix x y = compare (toListFromRawMatrix (toRawMatrixFromMatrix (toMatrixFromRawMatrix (toRawMatrixFromMatrix x)))) (toListFromRawMatrix (toRawMatrixFromMatrix (toMatrixFromRawMatrix (toRawMatrixFromMatrix y))))
 
 {-| 或る値が `Matrix` 型の規約を満たしているか検証します。
 -}
@@ -230,10 +244,7 @@ expandMatrix matrix n
                   Ok patrix_
                     ->
                       case calcMatrixFromPatrix patrix_ of
-                        PossibleCase matrix_
-                          ->
-                            case matrix_ of
-                              Matrix _ _ x_y_int -> PossibleCase (Ok (toMatrixFromRawMatrix x_y_int))
+                        PossibleCase matrix_ -> PossibleCase (Ok (toMatrixFromRawMatrix (toRawMatrixFromMatrix matrix_)))
                         ImpossibleCase -> ImpossibleCase
                   Err (OutOfIndexError patrix_ n_ coftype)
                     ->
@@ -755,6 +766,7 @@ expandPatrix_helper_2 x_y_pindex xr yr x_ y_
                                         else PossibleCase (Pindex (x_ - 1))
                         Nothing -> ImpossibleCase
 
+{-| バシク行列システム 4 の `Notation` です。 -}
 notation : Notation (Maxipointed Matrix)
 notation
   =
