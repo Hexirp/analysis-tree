@@ -13,6 +13,13 @@ test-job:
     - npm install -g --unsafe-perm elm-test
     - elm-test
 
+lint-job:
+  stage: test
+  script:
+    - npm install -g --unsafe-perm elm
+    - npm install -g --unsafe-perm elm-review
+    - elm-review --template jfmengels/elm-review-unused/example
+
 pages:
   stage: deploy
   script:
