@@ -19,6 +19,7 @@ lint-job:
     - npm install -g --unsafe-perm elm
     - npm install -g --unsafe-perm elm-review
     - elm-review --template jfmengels/elm-review-unused/example
+  allow_failure: true
 
 pages:
   stage: deploy
