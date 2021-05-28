@@ -84,8 +84,7 @@ module BMS_4
 @docs Patrix (..), calcPatrixFromMatrix, MemoCalcPatrixFromMatrix, emptyMemoCalcPatrixFromMatrix, getMemoCalcParentOnPatrixFromRawMatrix, getMemoCalcAncestorSetOnPatrixFromRawMatrix, insertMemoCalcParentOnPatrixFromRawMatrix, insertMemoCalcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrix, calcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrixWithMemo, calcAncestorSetOnPatrixFromRawMatrixWithMemo, calcMatrixFromPatrix, calcElementOnMatrixFromRawPatrix, calcCoftypeOfPatrix, calcBadRootOfPatrix, expandPatrix
 
 # 基本列付きの順序数表記
-@docs notation
-
+@docs notations
 -}
 
 import Result exposing (Result)
