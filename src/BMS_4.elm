@@ -198,9 +198,9 @@ toMatrixFromRawMatrix_helper_5 x_y_int e x_ y_
       Just y_int
         ->
           case Array.get y_ y_int of
-            Just int -> int
-            Nothing -> e
-      Nothing -> e
+            Just int -> int - e
+            Nothing -> 0
+      Nothing -> 0
 
 {-| 或る行列を或る生の行列へ変換します。
 -}
