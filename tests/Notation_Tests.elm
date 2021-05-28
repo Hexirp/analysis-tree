@@ -10,8 +10,6 @@ module Notation_Tests
 
 import Array
 
-import Case
-
 import Notation exposing (..)
 
 import Expect

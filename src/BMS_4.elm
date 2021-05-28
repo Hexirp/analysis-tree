@@ -103,8 +103,6 @@ import Notation
     (
       Nat (..)
     ,
-      toNatFromInt
-    ,
       toIntFromNat
     ,
       Coftype (..)

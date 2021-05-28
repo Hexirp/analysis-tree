@@ -4,7 +4,7 @@ module Array.Extra.Folding_Tests
       test_Array
     )
 
-import Array exposing (..)
+import Array
 import Array.Extra.Folding exposing (..)
 
 import Expect

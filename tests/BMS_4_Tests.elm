@@ -8,7 +8,7 @@ module BMS_4_Tests
       test_Notation
     )
 
-import Array exposing (Array)
+import Array
 
 import Case exposing (Case (..))
 import Notation exposing (Nat (..))
