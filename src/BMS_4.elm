@@ -148,12 +148,7 @@ type Matrix = Matrix Int Int RawMatrix
 
 {-| 行列同士を比較します。 -}
 compareMatrix : Matrix -> Matrix -> Order
-compareMatrix (Matrix _ _ x) (Matrix _ _ y)
-  =
-    let
-      func (Matrix _ _ x_) (Matrix _ _ y_) = compare (toListFromRawMatrix x_) (toListFromRawMatrix y_)
-    in
-      func (toMatrixFromRawMatrix x) (toMatrixFromRawMatrix y)
+compareMatrix x y = compare (toListFromRawMatrix (toRawMatrixFromMatrix (toMatrixFromRawMatrix (toRawMatrixFromMatrix x)))) (toListFromRawMatrix (toRawMatrixFromMatrix (toMatrixFromRawMatrix (toRawMatrixFromMatrix y))))
 
 {-| 或る値が `Matrix` 型の規約を満たしているか検証します。
 -}
@@ -252,10 +247,7 @@ expandMatrix matrix n
                   Ok patrix_
                     ->
                       case calcMatrixFromPatrix patrix_ of
-                        PossibleCase matrix_
-                          ->
-                            case matrix_ of
-                              Matrix _ _ x_y_int -> PossibleCase (Ok (toMatrixFromRawMatrix x_y_int))
+                        PossibleCase matrix_ -> PossibleCase (Ok (toMatrixFromRawMatrix (toRawMatrixFromMatrix matrix_)))
                         ImpossibleCase -> ImpossibleCase
                   Err (OutOfIndexError patrix_ n_ coftype)
                     ->
