@@ -108,7 +108,7 @@ test_toMatrixFromRawMatrix
             =
               let
                 target = toMatrixFromRawMatrix (Array.fromList [Array.fromList [-1], Array.fromList [0, 0, 0], Array.fromList [1, 1]])
-                result = Matrix 3 3 (Array.fromList [Array.fromList [-1, -1, -1], Array.fromList [0, 0, 0], Array.fromList [1, 1, -1]])
+                result = Matrix 3 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1], Array.fromList [2, 2, 0]])
               in
                 target |> Expect.equal result
         in
@@ -152,7 +152,7 @@ test_toMatrixFromRawMatrix
             =
               let
                 target = toMatrixFromRawMatrix (Array.fromList [Array.fromList [], Array.fromList [0, 0, -1]])
-                result = Matrix 2 2 (Array.fromList [Array.fromList [-1, -1], Array.fromList [0, 0]])
+                result = Matrix 2 2 (Array.fromList [Array.fromList [0, 0], Array.fromList [1, 1]])
               in
                 target |> Expect.equal result
         in
