@@ -4,7 +4,11 @@ module Notation_Tests
       test_Nat
     ,
       test_Coftype
+    ,
+      test_RawOuter
     )
+
+import Array exposing (Array)
 
 import Case exposing (Case (..))
 
@@ -242,6 +246,72 @@ test_compareNat
               let
                 target = compareNat Zero (Nat -1)
                 result = GT
+              in
+                target |> Expect.equal result
+        in
+          test "abnormal case" expect
+      ]
+
+test_RawOuter : Test
+test_RawOuter
+  =
+    describe "RawOuter"
+      [
+        test_toRawOuterFromList
+      ,
+        test_toListFromRawOuter
+      ]
+
+test_toRawOuterFromList : Test
+test_toRawOuterFromList
+  =
+    describe "toRawOuterFromList"
+      [
+        let
+          expect _
+            =
+              let
+                target = toRawOuterFromList [3, 3, 1, 0]
+                result = Array.fromList [3, 3, 1, 0]
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = toRawOuterFromList [3, -3, 1, 0]
+                result = Array.fromList [3, -3, 1, 0]
+              in
+                target |> Expect.equal result
+        in
+          test "abnormal case" expect
+      ]
+
+test_toListFromRawOuter : Test
+test_toListFromRawOuter
+  =
+    describe "toListFromRawOuter"
+      [
+        let
+          expect _
+            =
+              let
+                target = toListFromRawOuter (Array.fromList [2, 2, 0])
+                result = [2, 2, 0]
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = toListFromRawOuter (Array.fromList [-2, 2, 0])
+                result = [-2, 2, 0]
               in
                 target |> Expect.equal result
         in

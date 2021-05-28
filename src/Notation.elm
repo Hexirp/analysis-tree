@@ -162,52 +162,58 @@ toRawOuterFromList list = Array.fromList list
 toListFromRawOuter : RawOuter -> List Int
 toListFromRawOuter x_int = Array.toList x_int
 
+{-| 表記の項から生の外表記の項へ変換する時に、それが不可能だと発生するエラーです。
+
+`IsGreaterThanMaximumError` は、其の表記の項が `notation.maximum` より大きいと判定された時に発生するエラーです。
+
+`IsLessThanZeroError` は、其の表記の項が、共終タイプが `Zero` となる項より小さいと判定された時に発生するエラーです。
+
+`IsSkeppedError` は、探索において、其の表記の項に辿り着く前に共終タイプが `One` となる項に辿り着いてしまった時に発生するエラーです。
+
+`IsIrregularSequenceError` は、探索において、共終タイプが `Omega` であるにも関わらず `2` 以上の係数による展開がエラーになる項に辿り着いてしまった時に発生するエラーです。
+-}
+type IsNotConvertOuterError term = IsGreaterThanMaximumError term (Array Int) term | IsLessThanZeroError term (Array Int) term Nat (OutOfIndexError term) | IsSkeppedError term (Array Int) term Nat (OutOfIndexError term) | IsIrregularSequenceError term (Array Int) term Nat (OutOfIndexError term)
+
 {-| 表記の項から生の外表記の項へ変換します。
 -}
-toRawOuterFromTerm : Notation term -> term -> Case (Maybe RawOuter)
-toRawOuterFromTerm notation term
-  =
-    case notation.compare term notation.maximum of
-      LT -> toRawOuterFromTerm_helper_1 notation term Array.empty notation.maximum
-      EQ -> PossibleCase (Just Array.empty)
-      GT -> PossibleCase Nothing
+toRawOuterFromTerm : Notation term -> term -> Case (Result (IsNotConvertOuterError term) RawOuter)
+toRawOuterFromTerm notation term = toRawOuterFromTerm_helper_1 notation term Array.empty notation.maximum
 
-toRawOuterFromTerm_helper_1 : Notation term -> term -> Array Int -> term -> Case (Maybe RawOuter)
+toRawOuterFromTerm_helper_1 : Notation term -> term -> Array Int -> term -> Case (Result (IsNotConvertOuterError term) RawOuter)
 toRawOuterFromTerm_helper_1 notation term x_int term_
   =
-    case notation.expand term_ zero of
-      PossibleCase result_term__
-        ->
-          case result_term__ of
-            Ok term__
-              ->
-                case notation.compare term term__ of
-                  LT -> toRawOuterFromTerm_helper_2 notation term x_int term__ zero
-                  EQ -> PossibleCase (Just (Array.push 0 x_int))
-                  GT -> PossibleCase Nothing
-            Err _ -> PossibleCase Nothing
-      ImpossibleCase -> ImpossibleCase
+    case notation.compare term term_ of
+      LT -> toRawOuterFromTerm_helper_2 notation term x_int term_ zero
+      EQ -> PossibleCase (Ok x_int)
+      GT -> PossibleCase (Err (IsGreaterThanMaximumError term x_int term_))
 
-toRawOuterFromTerm_helper_2 : Notation term -> term -> Array Int -> term -> Nat -> Case (Maybe RawOuter)
+toRawOuterFromTerm_helper_2 : Notation term -> term -> Array Int -> term -> Nat -> Case (Result (IsNotConvertOuterError term) RawOuter)
 toRawOuterFromTerm_helper_2 notation term x_int term_ nat
   =
-    case notation.expand term_ (succ nat) of
+    case notation.expand term_ nat of
       PossibleCase result_term__
         ->
           case result_term__ of
             Ok term__
               ->
-                case notation.compare term term__ of
-                  LT -> toRawOuterFromTerm_helper_2 notation term x_int term__ (succ nat)
-                  EQ -> PossibleCase (Just (Array.push (toIntFromNat (succ nat)) x_int))
-                  GT -> toRawOuterFromTerm_helper_1 notation term (Array.push (toIntFromNat nat) x_int) term_
+                case
+                  case notation.compare term term__ of
+                    LT -> True
+                    EQ -> True
+                    GT -> False
+                of
+                  True -> toRawOuterFromTerm_helper_1 notation term (Array.push (toIntFromNat nat) x_int) term__
+                  False -> toRawOuterFromTerm_helper_2 notation term x_int term_ (succ nat)
             Err e
               ->
                 if 0 <= toIntFromNat nat
                   then
                     if 1 <= toIntFromNat nat
-                      then toRawOuterFromTerm_helper_1 notation term (Array.push 0 x_int) term_
-                      else PossibleCase Nothing
+                      then
+                        if 2 <= toIntFromNat nat
+                          then PossibleCase (Err (IsIrregularSequenceError term x_int term_ nat e))
+                          else PossibleCase (Err (IsSkeppedError term x_int term_ nat e))
+                      else PossibleCase (Err (IsLessThanZeroError term x_int term_ nat e))
                   else ImpossibleCase
       ImpossibleCase -> ImpossibleCase
 
@@ -251,15 +257,15 @@ type Outer = Outer RawOuter
 
 {-| 表記の項から外表記の項へ変換します。
 -}
-toOuterFromTerm : Notation term -> term -> Case (Maybe Outer)
+toOuterFromTerm : Notation term -> term -> Case (Result (IsNotConvertOuterError term) Outer)
 toOuterFromTerm notation term
   =
     case toRawOuterFromTerm notation term of
-      PossibleCase maybe_x_int
+      PossibleCase result_x_int
         ->
-          case maybe_x_int of
-            Just x_int -> PossibleCase (Just (Outer x_int))
-            Nothing -> PossibleCase Nothing
+          case result_x_int of
+            Ok x_int -> PossibleCase (Ok (Outer x_int))
+            Err e -> PossibleCase (Err e)
       ImpossibleCase -> ImpossibleCase
 
 {-| 外表記の項から表記の項へ変換します。
@@ -269,7 +275,7 @@ toTermFromOuter notation outer = toTermFromRawOuter notation (toRawOuterFromOute
 
 {-| 生の外表記の項から外表記の項へ変換します。
 -}
-toOuterFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (OutOfIndexError term) (Maybe Outer)))
+toOuterFromRawOuter : Notation term -> RawOuter -> Case (Result IsNegativeError (Result (OutOfIndexError term) (Result (IsNotConvertOuterError term) Outer)))
 toOuterFromRawOuter notation x_int
   =
     let
@@ -285,7 +291,7 @@ toOuterFromRawOuter notation x_int
                     Ok term
                       ->
                         case toOuterFromTerm notation term of
-                          PossibleCase maybe_outer -> PossibleCase (Ok (Ok maybe_outer))
+                          PossibleCase result_outer -> PossibleCase (Ok (Ok result_outer))
                           ImpossibleCase -> ImpossibleCase
                     Err e -> PossibleCase (Ok (Err e))
               Err e -> PossibleCase (Err e)
@@ -298,7 +304,7 @@ toRawOuterFromOuter (Outer x) = x
 
 {-| 外表記の項を正規化します。
 -}
-canonicalize : Notation term -> Outer -> Case (Result IsNegativeError (Result (OutOfIndexError term) (Maybe Outer)))
+canonicalize : Notation term -> Outer -> Case (Result IsNegativeError (Result (OutOfIndexError term) (Result (IsNotConvertOuterError term) Outer)))
 canonicalize notation outer = toOuterFromRawOuter notation (toRawOuterFromOuter outer)
 
 {-| 最大元が加えられた表記です。
@@ -336,7 +342,7 @@ expandMaxipointed f g m_term nat
             PossibleCase result_term_
               ->
                 case result_term_ of
-                  Ok term_ -> PossibleCase (Ok (Lower term))
+                  Ok term_ -> PossibleCase (Ok (Lower term_))
                   Err (OutOfIndexError term_ nat_ coftype) -> PossibleCase (Err (OutOfIndexError (Lower term_) nat_ coftype))
             ImpossibleCase -> ImpossibleCase
       Maximum
