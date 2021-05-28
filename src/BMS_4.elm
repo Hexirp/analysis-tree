@@ -66,6 +66,28 @@ module BMS_4
       notation
     )
 
+{-| バシク行列システム 4 です。
+
+# 生の行列
+@docs RawMatrix, toRawMatrixFromList, toListFromRawMatrix
+
+# 行列
+@docs Matrix, compareMatrix, verifyMatrix, toMatrixFromRawMatrix, toRawMatrixFromMatrix, calcCoftypeOfMatrix, expandMatrix
+
+# ピンデックス
+@docs Pindex
+
+# 生のパトリックス
+@docs RawPatrix, toRawPatrixFromList, toListFromRawPatrix
+
+# パトリックス
+@docs Patrix (..), calcPatrixFromMatrix, MemoCalcPatrixFromMatrix, emptyMemoCalcPatrixFromMatrix, getMemoCalcParentOnPatrixFromRawMatrix, getMemoCalcAncestorSetOnPatrixFromRawMatrix, insertMemoCalcParentOnPatrixFromRawMatrix, insertMemoCalcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrix, calcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrixWithMemo, calcAncestorSetOnPatrixFromRawMatrixWithMemo, calcMatrixFromPatrix, calcElementOnMatrixFromRawPatrix, calcCoftypeOfPatrix, calcBadRootOfPatrix, expandPatrix
+
+# 基本列付きの順序数表記
+@docs notation
+
+-}
+
 import Result exposing (Result)
 
 import Case exposing (Case (..))
@@ -755,6 +777,7 @@ expandPatrix_helper_2 x_y_pindex xr yr x_ y_
                                         else PossibleCase (Pindex (x_ - 1))
                         Nothing -> ImpossibleCase
 
+{-| バシク行列システム 4 の `Notation` です。 -}
 notation : Notation (Maxipointed Matrix)
 notation
   =
