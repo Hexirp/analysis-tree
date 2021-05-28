@@ -2,6 +2,10 @@
 
 ## not yet released
 
+https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/12 により次の変更が行われた。
+
+* `Notation` モジュールという、複数の表記を横断して操作を抽象化するモジュールを追加した。
+
 ## 0.4.0
 
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/8 により次の変更が行われた。
