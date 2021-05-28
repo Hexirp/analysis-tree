@@ -62,13 +62,18 @@ module BMS_4
       calcBadRootOfPatrix
     ,
       expandPatrix
+    ,
+      notation
     )
+
+import Result exposing (Result)
 
 import Case exposing (Case (..))
 
 import Dict exposing (Dict)
 
 import Array exposing (Array)
+import Array.Extra as Array
 import Array.Extra.Folding as Array
 
 import Notation
@@ -83,6 +88,16 @@ import Notation
       Coftype (..)
     ,
       compareNat
+    ,
+      OutOfIndexError (..)
+    ,
+      Notation
+    ,
+      Maxipointed (..)
+    ,
+      compareMaxipointed
+    ,
+      expandMaxipointed
     )
 
 {-| これはバシク行列システムの行列を表す生の型です。
@@ -111,7 +126,12 @@ type Matrix = Matrix Int Int RawMatrix
 
 {-| 行列同士を比較します。 -}
 compareMatrix : Matrix -> Matrix -> Order
-compareMatrix (Matrix _ _ x) (Matrix _ _ y) = compare (toListFromRawMatrix x) (toListFromRawMatrix y)
+compareMatrix (Matrix _ _ x) (Matrix _ _ y)
+  =
+    let
+      func (Matrix _ _ x_) (Matrix _ _ y_) = compare (toListFromRawMatrix x_) (toListFromRawMatrix y_)
+    in
+      func (toMatrixFromRawMatrix x) (toMatrixFromRawMatrix y)
 
 {-| 或る値が `Matrix` 型の規約を満たしているか検証します。
 -}
@@ -128,14 +148,59 @@ toMatrixFromRawMatrix : RawMatrix -> Matrix
 toMatrixFromRawMatrix x_y_int
   =
     let
-      x = Array.length x_y_int
-      y = Maybe.withDefault 0 (Array.maximum (Array.map Array.length x_y_int))
-      e = Maybe.withDefault 0 (Array.minimum (Array.map (\y_int -> Maybe.withDefault 0 (Array.minimum y_int)) x_y_int))
+      e = toMatrixFromRawMatrix_helper_1 x_y_int
+      x = toMatrixFromRawMatrix_helper_2 x_y_int
+      y = toMatrixFromRawMatrix_helper_3 x_y_int e
     in
-      Matrix x y (Array.map (fromArrayToMatrix_helper_1 y e) x_y_int)
+      Matrix x y (toMatrixFromRawMatrix_helper_4 x_y_int e x y)
 
-fromArrayToMatrix_helper_1 : Int -> Int -> Array Int -> Array Int
-fromArrayToMatrix_helper_1 y e y_int = Array.initialize y (\i -> Maybe.withDefault e (Array.get i y_int))
+toMatrixFromRawMatrix_helper_1 : Array (Array Int) -> Int
+toMatrixFromRawMatrix_helper_1 x_y_int = Maybe.withDefault 0 (Array.minimum (Array.map (\y_int -> Maybe.withDefault 0 (Array.minimum y_int)) x_y_int))
+
+toMatrixFromRawMatrix_helper_2 : Array (Array Int) -> Int
+toMatrixFromRawMatrix_helper_2 x_y_int = Array.length x_y_int
+
+toMatrixFromRawMatrix_helper_3 : Array (Array Int) -> Int -> Int
+toMatrixFromRawMatrix_helper_3 x_y_int e
+  =
+    let
+      func_0 y_int
+        =
+          let
+            func_1 int (i_0, i_1)
+              =
+                if e <= int
+                  then
+                    if e + 1 <= int
+                      then (i_0 + 1, i_0 + 1)
+                      else (i_0 + 1, i_1)
+                  else (i_0 + 1, i_1)
+          in
+            case Array.foldl func_1 (0, 0) y_int of
+              (i_0, i_1) -> i_1
+    in
+      Maybe.withDefault 0 (Array.maximum (Array.map func_0 x_y_int))
+
+toMatrixFromRawMatrix_helper_4 : Array (Array Int) -> Int -> Int -> Int -> Array (Array Int)
+toMatrixFromRawMatrix_helper_4 x_y_int e x y
+  =
+    let
+      int_ x_ y_ = toMatrixFromRawMatrix_helper_5 x_y_int e x_ y_
+      y_int_ x_ = Array.initialize y (\y_ -> int_ x_ y_)
+      x_y_int_ = Array.initialize x (\x_ -> y_int_ x_)
+    in
+      x_y_int_
+
+toMatrixFromRawMatrix_helper_5 : Array (Array Int) -> Int -> Int -> Int -> Int
+toMatrixFromRawMatrix_helper_5 x_y_int e x_ y_
+  =
+    case Array.get x_ x_y_int of
+      Just y_int
+        ->
+          case Array.get y_ y_int of
+            Just int -> int - e
+            Nothing -> 0
+      Nothing -> 0
 
 {-| 或る行列を或る生の行列へ変換します。
 -}
@@ -152,22 +217,29 @@ calcCoftypeOfMatrix matrix
 
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
-expandMatrix : Matrix -> Nat -> Case (Maybe Matrix)
+expandMatrix : Matrix -> Nat -> Case (Result (OutOfIndexError Matrix) Matrix)
 expandMatrix matrix n
   =
     case calcPatrixFromMatrix matrix of
       PossibleCase patrix
         ->
           case expandPatrix patrix n of
-            PossibleCase m_patrix_
+            PossibleCase result_patrix_
               ->
-                case m_patrix_ of
-                  Just patrix_
+                case result_patrix_ of
+                  Ok patrix_
                     ->
                       case calcMatrixFromPatrix patrix_ of
-                        PossibleCase matrix_ -> PossibleCase (Just matrix_)
+                        PossibleCase matrix_
+                          ->
+                            case matrix_ of
+                              Matrix _ _ x_y_int -> PossibleCase (Ok (toMatrixFromRawMatrix x_y_int))
                         ImpossibleCase -> ImpossibleCase
-                  Nothing -> PossibleCase Nothing
+                  Err (OutOfIndexError patrix_ n_ coftype)
+                    ->
+                      case calcMatrixFromPatrix patrix_ of
+                        PossibleCase matrix_ -> PossibleCase (Err (OutOfIndexError matrix_ n_ coftype))
+                        ImpossibleCase -> ImpossibleCase
             ImpossibleCase -> ImpossibleCase
       ImpossibleCase -> ImpossibleCase
 
@@ -515,35 +587,41 @@ calcBadRootOfPatrix patrix
 
 {-| 或るパトリックスを或る係数で展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
-expandPatrix : Patrix -> Nat -> Case (Maybe Patrix)
+expandPatrix : Patrix -> Nat -> Case (Result (OutOfIndexError Patrix) Patrix)
 expandPatrix patrix n
   =
     case calcCoftypeOfPatrix patrix of
-      Zero -> PossibleCase Nothing
+      Zero -> PossibleCase (Err (OutOfIndexError patrix n Zero))
       One
         ->
-          case compareNat One n of
-            LT -> PossibleCase Nothing
-            EQ -> PossibleCase Nothing
-            GT
-              ->
-                case patrix of
-                  Patrix x y x_y_pindex -> PossibleCase (Just (Patrix (x - 1) y (Array.slice 0 -1 x_y_pindex)))
+          if 0 <= toIntFromNat n
+            then PossibleCase (Err (OutOfIndexError patrix n One))
+            else
+              case compareNat One n of
+                LT -> PossibleCase (Err (OutOfIndexError patrix n One))
+                EQ -> PossibleCase (Err (OutOfIndexError patrix n One))
+                GT
+                  ->
+                    case patrix of
+                      Patrix x y x_y_pindex -> PossibleCase (Ok (Patrix (x - 1) y (Array.pop x_y_pindex)))
       Omega
         ->
-          case calcBadRootOfPatrix patrix of
-            Just (xr, yr)
-              ->
-                case patrix of
-                  Patrix x y x_y_pindex
-                    ->
-                      let
-                        ex = xr + (((x - 1) - xr) * (toIntFromNat n + 1))
-                      in
-                        case expandPatrix_helper_1 x y x_y_pindex n xr yr ex of
-                          PossibleCase x_y_pindex_ -> PossibleCase (Just (Patrix ex y x_y_pindex_))
-                          ImpossibleCase -> ImpossibleCase
-            Nothing -> ImpossibleCase
+          if 0 <= toIntFromNat n
+            then
+              case calcBadRootOfPatrix patrix of
+                Just (xr, yr)
+                  ->
+                    case patrix of
+                      Patrix x y x_y_pindex
+                        ->
+                          let
+                            ex = xr + (((x - 1) - xr) * (toIntFromNat n + 1))
+                          in
+                            case expandPatrix_helper_1 x y x_y_pindex n xr yr ex of
+                              PossibleCase x_y_pindex_ -> PossibleCase (Ok (Patrix ex y x_y_pindex_))
+                              ImpossibleCase -> ImpossibleCase
+                Nothing -> ImpossibleCase
+            else PossibleCase (Err (OutOfIndexError patrix n Omega))
 
 expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Int -> Case RawPatrix
 expandPatrix_helper_1 x y x_y_pindex n xr yr ex
@@ -581,7 +659,7 @@ expandPatrix_helper_2 x_y_pindex xr yr x_ y_
         let
           x = Array.length x_y_pindex
           m = (x_ - xr) // ((x - 1) - xr)
-          n = modBy ((x - 1) - xr) (x_ - xr)
+          n = (x_ - xr) |> modBy ((x - 1) - xr)
         in
           if m == 0
             then
@@ -676,3 +754,26 @@ expandPatrix_helper_2 x_y_pindex xr yr x_ y_
                                         then PossibleCase Null
                                         else PossibleCase (Pindex (x_ - 1))
                         Nothing -> ImpossibleCase
+
+notation : Notation (Maxipointed Matrix)
+notation
+  =
+    {
+      compare = compareMaxipointed compareMatrix
+    ,
+      expand
+        =
+          let
+            f nat
+              =
+                let
+                  int = toIntFromNat nat
+                in
+                  if 0 <= int
+                    then Just (Matrix 2 int (Array.fromList [Array.repeat int 0, Array.repeat int 1]))
+                    else Nothing
+          in
+            expandMaxipointed expandMatrix f
+    ,
+      maximum = Maximum
+    }
