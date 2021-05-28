@@ -1,6 +1,20 @@
 module Case
   exposing
-    (Case (..), isValid, traverseArray, initializeArrayWithCaseWithState)
+    (
+      Case (..)
+    ,
+      isValid
+    ,
+      traverseArray
+    ,
+      sequenceArray
+    ,
+      sequenceArrayWithState
+    ,
+      initializeArrayWithCase
+    ,
+      initializeArrayWithCaseWithState
+    )
 
 {-| 型の上では値が存在しない可能性があるが、実際には値が存在されると期待される型です。
 
@@ -12,7 +26,7 @@ module Case
 
 # 関数たち
 
-@docs isValid, traverseArray
+@docs isValid, traverseArray, sequenceArray, sequenceArrayWithState, initializeArrayWithCase, initializeArrayWithCaseWithState
 -}
 
 import Array exposing (Array)
@@ -25,7 +39,7 @@ import Array exposing (Array)
     Nothing -> ImpossibleCase
     Just int -> PossibleCase int
 -}
-type Case a = ImpossibleCase | PossibleCase a
+type Case a = PossibleCase a | ImpossibleCase
 
 {-| 或る `Case` 型の値が妥当であることを確かめます。 -}
 isValid : Case a -> Bool
@@ -37,46 +51,63 @@ isValid case_x
 
 {-| 或る配列を或る `Case` 型を返す関数によってトラバースします。 -}
 traverseArray : (a -> Case b) -> Array a -> Case (Array b)
-traverseArray f array_x
-  =
-    Array.foldl
-      (\x case_r
-        ->
-          case f x of
-            ImpossibleCase -> ImpossibleCase
-            PossibleCase y
-              ->
-                case case_r of
-                  ImpossibleCase -> ImpossibleCase
-                  PossibleCase r -> PossibleCase (Array.push y r))
-      (PossibleCase Array.empty)
-      array_x
-
-{-| 或る配列を或る関数により生成します。 `initializeArrayWithCaseWithState int func state` は、その長さが `int` でインデックスが `i` の要素を `f i` である配列を返します。 `Case` と状態の作用が加わっています。 -}
-initializeArrayWithCaseWithState
-  :
-    Int
-      ->
-        (Int -> state -> Case (a, state))
-          -> state -> Case (Array a, state)
-initializeArrayWithCaseWithState int func state
+traverseArray f int_x
   =
     let
-      helper n s
+      func x case_int_x_
         =
-          if int <= n
-            then PossibleCase ([], s)
-            else
-              case func n s of
-                ImpossibleCase -> ImpossibleCase
-                PossibleCase (xp, s_)
-                  ->
-                    case helper (n + 1) s_ of
-                      ImpossibleCase -> ImpossibleCase
-                      PossibleCase (xs, s__) -> PossibleCase (xp :: xs, s__)
+          case case_int_x_ of
+            PossibleCase int_x_
+              ->
+                case f x of
+                  PossibleCase y
+                    ->
+                      PossibleCase (Array.push y int_x_)
+                  ImpossibleCase -> ImpossibleCase
+            ImpossibleCase -> ImpossibleCase
     in
-      case helper 0 state of
-        ImpossibleCase -> ImpossibleCase
-        PossibleCase (list, state_)
-          ->
-            PossibleCase (Array.fromList list, state_)
+      Array.foldl func (PossibleCase Array.empty) int_x
+
+{-| 或る配列を其の恒等関数によってトラバースします。 -}
+sequenceArray : Array (Case a) -> Case (Array a)
+sequenceArray int_x
+  =
+    let
+      func case_x case_int_x_
+        =
+          case case_int_x_ of
+            PossibleCase int_x_
+              ->
+                case case_x of
+                  PossibleCase x
+                    ->
+                      PossibleCase (Array.push x int_x_)
+                  ImpossibleCase -> ImpossibleCase
+            ImpossibleCase -> ImpossibleCase
+    in
+      Array.foldl func (PossibleCase Array.empty) int_x
+
+{-| 或る配列を其の恒等関数によってトラバースします。状態の作用が加わっています。 -}
+sequenceArrayWithState : Array (state -> Case (a, state)) -> state -> Case (Array a, state)
+sequenceArrayWithState int_x
+  =
+    let
+      func case_x case_int_x_
+        =
+          case case_int_x_ of
+            PossibleCase (int_x_, s)
+              ->
+                case case_x s of
+                  PossibleCase (x, s_) -> PossibleCase (Array.push x int_x_, s_)
+                  ImpossibleCase -> ImpossibleCase
+            ImpossibleCase -> ImpossibleCase
+    in
+      \s -> Array.foldl func (PossibleCase (Array.empty, s)) int_x
+
+{-| 或る配列を或る関数により生成します。 `initializeArrayWithCase int func` は、その長さが `int` でインデックス `i` の要素が `f i` である配列を返します。 `Case` の作用が加わっています。 -}
+initializeArrayWithCase : Int -> (Int -> Case a) -> Case (Array a)
+initializeArrayWithCase int f = sequenceArray (Array.initialize int f)
+
+{-| 或る配列を或る関数により生成します。 `initializeArrayWithCaseWithState int func state` は、その長さが `int` でインデックス `i` の要素が `f i` である配列を返します。 `Case` と状態の作用が加わっています。 -}
+initializeArrayWithCaseWithState : Int -> (Int -> state -> Case (a, state)) -> state -> Case (Array a, state)
+initializeArrayWithCaseWithState int f = sequenceArrayWithState (Array.initialize int f)

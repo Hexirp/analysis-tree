@@ -1,87 +1,104 @@
 module BMS_4
   exposing
     (
-      Nat (..),
-      toIntFromNat,
-      Coftype (..),
-      isLessThanCoftype,
-      RawMatrix,
-      toRawMatrixFromList,
-      toListFromRawMatrix,
-      Matrix (..),
-      compareMatrix,
-      verifyMatrix,
-      toMatrixFromRawMatrix,
-      toRawMatrixFromMatrix,
-      calcCoftypeOfMatrix,
-      expandMatrix,
-      Pindex (..),
-      RawPatrix,
-      toRawPatrixFromList,
-      toListFromRawPatrix,
-      Patrix (..),
-      calcPatrixFromMatrix,
-      MemoCalcPatrixFromMatrix,
-      emptyMemoCalcPatrixFromMatrix,
-      getMemoCalcParentOnPatrixFromRawMatrix,
-      getMemoCalcAncestorSetOnPatrixFromRawMatrix,
-      insertMemoCalcParentOnPatrixFromRawMatrix,
-      insertMemoCalcAncestorSetOnPatrixFromRawMatrix,
-      calcParentOnPatrixFromRawMatrix,
-      calcAncestorSetOnPatrixFromRawMatrix,
-      calcParentOnPatrixFromRawMatrixWithMemo,
-      calcAncestorSetOnPatrixFromRawMatrixWithMemo,
-      calcMatrixFromPatrix,
-      calcElementOnMatrixFromRawPatrix,
-      calcCoftypeOfPatrix,
-      calcBadRootOfPatrix,
-      expandPatrix,
-      RawOuter,
-      toMatrixFromRawOuter,
-      Outer (..),
-      toOuterFromMatrix,
-      toMatrixFromOuter,
-      toOuterFromRawOuter,
-      toRawOuterFromOuter
+      RawMatrix
+    ,
+      toRawMatrixFromList
+    ,
+      toListFromRawMatrix
+    ,
+      Matrix (..)
+    ,
+      compareMatrix
+    ,
+      verifyMatrix
+    ,
+      toMatrixFromRawMatrix
+    ,
+      toRawMatrixFromMatrix
+    ,
+      calcCoftypeOfMatrix
+    ,
+      expandMatrix
+    ,
+      Pindex (..)
+    ,
+      RawPatrix
+    ,
+      toRawPatrixFromList
+    ,
+      toListFromRawPatrix
+    ,
+      Patrix (..)
+    ,
+      calcPatrixFromMatrix
+    ,
+      MemoCalcPatrixFromMatrix
+    ,
+      emptyMemoCalcPatrixFromMatrix
+    ,
+      getMemoCalcParentOnPatrixFromRawMatrix
+    ,
+      getMemoCalcAncestorSetOnPatrixFromRawMatrix
+    ,
+      insertMemoCalcParentOnPatrixFromRawMatrix
+    ,
+      insertMemoCalcAncestorSetOnPatrixFromRawMatrix
+    ,
+      calcParentOnPatrixFromRawMatrix
+    ,
+      calcAncestorSetOnPatrixFromRawMatrix
+    ,
+      calcParentOnPatrixFromRawMatrixWithMemo
+    ,
+      calcAncestorSetOnPatrixFromRawMatrixWithMemo
+    ,
+      calcMatrixFromPatrix
+    ,
+      calcElementOnMatrixFromRawPatrix
+    ,
+      calcCoftypeOfPatrix
+    ,
+      calcBadRootOfPatrix
+    ,
+      expandPatrix
+    ,
+      notation
     )
+
+import Result exposing (Result)
 
 import Case exposing (Case (..))
 
 import Dict exposing (Dict)
 
 import Array exposing (Array)
+import Array.Extra as Array
 import Array.Extra.Folding as Array
 
-{-| これは自然数です。
--}
-type Nat = Nat Int
-
-{-| 或る整数から或る自然数へ変換します。
--}
-toNatFromInt : Int -> Maybe Nat
-toNatFromInt x = if 0 <= x then Just (Nat x) else Nothing
-
-{-| 或る自然数から或る整数へ変換します。
--}
-toIntFromNat : Nat -> Int
-toIntFromNat (Nat int) = int
-
-{-| これは共終タイプです。
--}
-type Coftype = Zero | One | Omega
-
-{-| 或る自然数が、或る共終タイプよりも小さいかどうか判定します。
--}
-isLessThanCoftype : Nat -> Coftype -> Bool
-isLessThanCoftype nat coftype
-  =
-    case coftype of
-      Zero -> False
-      One
-        ->
-          case nat of
-            Nat int -> int < 1
-      Omega -> True
+import Notation
+  exposing
+    (
+      Nat (..)
+    ,
+      toNatFromInt
+    ,
+      toIntFromNat
+    ,
+      Coftype (..)
+    ,
+      compareNat
+    ,
+      OutOfIndexError (..)
+    ,
+      Notation
+    ,
+      Maxipointed (..)
+    ,
+      compareMaxipointed
+    ,
+      expandMaxipointed
+    )
 
 {-| これはバシク行列システムの行列を表す生の型です。
 
@@ -111,19 +128,15 @@ type Matrix = Matrix Int Int RawMatrix
 compareMatrix : Matrix -> Matrix -> Order
 compareMatrix (Matrix _ _ x) (Matrix _ _ y)
   =
-    compare (toListFromRawMatrix x) (toListFromRawMatrix y)
+    let
+      func (Matrix _ _ x_) (Matrix _ _ y_) = compare (toListFromRawMatrix x_) (toListFromRawMatrix y_)
+    in
+      func (toMatrixFromRawMatrix x) (toMatrixFromRawMatrix y)
 
 {-| 或る値が `Matrix` 型の規約を満たしているか検証します。
 -}
 verifyMatrix : Matrix -> Bool
-verifyMatrix matrix
-  =
-    case matrix of
-      Matrix x y x_y_int
-        ->
-          True
-            && Array.length x_y_int == x
-            && Array.all (\a -> Array.length a == y) x_y_int
+verifyMatrix (Matrix x y x_y_int) = Array.length x_y_int == x && Array.all (\a -> Array.length a == y) x_y_int
 
 {-| 或る生の行列を或る行列へ変換します。
 
@@ -135,69 +148,100 @@ toMatrixFromRawMatrix : RawMatrix -> Matrix
 toMatrixFromRawMatrix x_y_int
   =
     let
-      x = Array.length x_y_int
-      y
-        =
-          case Array.maximum (Array.map Array.length x_y_int) of
-            Nothing -> 0
-            Just y_ -> y_
-      e
-        =
-          case
-            (Array.minimum
-              (Array.map
-                (\y_int
-                  ->
-                    case Array.minimum y_int of
-                      Nothing -> 0
-                      Just e_ -> e_)
-                x_y_int))
-          of
-            Nothing -> 0
-            Just e_ -> e_
+      e = toMatrixFromRawMatrix_helper_1 x_y_int
+      x = toMatrixFromRawMatrix_helper_2 x_y_int
+      y = toMatrixFromRawMatrix_helper_3 x_y_int e
     in
-      Matrix x y (Array.map (fromArrayToMatrix_helper_1 y e) x_y_int)
+      Matrix x y (toMatrixFromRawMatrix_helper_4 x_y_int e x y)
 
-fromArrayToMatrix_helper_1 : Int -> Int -> Array Int -> Array Int
-fromArrayToMatrix_helper_1 y e y_int
-  = Array.initialize y (\i -> Maybe.withDefault e (Array.get i y_int))
+toMatrixFromRawMatrix_helper_1 : Array (Array Int) -> Int
+toMatrixFromRawMatrix_helper_1 x_y_int = Maybe.withDefault 0 (Array.minimum (Array.map (\y_int -> Maybe.withDefault 0 (Array.minimum y_int)) x_y_int))
+
+toMatrixFromRawMatrix_helper_2 : Array (Array Int) -> Int
+toMatrixFromRawMatrix_helper_2 x_y_int = Array.length x_y_int
+
+toMatrixFromRawMatrix_helper_3 : Array (Array Int) -> Int -> Int
+toMatrixFromRawMatrix_helper_3 x_y_int e
+  =
+    let
+      func_0 y_int
+        =
+          let
+            func_1 int (i_0, i_1)
+              =
+                if e <= int
+                  then
+                    if e + 1 <= int
+                      then (i_0 + 1, i_0 + 1)
+                      else (i_0 + 1, i_1)
+                  else (i_0 + 1, i_1)
+          in
+            case Array.foldl func_1 (0, 0) y_int of
+              (i_0, i_1) -> i_1
+    in
+      Maybe.withDefault 0 (Array.maximum (Array.map func_0 x_y_int))
+
+toMatrixFromRawMatrix_helper_4 : Array (Array Int) -> Int -> Int -> Int -> Array (Array Int)
+toMatrixFromRawMatrix_helper_4 x_y_int e x y
+  =
+    let
+      int_ x_ y_ = toMatrixFromRawMatrix_helper_5 x_y_int e x_ y_
+      y_int_ x_ = Array.initialize y (\y_ -> int_ x_ y_)
+      x_y_int_ = Array.initialize x (\x_ -> y_int_ x_)
+    in
+      x_y_int_
+
+toMatrixFromRawMatrix_helper_5 : Array (Array Int) -> Int -> Int -> Int -> Int
+toMatrixFromRawMatrix_helper_5 x_y_int e x_ y_
+  =
+    case Array.get x_ x_y_int of
+      Just y_int
+        ->
+          case Array.get y_ y_int of
+            Just int -> int - e
+            Nothing -> 0
+      Nothing -> 0
 
 {-| 或る行列を或る生の行列へ変換します。
 -}
 toRawMatrixFromMatrix : Matrix -> RawMatrix
-toRawMatrixFromMatrix matrix
-  =
-    case matrix of
-      Matrix x y x_y_int -> x_y_int
+toRawMatrixFromMatrix (Matrix x y x_y_int) = x_y_int
 
 {-| 或る行列の共終タイプを計算します。 -}
 calcCoftypeOfMatrix : Matrix -> Case Coftype
 calcCoftypeOfMatrix matrix
   =
     case calcPatrixFromMatrix matrix of
-      ImpossibleCase -> ImpossibleCase
       PossibleCase patrix -> PossibleCase (calcCoftypeOfPatrix patrix)
+      ImpossibleCase -> ImpossibleCase
 
 {-| 或る行列を或る自然数により展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
-expandMatrix : Matrix -> Nat -> Case (Maybe Matrix)
+expandMatrix : Matrix -> Nat -> Case (Result (OutOfIndexError Matrix) Matrix)
 expandMatrix matrix n
   =
     case calcPatrixFromMatrix matrix of
-      ImpossibleCase -> ImpossibleCase
       PossibleCase patrix
         ->
           case expandPatrix patrix n of
-            ImpossibleCase -> ImpossibleCase
-            PossibleCase m_patrix_
+            PossibleCase result_patrix_
               ->
-                case m_patrix_ of
-                  Nothing -> PossibleCase Nothing
-                  Just patrix_
+                case result_patrix_ of
+                  Ok patrix_
                     ->
                       case calcMatrixFromPatrix patrix_ of
+                        PossibleCase matrix_
+                          ->
+                            case matrix_ of
+                              Matrix _ _ x_y_int -> PossibleCase (Ok (toMatrixFromRawMatrix x_y_int))
                         ImpossibleCase -> ImpossibleCase
-                        PossibleCase matrix_ -> PossibleCase (Just matrix_)
+                  Err (OutOfIndexError patrix_ n_ coftype)
+                    ->
+                      case calcMatrixFromPatrix patrix_ of
+                        PossibleCase matrix_ -> PossibleCase (Err (OutOfIndexError matrix_ n_ coftype))
+                        ImpossibleCase -> ImpossibleCase
+            ImpossibleCase -> ImpossibleCase
+      ImpossibleCase -> ImpossibleCase
 
 {-| これはピンデックスです。ピンデックスは或る行列の要素へのポインターを意味します。
 -}
@@ -242,444 +286,227 @@ calcPatrixFromMatrix matrix
 {-| `calcPatrixFromMatrix` の内部計算のメモです。
 -}
 type alias MemoCalcPatrixFromMatrix
-  = (Dict (Int, Int) Pindex, Dict (Int, Int) (Int -> Bool))
+  =
+    {
+      parent : Dict (Int, Int) Pindex
+    ,
+      ancestorSet : Dict (Int, Int) (Int -> Bool)
+    }
 
 {-| 其の空の `MemoCalcPatrixFromMatrix` です。
 -}
 emptyMemoCalcPatrixFromMatrix : MemoCalcPatrixFromMatrix
-emptyMemoCalcPatrixFromMatrix = (Dict.empty, Dict.empty)
+emptyMemoCalcPatrixFromMatrix = { parent = Dict.empty, ancestorSet = Dict.empty }
 
 {-| 或る `MemoCalcPatrixFromMatrix` から `calcParentOnPatrixFromRawMatrix` の結果を取り出します。
 -}
-getMemoCalcParentOnPatrixFromRawMatrix
-  : MemoCalcPatrixFromMatrix -> Int -> Int -> Maybe Pindex
-getMemoCalcParentOnPatrixFromRawMatrix memo x y
-  =
-    case memo of
-      (memo_1, memo_2) -> Dict.get (x, y) memo_1
+getMemoCalcParentOnPatrixFromRawMatrix : MemoCalcPatrixFromMatrix -> (Int, Int) -> Maybe Pindex
+getMemoCalcParentOnPatrixFromRawMatrix memo k = Dict.get k memo.parent
 
 {-| 或る `MemoCalcPatrixFromMatrix` から `calcAncestorSetOnPatrixFromRawMatrix` の結果を取り出します。
 -}
-getMemoCalcAncestorSetOnPatrixFromRawMatrix
-  : MemoCalcPatrixFromMatrix -> Int -> Int -> Maybe (Int -> Bool)
-getMemoCalcAncestorSetOnPatrixFromRawMatrix memo x y
-  =
-    case memo of
-      (memo_1, memo_2) -> Dict.get (x, y) memo_2
+getMemoCalcAncestorSetOnPatrixFromRawMatrix : MemoCalcPatrixFromMatrix -> (Int, Int) -> Maybe (Int -> Bool)
+getMemoCalcAncestorSetOnPatrixFromRawMatrix memo k = Dict.get k memo.ancestorSet
 
-{-| 或る `MemoCalcPatrixFromMatrix` に `calcPatrixOnPatrixFromRawMatrix` の結果をメモします。
+{-| 或る `MemoCalcPatrixFromMatrix` に `calcParentOnPatrixFromRawMatrix` の結果をメモします。
 -}
-insertMemoCalcParentOnPatrixFromRawMatrix
-  :
-    MemoCalcPatrixFromMatrix
-      -> Int -> Int -> Pindex -> MemoCalcPatrixFromMatrix
-insertMemoCalcParentOnPatrixFromRawMatrix memo x y r
-  =
-    case memo of
-      (memo_1, memo_2) -> (Dict.insert (x, y) r memo_1, memo_2)
+insertMemoCalcParentOnPatrixFromRawMatrix : MemoCalcPatrixFromMatrix -> (Int, Int) -> Pindex -> MemoCalcPatrixFromMatrix
+insertMemoCalcParentOnPatrixFromRawMatrix memo k v = { memo | parent = Dict.insert k v memo.parent }
 
 {-| 或る `MemoCalcPatrixFromMatrix` に `calcAncestorSetOnPatrixFromRawMatrix` の結果をメモします。
 -}
-insertMemoCalcAncestorSetOnPatrixFromRawMatrix
-  :
-    MemoCalcPatrixFromMatrix
-      -> Int -> Int -> (Int -> Bool) -> MemoCalcPatrixFromMatrix
-insertMemoCalcAncestorSetOnPatrixFromRawMatrix memo x y r
-  =
-    case memo of
-      (memo_1, memo_2) -> (memo_1, Dict.insert (x, y) r memo_2)
+insertMemoCalcAncestorSetOnPatrixFromRawMatrix : MemoCalcPatrixFromMatrix -> (Int, Int) -> (Int -> Bool) -> MemoCalcPatrixFromMatrix
+insertMemoCalcAncestorSetOnPatrixFromRawMatrix memo k v = { memo | ancestorSet = Dict.insert k v memo.ancestorSet }
 
-calcPatrixFromMatrix_helper_1
-  : Int -> Int -> RawMatrix -> Case RawPatrix
+calcPatrixFromMatrix_helper_1 : Int -> Int -> RawMatrix -> Case RawPatrix
 calcPatrixFromMatrix_helper_1 x y x_y_int
   =
-    case
-      calcPatrixFromMatrix_helper_2
-        x
-        y
-        x_y_int
-        emptyMemoCalcPatrixFromMatrix
-    of
-      ImpossibleCase -> ImpossibleCase
+    case calcPatrixFromMatrix_helper_2 x y x_y_int emptyMemoCalcPatrixFromMatrix of
       PossibleCase (x_y_patrix, memo) -> PossibleCase x_y_patrix
+      ImpossibleCase -> ImpossibleCase
 
-calcPatrixFromMatrix_helper_2
-  :
-    Int
-      ->
-        Int
-          ->
-            RawMatrix
-              ->
-                MemoCalcPatrixFromMatrix
-                  ->
-                    Case (Array (Array Pindex), MemoCalcPatrixFromMatrix)
+calcPatrixFromMatrix_helper_2 : Int -> Int -> RawMatrix -> MemoCalcPatrixFromMatrix -> Case (Array (Array Pindex), MemoCalcPatrixFromMatrix)
 calcPatrixFromMatrix_helper_2 x y x_y_int
   =
-    Case.initializeArrayWithCaseWithState
-      x
-      (\x_
-        ->
-          Case.initializeArrayWithCaseWithState
-            y
-            (\y_
-              ->
-                calcParentOnPatrixFromRawMatrixWithMemo x_y_int x_ y_))
+    let
+      pindex x_ y_ = calcParentOnPatrixFromRawMatrixWithMemo x_y_int x_ y_
+      y_pindex x_ = Case.initializeArrayWithCaseWithState y (\y_ -> pindex x_ y_)
+      x_y_pindex = Case.initializeArrayWithCaseWithState x (\x_ -> y_pindex x_)
+    in
+      x_y_pindex
 
 {-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の親を表す或る `Pindex` を計算し、それを返します。
 
 `x` が範囲を外れている時は、 `Null` を返します。 `x` が範囲を外れていなくて `y` が `0` 未満である時は、 `x` が `0` であるならば `Null` となり、そうでないならば `Pindex (x - 1)` となります。 `x` が範囲の中にあって `y` が `x` が指す列の長さ以上である時は、 `Null` になります。
 -}
-calcParentOnPatrixFromRawMatrix
-  : RawMatrix -> Int -> Int -> Case Pindex
+calcParentOnPatrixFromRawMatrix : RawMatrix -> Int -> Int -> Case Pindex
 calcParentOnPatrixFromRawMatrix x_y_int x y
   =
-    case
-      calcParentOnPatrixFromRawMatrixWithMemo
-        x_y_int
-        x
-        y
-        emptyMemoCalcPatrixFromMatrix
-    of
-      ImpossibleCase -> ImpossibleCase
+    case calcParentOnPatrixFromRawMatrixWithMemo x_y_int x y emptyMemoCalcPatrixFromMatrix of
       PossibleCase (pindex, memo) -> PossibleCase pindex
+      ImpossibleCase -> ImpossibleCase
 
 {-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の先祖を表す或る集合 (`Int -> Bool`) を計算し、それを返します。
 -}
-calcAncestorSetOnPatrixFromRawMatrix
-  : RawMatrix -> Int -> Int -> Case (Int -> Bool)
+calcAncestorSetOnPatrixFromRawMatrix : RawMatrix -> Int -> Int -> Case (Int -> Bool)
 calcAncestorSetOnPatrixFromRawMatrix x_y_int x y
   =
-    case
-      calcAncestorSetOnPatrixFromRawMatrixWithMemo
-        x_y_int
-        x
-        y
-        emptyMemoCalcPatrixFromMatrix
-    of
-      ImpossibleCase -> ImpossibleCase
+    case calcAncestorSetOnPatrixFromRawMatrixWithMemo x_y_int x y emptyMemoCalcPatrixFromMatrix of
       PossibleCase (is_ancestor, memo) -> PossibleCase is_ancestor
+      ImpossibleCase -> ImpossibleCase
 
 {-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の親を表す或る `Pindex` を計算し、それを返します。メモ化しています。
 
 `x` が範囲を外れている時は、 `Null` を返します。 `x` が範囲を外れていなくて `y` が `0` 未満である時は、 `x` が `0` であるならば `Null` となり、そうでないならば `Pindex (x - 1)` となります。 `x` が範囲の中にあって `y` が `x` が指す列の長さ以上である時は、 `Null` になります。
 -}
-calcParentOnPatrixFromRawMatrixWithMemo
-  :
-    RawMatrix
-      ->
-        Int
-          ->
-            Int
-              ->
-                MemoCalcPatrixFromMatrix
-                  ->
-                    Case (Pindex, MemoCalcPatrixFromMatrix)
+calcParentOnPatrixFromRawMatrixWithMemo : RawMatrix -> Int -> Int -> MemoCalcPatrixFromMatrix -> Case (Pindex, MemoCalcPatrixFromMatrix)
 calcParentOnPatrixFromRawMatrixWithMemo x_y_int x y memo
   =
-    case getMemoCalcParentOnPatrixFromRawMatrix memo x y of
-      Nothing
-        ->
-          case Array.get x x_y_int of
-            Nothing
-              ->
-                if 0 <= x && x < Array.length x_y_int
-                  then ImpossibleCase
-                  else
-                    PossibleCase
-                      (
-                        Null,
-                        insertMemoCalcParentOnPatrixFromRawMatrix
-                          memo
-                          x
-                          y
-                          Null
-                      )
-            Just y_int
-              ->
-                case Array.get y y_int of
-                  Nothing ->
-                    if 0 <= y
-                      then
-                        if y < Array.length y_int
-                          then ImpossibleCase
-                          else
-                            PossibleCase
-                              (
-                                Null,
-                                insertMemoCalcParentOnPatrixFromRawMatrix
-                                  memo
-                                  x
-                                  y
-                                  Null
-                              )
-                      else
-                        if 0 <= x && x < Array.length x_y_int
-                          then
-                            if x == 0
-                              then
-                                PossibleCase
-                                  (
-                                    Null,
-                                    insertMemoCalcParentOnPatrixFromRawMatrix
-                                      memo
-                                      x
-                                      y
-                                      Null
-                                  )
-                              else
-                                PossibleCase
-                                  (
-                                    Pindex (x - 1),
-                                    insertMemoCalcParentOnPatrixFromRawMatrix
-                                      memo
-                                      x
-                                      y
-                                      (Pindex (x - 1))
-                                  )
-                          else
-                            ImpossibleCase
-                  Just int
-                    ->
-                      calcParentOnPatrixFromRawMatrixWithMemo_helper_1
-                        x_y_int
-                        x
-                        y
-                        y_int
-                        int
-                        (x - 1)
-                        memo
-      Just pindex -> PossibleCase (pindex, memo)
+    let
+      get = getMemoCalcParentOnPatrixFromRawMatrix memo (x, y)
+      set = insertMemoCalcParentOnPatrixFromRawMatrix memo (x, y)
+      parent_0 = calcParentOnPatrixFromRawMatrixWithMemo_helper_1
+    in
+      case get of
+        Just pindex -> PossibleCase (pindex, memo)
+        Nothing
+          ->
+            case Array.get x x_y_int of
+              Just y_int
+                ->
+                  case Array.get y y_int of
+                    Just int -> parent_0 x_y_int x y y_int int (x - 1) memo
+                    Nothing ->
+                      if 0 <= y
+                        then
+                          if y < Array.length y_int
+                            then ImpossibleCase
+                            else PossibleCase (Null, set Null)
+                        else
+                          if 0 <= x && x < Array.length x_y_int
+                            then
+                              if x == 0
+                                then PossibleCase (Null, set Null)
+                                else PossibleCase (Pindex (x - 1), set (Pindex (x - 1)))
+                            else
+                              ImpossibleCase
+              Nothing
+                ->
+                  if 0 <= x && x < Array.length x_y_int
+                    then ImpossibleCase
+                    else PossibleCase (Null, set Null)
 
 -- x と y の親を探索する。
 -- p が範囲を外れた時は、 p < x かつ x は範囲を外れていないという事実より、 p < 0 であり、ここまで探索の手が伸びるということは、 x の y での親はないということである。
 -- p がずれたことにより y が範囲を外れた時は、それが y < 0 である、つまり上側だった時は、 calcParentOnPatrixFromRawMatrixWithMemo が示しているような 0 ← 1 ← 2 ← 3 ← ... の構造に従って親を判定する。それが、 Array.length y_int <= y である、つまり下側だった時は、そこは底値で埋め尽くされているという考え方に従って親を判定する。これらは、結果的に同じ処理となる。
 -- p は関数の状態を保持する役割を持つ引数である。 calcParentOnPatrixFromRawMatrixWithMemo と再帰の構造より p < x である。
-calcParentOnPatrixFromRawMatrixWithMemo_helper_1
-  :
-    RawMatrix
-      ->
-        Int
-          ->
-            Int
-              ->
-                Array Int
-                  ->
-                    Int
-                      ->
-                        Int
-                          ->
-                            MemoCalcPatrixFromMatrix
-                              ->
-                                Case (Pindex, MemoCalcPatrixFromMatrix)
+calcParentOnPatrixFromRawMatrixWithMemo_helper_1 : RawMatrix -> Int -> Int -> Array Int -> Int -> Int -> MemoCalcPatrixFromMatrix -> Case (Pindex, MemoCalcPatrixFromMatrix)
 calcParentOnPatrixFromRawMatrixWithMemo_helper_1 x_y_int x y y_int int p memo
   =
-    case Array.get p x_y_int of
-      Nothing
-        ->
-          PossibleCase
-            (
-              Null,
-              insertMemoCalcParentOnPatrixFromRawMatrix
-              memo
-              x
-              y
-              Null
-            )
-      Just y_int_
-        ->
-          case Array.get y y_int_ of
-            Nothing
-              ->
-                if 0 <= y && y < Array.length y_int_
-                  then ImpossibleCase
-                  else
-                    case
-                      calcAncestorSetOnPatrixFromRawMatrixWithMemo
-                        x_y_int
-                        x
-                        (y - 1)
-                        memo
-                    of
-                      ImpossibleCase -> ImpossibleCase
-                      PossibleCase (is_ancestor, memo_)
-                        ->
-                          if is_ancestor p
-                            then
-                              PossibleCase
-                                (
-                                  Pindex p,
-                                  insertMemoCalcParentOnPatrixFromRawMatrix
-                                    memo_
-                                    x
-                                    y
-                                    (Pindex p)
-                                )
-                            else
-                              calcParentOnPatrixFromRawMatrixWithMemo_helper_1
-                                x_y_int
-                                x
-                                y
-                                y_int
-                                int
-                                (p - 1)
-                                memo_
-            Just int_
-              ->
-                case
-                  calcAncestorSetOnPatrixFromRawMatrixWithMemo
-                    x_y_int
-                    x
-                    (y - 1)
-                    memo
-                of
-                  ImpossibleCase -> ImpossibleCase
-                  PossibleCase (is_ancestor, memo_)
-                    ->
-                      if int_ < int && is_ancestor p
-                        then
-                          PossibleCase
-                            (
-                              Pindex p,
-                              insertMemoCalcParentOnPatrixFromRawMatrix
-                                memo_
-                                x
-                                y
-                                (Pindex p)
-                            )
-                        else
-                          calcParentOnPatrixFromRawMatrixWithMemo_helper_1
-                            x_y_int
-                            x
-                            y
-                            y_int
-                            int
-                            (p - 1)
-                            memo_
+    let
+      set = insertMemoCalcParentOnPatrixFromRawMatrix memo (x, y)
+      parent = calcAncestorSetOnPatrixFromRawMatrixWithMemo
+      parent_0 = calcParentOnPatrixFromRawMatrixWithMemo_helper_1
+    in
+      case Array.get p x_y_int of
+        Just y_int_
+          ->
+            case Array.get y y_int_ of
+              Just int_
+                ->
+                  case parent x_y_int x (y - 1) memo of
+                    PossibleCase (is_ancestor, memo_)
+                      ->
+                        if int_ < int && is_ancestor p
+                          then PossibleCase (Pindex p, set (Pindex p))
+                          else parent_0 x_y_int x y y_int int (p - 1) memo_
+                    ImpossibleCase -> ImpossibleCase
+              Nothing
+                ->
+                  if 0 <= y && y < Array.length y_int_
+                    then ImpossibleCase
+                    else
+                      case parent x_y_int x (y - 1) memo of
+                        PossibleCase (is_ancestor, memo_)
+                          ->
+                            if is_ancestor p
+                              then PossibleCase (Pindex p, set (Pindex p))
+                              else parent_0 x_y_int x y y_int int (p - 1) memo_
+                        ImpossibleCase -> ImpossibleCase
+        Nothing -> PossibleCase (Null, set Null)
 
 {-| 或る `RawMatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、その要素の先祖を表す或る集合 (`Int -> Bool`) を計算し、それを返します。メモ化しています。
 -}
-calcAncestorSetOnPatrixFromRawMatrixWithMemo
-  :
-    RawMatrix
-      ->
-        Int
-          ->
-            Int
-              ->
-                MemoCalcPatrixFromMatrix
-                  ->
-                    Case (Int -> Bool, MemoCalcPatrixFromMatrix)
+calcAncestorSetOnPatrixFromRawMatrixWithMemo : RawMatrix -> Int -> Int -> MemoCalcPatrixFromMatrix -> Case (Int -> Bool, MemoCalcPatrixFromMatrix)
 calcAncestorSetOnPatrixFromRawMatrixWithMemo x_y_int x y memo
   =
-    case getMemoCalcAncestorSetOnPatrixFromRawMatrix memo x y of
-      Nothing
-        ->
-          case calcParentOnPatrixFromRawMatrixWithMemo x_y_int x y memo of
-            ImpossibleCase -> ImpossibleCase
-            PossibleCase (xp, memo_) -> case xp of
-              Null
-                ->
-                  PossibleCase
-                    (
-                      \x__ -> x == x__,
-                      insertMemoCalcAncestorSetOnPatrixFromRawMatrix
-                        memo_
-                        x
-                        y
-                        (\x__ -> x == x__)
-                    )
-              Pindex x_
-                ->
-                  if x_ < x
-                    then
-                      case
-                        calcAncestorSetOnPatrixFromRawMatrixWithMemo
-                        x_y_int
-                        x_
-                        y
-                        memo_
-                      of
-                        ImpossibleCase -> ImpossibleCase
-                        PossibleCase (is_ancestor, memo__)
-                          ->
-                            PossibleCase
-                              (
-                                \x__ -> x == x__ || is_ancestor x__,
-                                insertMemoCalcAncestorSetOnPatrixFromRawMatrix
-                                  memo__
-                                  x
-                                  y
-                                  (\x__ -> x == x__ || is_ancestor x__)
-                              )
-                    else
-                      PossibleCase
-                        (
-                          \x__ -> x == x__,
-                          insertMemoCalcAncestorSetOnPatrixFromRawMatrix
-                            memo_
-                            x
-                            y
-                            (\x__ -> x == x__)
-                        )
-      Just is_ancestor -> PossibleCase (is_ancestor, memo)
+    let
+      get = getMemoCalcAncestorSetOnPatrixFromRawMatrix memo (x, y)
+      set = insertMemoCalcAncestorSetOnPatrixFromRawMatrix memo (x, y)
+      parent = calcParentOnPatrixFromRawMatrixWithMemo
+      ancestorSet = calcAncestorSetOnPatrixFromRawMatrixWithMemo
+    in
+      case get of
+        Just is_ancestor -> PossibleCase (is_ancestor, memo)
+        Nothing
+          ->
+            case parent x_y_int x y memo of
+              PossibleCase (xp, memo_) -> case xp of
+                Null
+                  ->
+                    let
+                      v = \x__ -> x == x__
+                    in
+                      PossibleCase (v, set v)
+                Pindex x_
+                  ->
+                    if x_ < x
+                      then
+                        case ancestorSet x_y_int x_ y memo_ of
+                          PossibleCase (v, memo__)
+                            ->
+                              let
+                                v_ = \x__ -> x == x__ || v x__
+                              in
+                                PossibleCase (v_, set v_)
+                          ImpossibleCase -> ImpossibleCase
+                      else
+                        let
+                          v = \x__ -> x == x__
+                        in
+                          PossibleCase (v, set v)
+              ImpossibleCase -> ImpossibleCase
 
 {-| 或るパトリックスから或る行列を計算します。
 -}
 calcMatrixFromPatrix : Patrix -> Case Matrix
-calcMatrixFromPatrix patrix
+calcMatrixFromPatrix (Patrix x y x_y_pindex)
   =
-    case patrix of
-      Patrix x y x_y_pindex
-        ->
-          case calcMatrixFromPatrix_helper_1 x y x_y_pindex of
-            ImpossibleCase -> ImpossibleCase
-            PossibleCase x_y_int -> PossibleCase (Matrix x y x_y_int)
+    case calcMatrixFromPatrix_helper_1 x y x_y_pindex of
+      PossibleCase x_y_int -> PossibleCase (Matrix x y x_y_int)
+      ImpossibleCase -> ImpossibleCase
 
-calcMatrixFromPatrix_helper_1
-  : Int -> Int -> RawPatrix -> Case RawMatrix
+calcMatrixFromPatrix_helper_1 : Int -> Int -> RawPatrix -> Case RawMatrix
 calcMatrixFromPatrix_helper_1 x y x_y_pindex
   =
-    Case.traverseArray (\case_x -> case_x)
-      (Array.map (Case.traverseArray (\case_x -> case_x))
-        (calcMatrixFromPatrix_helper_2 x y x_y_pindex))
-
-calcMatrixFromPatrix_helper_2
-  : Int -> Int -> RawPatrix -> Array (Array (Case Int))
-calcMatrixFromPatrix_helper_2 x y x_y_pindex
-  =
-    Array.initialize
-      x
-      (\x_
-        ->
-          Array.initialize
-            y
-            (\y_
-              ->
-                calcElementOnMatrixFromRawPatrix x_y_pindex x_ y_))
+    let
+      int x_ y_ = calcElementOnMatrixFromRawPatrix x_y_pindex x_ y_
+      y_int x_ = Case.initializeArrayWithCase y (\y_ -> int x_ y_)
+      x_y_int = Case.initializeArrayWithCase x (\x_ -> y_int x_)
+    in
+      x_y_int
 
 {-| 或る `RawPatrix` と、それの一つの要素を特定する二つの整数 `x` と `y` から、其の `RawPatrix` に対応する行列の、その要素に対応する要素を表す、或る `Int` を計算し、それを返します。
 
 `x` が範囲を外れている時は、 `0` を返します。 `x` が範囲を外れていなくて `y` が範囲を外れている時は、 `0` を返します。
 -}
-calcElementOnMatrixFromRawPatrix
-  : RawPatrix -> Int -> Int -> Case Int
+calcElementOnMatrixFromRawPatrix : RawPatrix -> Int -> Int -> Case Int
 calcElementOnMatrixFromRawPatrix x_y_pindex x y
   =
     case Array.get x x_y_pindex of
-      Nothing
-        ->
-          if 0 <= x && x < Array.length x_y_pindex
-            then ImpossibleCase
-            else PossibleCase 0
       Just y_pindex
         ->
           case Array.get y y_pindex of
-            Nothing
-              ->
-                if 0 <= y && y < Array.length y_pindex
-                  then ImpossibleCase
-                  else PossibleCase 0
             Just pindex
               ->
                 case pindex of
@@ -688,12 +515,20 @@ calcElementOnMatrixFromRawPatrix x_y_pindex x y
                     ->
                       if p < x
                         then
-                          case
-                            calcElementOnMatrixFromRawPatrix x_y_pindex p y
-                          of
-                            ImpossibleCase -> ImpossibleCase
+                          case calcElementOnMatrixFromRawPatrix x_y_pindex p y of
                             PossibleCase int -> PossibleCase (int + 1)
+                            ImpossibleCase -> ImpossibleCase
                         else PossibleCase 0
+            Nothing
+              ->
+                if 0 <= y && y < Array.length y_pindex
+                  then ImpossibleCase
+                  else PossibleCase 0
+      Nothing
+        ->
+          if 0 <= x && x < Array.length x_y_pindex
+            then ImpossibleCase
+            else PossibleCase 0
 
 {-| 或る `Patrix` の共終タイプを計算します。
 -}
@@ -704,11 +539,10 @@ calcCoftypeOfPatrix patrix
       Patrix x y x_y_pindex
         ->
           case Array.get (Array.length x_y_pindex - 1) x_y_pindex of
-            Nothing -> Zero
             Just y_pindex
               ->
                 let
-                  f pindex
+                  func pindex
                     =
                       case pindex of
                         Null -> True
@@ -718,9 +552,10 @@ calcCoftypeOfPatrix patrix
                               then False
                               else True
                 in
-                  if Array.all f y_pindex
+                  if Array.all func y_pindex
                     then One
                     else Omega
+            Nothing -> Zero
 
 {-| 或るパトリックスの悪根を計算します。
 
@@ -733,11 +568,10 @@ calcBadRootOfPatrix patrix
       Patrix x y x_y_pindex
         ->
           case Array.get (Array.length x_y_pindex - 1) x_y_pindex of
-            Nothing -> Nothing
             Just y_pindex
               ->
                 let
-                  helper pindex (i, r)
+                  func pindex (i, r)
                     =
                       case pindex of
                         Null -> (i + 1, r)
@@ -747,88 +581,68 @@ calcBadRootOfPatrix patrix
                               then (i + 1, Just (int, i))
                               else (i + 1, r)
                 in
-                  case Array.foldl helper (0, Nothing) y_pindex of
+                  case Array.foldl func (0, Nothing) y_pindex of
                     (i, r) -> r
+            Nothing -> Nothing
 
 {-| 或るパトリックスを或る係数で展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
-expandPatrix : Patrix -> Nat -> Case (Maybe Patrix)
+expandPatrix : Patrix -> Nat -> Case (Result (OutOfIndexError Patrix) Patrix)
 expandPatrix patrix n
   =
     case calcCoftypeOfPatrix patrix of
-      Zero -> PossibleCase Nothing
+      Zero -> PossibleCase (Err (OutOfIndexError patrix n Zero))
       One
         ->
-          if isLessThanCoftype n One
-            then
-              case patrix of
-                Patrix x y x_y_pindex
+          if 0 <= toIntFromNat n
+            then PossibleCase (Err (OutOfIndexError patrix n One))
+            else
+              case compareNat One n of
+                LT -> PossibleCase (Err (OutOfIndexError patrix n One))
+                EQ -> PossibleCase (Err (OutOfIndexError patrix n One))
+                GT
                   ->
-                    PossibleCase
-                      (Just
-                        (Patrix (x - 1) y (Array.slice 0 -1 x_y_pindex)))
-            else PossibleCase Nothing
+                    case patrix of
+                      Patrix x y x_y_pindex -> PossibleCase (Ok (Patrix (x - 1) y (Array.pop x_y_pindex)))
       Omega
         ->
-          case calcBadRootOfPatrix patrix of
-            Nothing -> ImpossibleCase
-            Just (xr, yr)
-              ->
-                case patrix of
-                  Patrix x y x_y_pindex
-                    ->
-                      case
-                        expandPatrix_helper_1
-                          x
-                          y
-                          x_y_pindex
-                          n
-                          xr
-                          yr
-                      of
-                        ImpossibleCase -> ImpossibleCase
-                        PossibleCase x_y_pindex_
-                          ->
-                            PossibleCase
-                              (Just
-                                (Patrix
-                                  (xr + (((x - 1) - xr) * (toIntFromNat n + 1)))
-                                  y
-                                  x_y_pindex_))
+          if 0 <= toIntFromNat n
+            then
+              case calcBadRootOfPatrix patrix of
+                Just (xr, yr)
+                  ->
+                    case patrix of
+                      Patrix x y x_y_pindex
+                        ->
+                          let
+                            ex = xr + (((x - 1) - xr) * (toIntFromNat n + 1))
+                          in
+                            case expandPatrix_helper_1 x y x_y_pindex n xr yr ex of
+                              PossibleCase x_y_pindex_ -> PossibleCase (Ok (Patrix ex y x_y_pindex_))
+                              ImpossibleCase -> ImpossibleCase
+                Nothing -> ImpossibleCase
+            else PossibleCase (Err (OutOfIndexError patrix n Omega))
 
-expandPatrix_helper_1
-  : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Case RawPatrix
-expandPatrix_helper_1 x y x_y_pindex n xr yr
+expandPatrix_helper_1 : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Int -> Case RawPatrix
+expandPatrix_helper_1 x y x_y_pindex n xr yr ex
   =
-    Case.traverseArray (\case_x -> case_x)
-      (Array.map (Case.traverseArray (\case_x -> case_x))
-        (expandPatrix_helper_2 x y x_y_pindex n xr yr))
+    let
+      pindex_ x_ y_ = expandPatrix_helper_2 x_y_pindex xr yr x_ y_
+      y_pindex_ x_ = Case.initializeArrayWithCase y (\y_ -> pindex_ x_ y_)
+      x_y_pindex_ = Case.initializeArrayWithCase ex (\x_ -> y_pindex_ x_)
+    in
+      x_y_pindex_
 
-expandPatrix_helper_2
-  : Int -> Int -> RawPatrix -> Nat -> Int -> Int -> Array (Array (Case Pindex))
-expandPatrix_helper_2 x y x_y_pindex n xr yr
-  =
-    Array.initialize
-      (xr + (((x - 1) - xr) * (toIntFromNat n + 1)))
-      (\x_
-        ->
-          Array.initialize
-            y
-            (\y_
-              ->
-                expandPatrix_helper_3 x_y_pindex xr yr x_ y_))
-
-expandPatrix_helper_3
-  : RawPatrix -> Int -> Int -> Int -> Int -> Case Pindex
-expandPatrix_helper_3 x_y_pindex xr yr x_ y_
+expandPatrix_helper_2 : RawPatrix -> Int -> Int -> Int -> Int -> Case Pindex
+expandPatrix_helper_2 x_y_pindex xr yr x_ y_
   =
     if x_ < xr
       then
         case Array.get x_ x_y_pindex of
-          Nothing -> ImpossibleCase
           Just y_pindex
             ->
               case Array.get y_ y_pindex of
+                Just pindex -> PossibleCase pindex
                 Nothing
                   ->
                     if 0 <= y_
@@ -840,20 +654,20 @@ expandPatrix_helper_3 x_y_pindex xr yr x_ y_
                         if x_ == 0
                           then PossibleCase Null
                           else PossibleCase (Pindex (x_ - 1))
-                Just pindex -> PossibleCase pindex
+          Nothing -> ImpossibleCase
       else
         let
           x = Array.length x_y_pindex
           m = (x_ - xr) // ((x - 1) - xr)
-          n = modBy ((x - 1) - xr) (x_ - xr)
+          n = (x_ - xr) |> modBy ((x - 1) - xr)
         in
           if m == 0
             then
               case Array.get x_ x_y_pindex of
-                Nothing -> ImpossibleCase
                 Just y_pindex
                   ->
                     case Array.get y_ y_pindex of
+                      Just pindex -> PossibleCase pindex
                       Nothing
                         ->
                           if 0 <= y_
@@ -865,51 +679,47 @@ expandPatrix_helper_3 x_y_pindex xr yr x_ y_
                               if x_ == 0
                                 then PossibleCase Null
                                 else PossibleCase (Pindex (x_ - 1))
-                      Just pindex -> PossibleCase pindex
+                Nothing -> ImpossibleCase
             else
               if y_ < yr
                 then
                   if n == 0
                     then
                       case Array.get (x - 1) x_y_pindex of
-                        Nothing -> ImpossibleCase
                         Just y_pindex
                           ->
                             case Array.get y_ y_pindex of
-                              Nothing -> ImpossibleCase
                               Just pindex
                                 ->
                                   case pindex of
                                     Null -> PossibleCase Null
-                                    Pindex int
-                                      ->
-                                        PossibleCase
-                                          (Pindex
-                                            (int + ((x - 1) - xr) * (m - 1)))
+                                    Pindex int -> PossibleCase (Pindex (int + ((x - 1) - xr) * (m - 1)))
+                              Nothing -> ImpossibleCase
+                        Nothing -> ImpossibleCase
                     else
                       case Array.get (xr + n) x_y_pindex of
-                        Nothing -> ImpossibleCase
                         Just y_pindex
                           ->
                             case Array.get y_ y_pindex of
-                              Nothing -> ImpossibleCase
                               Just pindex
                                 ->
                                   case pindex of
                                     Null -> PossibleCase Null
-                                    Pindex int
-                                      ->
-                                        PossibleCase
-                                          (Pindex
-                                            (int + ((x - 1) - xr) * m))
+                                    Pindex int -> PossibleCase (Pindex (int + ((x - 1) - xr) * m))
+                              Nothing -> ImpossibleCase
+                        Nothing -> ImpossibleCase
                 else
                   if n == 0
                     then
                       case Array.get xr x_y_pindex of
-                        Nothing -> ImpossibleCase
                         Just y_pindex
                           ->
                             case Array.get y_ y_pindex of
+                              Just pindex
+                                ->
+                                  case pindex of
+                                    Null -> PossibleCase Null
+                                    Pindex int -> PossibleCase (Pindex int)
                               Nothing
                                 ->
                                   if 0 <= y_
@@ -921,21 +731,17 @@ expandPatrix_helper_3 x_y_pindex xr yr x_ y_
                                       if x_ == 0
                                         then PossibleCase Null
                                         else PossibleCase (Pindex (x_ - 1))
-                              Just pindex
-                                ->
-                                  case pindex of
-                                    Null -> PossibleCase Null
-                                    Pindex int
-                                      ->
-                                        PossibleCase
-                                          (Pindex
-                                            int)
+                        Nothing -> ImpossibleCase
                     else
                       case Array.get (xr + n) x_y_pindex of
-                        Nothing -> ImpossibleCase
                         Just y_pindex
                           ->
                             case Array.get y_ y_pindex of
+                              Just pindex
+                                ->
+                                  case pindex of
+                                    Null -> PossibleCase Null
+                                    Pindex int -> PossibleCase (Pindex (int + ((x - 1) - xr) * m))
                               Nothing
                                 ->
                                   if 0 <= y_
@@ -947,133 +753,27 @@ expandPatrix_helper_3 x_y_pindex xr yr x_ y_
                                       if x_ == 0
                                         then PossibleCase Null
                                         else PossibleCase (Pindex (x_ - 1))
-                              Just pindex
-                                ->
-                                  case pindex of
-                                    Null -> PossibleCase Null
-                                    Pindex int
-                                      ->
-                                        PossibleCase
-                                          (Pindex
-                                            (int + ((x - 1) - xr) * m))
+                        Nothing -> ImpossibleCase
 
-{-| バシク行列システム 4 の生の外表記です。
--}
-type alias RawOuter = List Int
-
-{-| 生の外表記から行列へ変換します。
--}
-toMatrixFromRawOuter : RawOuter -> Case (Maybe (Maybe Matrix))
-toMatrixFromRawOuter outer
+notation : Notation (Maxipointed Matrix)
+notation
   =
-    let
-      f int c_m_m_matrix
+    {
+      compare = compareMaxipointed compareMatrix
+    ,
+      expand
         =
-          case c_m_m_matrix of
-            ImpossibleCase -> ImpossibleCase
-            PossibleCase m_m_matrix
-              ->
-                case m_m_matrix of
-                  Nothing -> PossibleCase Nothing
-                  Just m_matrix
-                    ->
-                      case m_matrix of
-                        Nothing
-                          ->
-                            if 0 <= int
-                              then
-                                PossibleCase
-                                  (Just
-                                    (Just
-                                      (toMatrixFromRawMatrix
-                                        (toRawMatrixFromList
-                                          [
-                                            List.repeat int 0
-                                          ,
-                                            List.repeat int 1
-                                          ]))))
-                              else
-                                PossibleCase Nothing
-                        Just matrix
-                          ->
-                            case toNatFromInt int of
-                              Nothing -> PossibleCase Nothing
-                              Just nat
-                                ->
-                                  case expandMatrix matrix nat of
-                                    ImpossibleCase -> ImpossibleCase
-                                    PossibleCase m_matrix_
-                                      ->
-                                        case m_matrix_ of
-                                          Nothing -> PossibleCase Nothing
-                                          Just matrix_
-                                            ->
-                                              PossibleCase (Just (Just matrix_))
-    in
-      List.foldl f (PossibleCase (Just Nothing)) outer
-
-{-| バシク行列システム 4 の外表記です。
--}
-type Outer = Outer RawOuter
-
-{-| 行列から外表記へ変換します。
--}
-toOuterFromMatrix : Maybe Matrix -> Case (Maybe Outer)
-toOuterFromMatrix m_matrix
-  =
-    case m_matrix of
-      Nothing -> PossibleCase (Just (Outer []))
-      Just matrix -> toOuterFromMatrix_helper_1 matrix []
-
-toOuterFromMatrix_helper_1 : Matrix -> List Int -> Case (Maybe Outer)
-toOuterFromMatrix_helper_1 matrix x
-  =
-    toOuterFromMatrix_helper_2 matrix x 0
-
-toOuterFromMatrix_helper_2 : Matrix -> List Int -> Int -> Case (Maybe Outer)
-toOuterFromMatrix_helper_2 matrix x n
-  =
-    case toMatrixFromRawOuter (x ++ [n]) of
-      ImpossibleCase -> ImpossibleCase
-      PossibleCase m_m_matrix_
-        ->
-          case m_m_matrix_ of
-            Nothing
-              ->
-                if n == 0
-                  then PossibleCase Nothing
-                  else toOuterFromMatrix_helper_1 matrix (x ++ [n - 1])
-            Just m_matrix_
-              ->
-                case m_matrix_ of
-                  Nothing -> ImpossibleCase
-                  Just matrix_
-                    ->
-                      case compareMatrix matrix matrix_ of
-                        LT -> toOuterFromMatrix_helper_1 matrix (x ++ [n - 1])
-                        EQ -> PossibleCase (Just (Outer (x ++ [n])))
-                        GT -> toOuterFromMatrix_helper_2 matrix x (n + 1)
-
-{-| 外表記から行列へ変換します。
--}
-toMatrixFromOuter : Outer -> Case (Maybe (Maybe Matrix))
-toMatrixFromOuter (Outer outer) = toMatrixFromRawOuter outer
-
-{-| 生の外表記から外表記へ変換します。
--}
-toOuterFromRawOuter : RawOuter -> Case (Maybe Outer)
-toOuterFromRawOuter x
-  =
-    case toMatrixFromRawOuter x of
-      ImpossibleCase -> ImpossibleCase
-      PossibleCase m_m_matrix
-        ->
-          case m_m_matrix of
-            Nothing -> PossibleCase Nothing
-            Just m_matrix
-              -> toOuterFromMatrix m_matrix
-
-{-| 外表記から生の外表記へ変換します。
--}
-toRawOuterFromOuter : Outer -> RawOuter
-toRawOuterFromOuter (Outer x) = x
+          let
+            f nat
+              =
+                let
+                  int = toIntFromNat nat
+                in
+                  if 0 <= int
+                    then Just (Matrix 2 int (Array.fromList [Array.repeat int 0, Array.repeat int 1]))
+                    else Nothing
+          in
+            expandMaxipointed expandMatrix f
+    ,
+      maximum = Maximum
+    }
