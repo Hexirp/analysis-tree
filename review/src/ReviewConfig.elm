@@ -31,8 +31,6 @@ config =
   ,
     NoUnused.Modules.rule
   ,
-    NoUnused.Parameters.rule
-  ,
     NoUnused.Patterns.rule
   ,
     NoUnused.Variables.rule
