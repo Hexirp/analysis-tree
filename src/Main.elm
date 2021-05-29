@@ -39,7 +39,7 @@ import Dict exposing (Dict)
 import Array exposing (Array)
 import Array.Extra as Array
 
-import Css exposing (displayFlex, margin, px)
+import Css exposing (displayFlex, alignItems, padding, padding2, margin, center, px)
 
 import Html.Styled exposing (Html, toUnstyled, div, button, textarea, text)
 import Html.Styled.Attributes exposing (css)
@@ -313,6 +313,10 @@ view_helper_1 model (Shape shape) x_int
             css
               [
                 displayFlex
+              ,
+                alignItems center
+              ,
+                padding2 (px 0) (px 8)
               ]
           ]
           [
@@ -320,7 +324,7 @@ view_helper_1 model (Shape shape) x_int
               [
                 css
                   [
-                    margin (px 8)
+                    padding2 (px 16) (px 8)
                   ]
               ]
               [
@@ -337,7 +341,7 @@ view_helper_1 model (Shape shape) x_int
               [
                 css
                   [
-                    margin (px 8)
+                    padding2 (px 16) (px 8)
                   ]
               ]
               [
