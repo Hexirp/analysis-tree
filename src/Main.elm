@@ -36,21 +36,12 @@ module Main
       main
     )
 
-import Case exposing (Case (..))
-
 import Dict exposing (Dict)
 
 import Array exposing (Array)
 import Array.Extra as Array
 
-import Notation
-
-import BMS_4
-import BMS_4.Parsing
-
-import Html exposing (Html, div, textarea, button, text)
-import Html.Attributes exposing (class)
-import Html.Events exposing (onClick, onInput)
+import Html exposing (Html, div, text)
 
 import Browser
 
