@@ -39,7 +39,7 @@ import Dict exposing (Dict)
 import Array exposing (Array)
 import Array.Extra as Array
 
-import Html exposing (Html, div, text)
+import Html.Styled exposing (Html, toUnstyled, div, text)
 
 import Browser
 
@@ -279,7 +279,7 @@ main
       {
         init = initialize
       ,
-        view = view
+        view = \model -> toUnstyled (view model)
       ,
         update = update
       }
