@@ -54,8 +54,6 @@ import Css
     ,
       padding2
     ,
-      margin
-    ,
       backgroundColor
     ,
       borderStyle
