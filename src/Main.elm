@@ -308,21 +308,29 @@ view_helper_1 model (Shape shape) x_int
         div
           []
           [
-            button
+            div
+              []
               [
-                onClick (Expand (Array.push (Array.length shape) x_int))
-              ]
-              [
-                text "Expand"
+                button
+                  [
+                    onClick (Expand (Array.push (Array.length shape) x_int))
+                  ]
+                  [
+                    text "Expand"
+                  ]
               ]
           ,
-            button
-              [
-                onClick (Retract x_int)
-              ]
-              [
-                text "Retract"
-              ]
+            div
+            []
+            [
+              button
+                [
+                  onClick (Retract x_int)
+                ]
+                [
+                  text "Retract"
+                ]
+            ]
           ]
       ,
         div
