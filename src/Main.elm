@@ -39,7 +39,7 @@ import Dict exposing (Dict)
 import Array exposing (Array)
 import Array.Extra as Array
 
-import Css exposing (displayFlex, alignItems, padding, padding2, margin, backgroundColor, borderStyle, boxShadow, boxShadow4, fontSize, color, center, none, px, rgb, hover)
+import Css exposing (displayFlex, alignItems, width, height, padding, padding2, margin, backgroundColor, borderStyle, boxShadow, boxShadow4, fontSize, color, center, none, px, rgb, hover)
 
 import Html.Styled exposing (Html, toUnstyled, div, button, textarea, text)
 import Html.Styled.Attributes exposing (css)
@@ -400,10 +400,26 @@ view_helper_1 model (Shape shape) x_int
           ]
       ,
         div
-          []
+          [
+            css
+              [
+                padding2 (px 0) (px 36)
+              ]
+          ]
           [
             textarea
-              []
+              [
+                css
+                  [
+                    height (px 80)
+                  ,
+                    width (px 400)
+                  ,
+                    borderStyle none
+                  ,
+                    backgroundColor (rgb 220 220 220)
+                  ]
+              ]
               []
           ]
       ,
