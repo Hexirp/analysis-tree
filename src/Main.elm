@@ -39,7 +39,10 @@ import Dict exposing (Dict)
 import Array exposing (Array)
 import Array.Extra as Array
 
+import Css exposing (displayFlex, margin, px)
+
 import Html.Styled exposing (Html, toUnstyled, div, button, textarea, text)
+import Html.Styled.Attributes exposing (css)
 import Html.Styled.Events exposing (onClick)
 
 import Browser
@@ -306,10 +309,20 @@ view_helper_1 model (Shape shape) x_int
       []
       [
         div
-          []
+          [
+            css
+              [
+                displayFlex
+              ]
+          ]
           [
             div
-              []
+              [
+                css
+                  [
+                    margin (px 8)
+                  ]
+              ]
               [
                 button
                   [
@@ -321,16 +334,21 @@ view_helper_1 model (Shape shape) x_int
               ]
           ,
             div
-            []
-            [
-              button
-                [
-                  onClick (Retract x_int)
-                ]
-                [
-                  text "Retract"
-                ]
-            ]
+              [
+                css
+                  [
+                    margin (px 8)
+                  ]
+              ]
+              [
+                button
+                  [
+                    onClick (Retract x_int)
+                  ]
+                  [
+                    text "Retract"
+                  ]
+              ]
           ]
       ,
         div
