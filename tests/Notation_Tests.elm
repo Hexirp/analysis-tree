@@ -16,8 +16,6 @@ import Expect
 import Fuzz
 import Test exposing (Test, describe, test, fuzz)
 
--- Nat
-
 test_Nat : Test
 test_Nat
   =
