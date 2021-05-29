@@ -87,7 +87,7 @@ type Shape = Shape (Array Shape)
   x
   ├ ─ x
   │   ├ ─ x
-  |   |   └ ─ o
+  │   │   └ ─ o
   │   └ ─ o
   ├ ─ x
   │   ├ ─ x
