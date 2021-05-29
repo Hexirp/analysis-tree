@@ -1,68 +1,150 @@
 module Main
   exposing
     (
-      Model
+      Shape (..)
     ,
-      Message
+      expandShape
+    ,
+      retractShape
+    ,
+      Mapping (..)
+    ,
+      emptyMapping
+    ,
+      getMapping
+    ,
+      insertMapping
+    ,
+      emptyMemo
+    ,
+      getMemo
+    ,
+      insertMemo
+    ,
+      Message (..)
+    ,
+      Model
     ,
       initialize
     ,
-      view
-    ,
       update
+    ,
+      view
     ,
       main
     )
-
-import Case exposing (Case (..))
 
 import Dict exposing (Dict)
 
 import Array exposing (Array)
 import Array.Extra as Array
 
-import Notation
+import Css
+  exposing
+    (
+      displayFlex
+    ,
+      alignItems
+    ,
+      width
+    ,
+      height
+    ,
+      padding
+    ,
+      padding2
+    ,
+      backgroundColor
+    ,
+      borderStyle
+    ,
+      boxShadow
+    ,
+      boxShadow4
+    ,
+      fontSize
+    ,
+      color
+    ,
+      center
+    ,
+      none
+    ,
+      px
+    ,
+      rgb
+    ,
+      hover
+    )
 
-import BMS_4
-import BMS_4.Parsing
-
-import Html exposing (Html, div, textarea, button, text)
-import Html.Attributes exposing (class)
-import Html.Events exposing (onClick, onInput)
+import Html.Styled exposing (Html, toUnstyled, div, button, textarea, text)
+import Html.Styled.Attributes exposing (css)
+import Html.Styled.Events exposing (onClick)
 
 import Browser
 
-import Debug
+{-| アプリケーションの木構造である。
 
--- 基本的にモデルの操作は単純に。
--- モデルに不整合が出る操作は view で弾く。
--- Model でチェックして、 view でもチェックする必要が
--- あるのなら、 View だけでチェックしたほうが簡単である。
--- ボタンの色を薄くするなどの処理が必要なので、
--- view でもチェックする必要があるんだよねえ……
-type alias Model
-  =
-    {
-      shape : Shape
-    ,
-      mapping : Mapping
-    ,
-      memo : Memo
-    }
+木構造の節には、それぞれ自然数のリストが割り当てられる。たとえば、次のような木構造を考えよう。
 
+  x
+  ├ ─ x
+  │   └ ─ x
+  └ ─ x
+      ├ ─ x
+      │   ├ ─ x
+      │   └ ─ x
+      └ ─ x
+
+これらには、次のような配列が割り当てられる。
+
+  []
+  [0]
+  [0, 0]
+  [1]
+  [1, 0]
+  [1, 0, 0]
+  [1, 0, 1]
+  [1, 1]
+-}
 type Shape = Shape (Array Shape)
 
-initialShape : Shape
-initialShape = Shape Array.empty
+{-| シェイプを展開する。
 
--- 指定された所が丁度いい所なら追加する。具体的には、
--- 配列の末尾だけ。それ以外は Nothing である。
--- あ、でも、そこが既に指定されている箇所なら何もしない。
--- expandShape では Notation 的に正しくない所にも
--- 木を生やしてしまう可能性があるけど、そこは
--- 表示の所でボタンを無効化することで対応する。
--- たとえば、 [1,2] のノードの所には、 [1,2,0] の Expand がある。
--- [1] のノードの所には、 [1,3] の Expand がある。
+次のような木構造があったとしよう。
+
+  x
+  ├ ─ x
+  │   └ ─ x
+  └ ─ x
+      ├ ─ x
+      │   ├ ─ x
+      │   └ ─ x
+      └ ─ x
+
+次のように追加可能な位置が示される。
+
+  x
+  ├ ─ x
+  │   ├ ─ x
+  │   │   └ ─ o
+  │   └ ─ o
+  ├ ─ x
+  │   ├ ─ x
+  │   │   ├ ─ x
+  │   │   │   └ ─ o
+  │   │   ├ ─ x
+  │   │   │   └ ─ o
+  │   │   └ ─ o
+  │   ├ ─ x
+  │   │   └ ─ o
+  │   └ ─ o
+  └ ─ o
+
+`o` に該当する位置を配列で与えると、そのように木構造が更新される。
+
+更新の仕方は、その要素が存在するかどうかのフラグを `True` にセットするようなセッターに似ていると考えてほしい。 `x` に該当する位置を配列で与えると、更新などは起こらず、エラーにもならない。それ以外の位置を指定すると、エラーとなる。
+-}
 expandShape : Array Int -> Shape -> Maybe Shape
 expandShape x_int shape
   =
@@ -104,6 +186,34 @@ expandShape_helper_1 xp xs (Shape shape)
                     Nothing -> Nothing
             else Nothing
 
+{-| シェイプを折り畳みする。
+
+次のような木構造があったとしよう。
+
+  x
+  ├ ─ x
+  │   └ ─ x
+  └ ─ x
+      ├ ─ x
+      │   ├ ─ x
+      │   └ ─ x
+      └ ─ x
+
+次のように削除可能な位置が示される。
+
+  x
+  ├ ─ x
+  │   └ ─ o
+  └ ─ x
+      ├ ─ x
+      │   ├ ─ o
+      │   └ ─ o
+      └ ─ o
+
+`o` に該当する位置を配列で与えると、そのように木構造が更新される。
+
+更新の仕方は、その要素が存在するかどうかのフラグを `False` にセットするようなセッターに似ていると考えてほしい。 既に要素が存在しない位置を配列で与えると、更新などは起こらず、エラーにもならない。 `x` に該当する位置を指定すると、エラーとなる。
+-}
 retractShape : Array Int -> Shape -> Maybe Shape
 retractShape x_int shape
   =
@@ -123,7 +233,14 @@ retractShape_helper_1 xp xs (Shape shape)
                 then
                   if Array.length shape - 1 < xp
                     then Just (Shape shape)
-                    else Just (Shape (Array.pop shape))
+                    else
+                      case Array.get xp shape of
+                        Just (Shape shape_)
+                          ->
+                            if Array.isEmpty shape_
+                              then Just (Shape (Array.pop shape))
+                              else Nothing
+                        Nothing -> Nothing
                 else Nothing
             else Nothing
       xsp :: xss
@@ -167,13 +284,29 @@ getMemo k (Memo dict) = Dict.get k dict
 insertMemo : List Int -> String -> Memo -> Memo
 insertMemo k v (Memo dict) = Memo (Dict.insert k v dict)
 
-type Message = Edit_Mapping (Array Int) String | Edit_Memo (Array Int) String | Expand (Array Int) | Retract (Array Int)
+type Message = Expand (Array Int) | Retract (Array Int) | Edit_Mapping (Array Int) String | Edit_Memo (Array Int) String
+
+-- 基本的にモデルの操作は単純に。
+-- モデルに不整合が出る操作は view で弾く。
+-- Model でチェックして、 view でもチェックする必要が
+-- あるのなら、 View だけでチェックしたほうが簡単である。
+-- ボタンの色を薄くするなどの処理が必要なので、
+-- view でもチェックする必要があるんだよねえ……
+type alias Model
+  =
+    {
+      shape : Shape
+    ,
+      mapping : Mapping
+    ,
+      memo : Memo
+    }
 
 initialize : Model
 initialize
   =
     {
-      shape = initialShape
+      shape = Shape Array.empty
     ,
       mapping = emptyMapping
     ,
@@ -181,10 +314,160 @@ initialize
     }
 
 update : Message -> Model -> Model
-update message model = model
+update message model
+  =
+    case message of
+      Expand x_int
+        ->
+          case expandShape x_int model.shape of
+            Just shape_ -> { model | shape = shape_ }
+            Nothing -> model
+      Retract x_int
+        ->
+          case retractShape x_int model.shape of
+            Just shape_ -> { model | shape = shape_ }
+            Nothing -> model
+      Edit_Mapping _ _ -> model
+      Edit_Memo _ _ -> model
 
 view : Model -> Html Message
-view model = div [] [ text "TODO!" ]
+view model =
+  div
+    []
+    [
+      view_helper_1 model model.shape Array.empty
+    ]
+
+view_helper_1 : Model -> Shape -> Array Int -> Html Message
+view_helper_1 model (Shape shape) x_int
+  =
+    div
+      []
+      [
+        div
+          [
+            css
+              [
+                displayFlex
+              ,
+                alignItems center
+              ,
+                padding2 (px 0) (px 8)
+              ]
+          ]
+          [
+            div
+              [
+                css
+                  [
+                    padding2 (px 16) (px 8)
+                  ]
+              ]
+              [
+                button
+                  [
+                    onClick (Expand (Array.push (Array.length shape) x_int))
+                  ,
+                    css
+                      [
+                        padding (px 8)
+                      ,
+                        borderStyle none
+                      ,
+                        backgroundColor (rgb 173 216 230)
+                      ,
+                        boxShadow4 (px 2) (px 2) (px 2) (rgb 208 208 208)
+                      ,
+                        fontSize (px 24)
+                      ,
+                        color (rgb 255 255 255)
+                      ,
+                        hover
+                          [
+                            backgroundColor (rgb 208 208 208)
+                          ,
+                            boxShadow none
+                          ]
+                      ]
+                  ]
+                  [
+                    text "Expand"
+                  ]
+              ]
+          ,
+            div
+              [
+                css
+                  [
+                    padding2 (px 16) (px 8)
+                  ]
+              ]
+              [
+                button
+                  [
+                    onClick (Retract x_int)
+                  ,
+                    css
+                      [
+                        padding (px 8)
+                      ,
+                        borderStyle none
+                      ,
+                        backgroundColor (rgb 173 216 230)
+                      ,
+                        boxShadow4 (px 2) (px 2) (px 2) (rgb 208 208 208)
+                      ,
+                        fontSize (px 24)
+                      ,
+                        color (rgb 255 255 255)
+                      ,
+                        hover
+                          [
+                            backgroundColor (rgb 208 208 208)
+                          ,
+                            boxShadow none
+                          ]
+                      ]
+                  ]
+                  [
+                    text "Retract"
+                  ]
+              ]
+          ]
+      ,
+        div
+          [
+            css
+              [
+                padding2 (px 0) (px 36)
+              ]
+          ]
+          [
+            textarea
+              [
+                css
+                  [
+                    height (px 80)
+                  ,
+                    width (px 400)
+                  ,
+                    borderStyle none
+                  ,
+                    backgroundColor (rgb 220 220 220)
+                  ]
+              ]
+              []
+          ]
+      ,
+        div
+          [
+            css
+              [
+                padding2 (px 0) (px 18)
+              ]
+          ]
+          (Array.toList (Array.indexedMap (\int shape_ -> view_helper_1 model shape_ (Array.push int x_int)) shape))
+      ]
 
 main : Program () Model Message
 main
@@ -193,7 +476,7 @@ main
       {
         init = initialize
       ,
-        view = view
+        view = \model -> toUnstyled (view model)
       ,
         update = update
       }
