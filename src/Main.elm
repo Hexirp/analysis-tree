@@ -424,7 +424,12 @@ view_helper_1 model (Shape shape) x_int
           ]
       ,
         div
-          []
+          [
+            css
+              [
+                padding2 (px 0) (px 18)
+              ]
+          ]
           (Array.toList (Array.indexedMap (\int shape_ -> view_helper_1 model shape_ (Array.push int x_int)) shape))
       ]
 
