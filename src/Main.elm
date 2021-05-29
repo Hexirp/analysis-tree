@@ -74,7 +74,8 @@ import Css
     ,
       rgb
     ,
-      hover)
+      hover
+    )
 
 import Html.Styled exposing (Html, toUnstyled, div, button, textarea, text)
 import Html.Styled.Attributes exposing (css)
