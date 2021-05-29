@@ -39,7 +39,7 @@ import Dict exposing (Dict)
 import Array exposing (Array)
 import Array.Extra as Array
 
-import Css exposing (displayFlex, alignItems, padding, padding2, margin, center, px)
+import Css exposing (displayFlex, alignItems, padding, padding2, margin, backgroundColor, borderStyle, boxShadow, boxShadow4, fontSize, color, center, none, px, rgb, hover)
 
 import Html.Styled exposing (Html, toUnstyled, div, button, textarea, text)
 import Html.Styled.Attributes exposing (css)
@@ -331,6 +331,28 @@ view_helper_1 model (Shape shape) x_int
                 button
                   [
                     onClick (Expand (Array.push (Array.length shape) x_int))
+                  ,
+                    css
+                      [
+                        padding (px 8)
+                      ,
+                        borderStyle none
+                      ,
+                        backgroundColor (rgb 173 216 230)
+                      ,
+                        boxShadow4 (px 2) (px 2) (px 2) (rgb 208 208 208)
+                      ,
+                        fontSize (px 24)
+                      ,
+                        color (rgb 255 255 255)
+                      ,
+                        hover
+                          [
+                            backgroundColor (rgb 208 208 208)
+                          ,
+                            boxShadow none
+                          ]
+                      ]
                   ]
                   [
                     text "Expand"
@@ -348,6 +370,28 @@ view_helper_1 model (Shape shape) x_int
                 button
                   [
                     onClick (Retract x_int)
+                  ,
+                    css
+                      [
+                        padding (px 8)
+                      ,
+                        borderStyle none
+                      ,
+                        backgroundColor (rgb 173 216 230)
+                      ,
+                        boxShadow4 (px 2) (px 2) (px 2) (rgb 208 208 208)
+                      ,
+                        fontSize (px 24)
+                      ,
+                        color (rgb 255 255 255)
+                      ,
+                        hover
+                          [
+                            backgroundColor (rgb 208 208 208)
+                          ,
+                            boxShadow none
+                          ]
+                      ]
                   ]
                   [
                     text "Retract"
