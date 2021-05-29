@@ -39,7 +39,7 @@ import Dict exposing (Dict)
 import Array exposing (Array)
 import Array.Extra as Array
 
-import Html.Styled exposing (Html, toUnstyled, div, text)
+import Html.Styled exposing (Html, toUnstyled, div, button, textarea, text)
 
 import Browser
 
@@ -270,7 +270,51 @@ update : Message -> Model -> Model
 update message model = model
 
 view : Model -> Html Message
-view model = div [] [ text "TODO!" ]
+view model =
+  div
+    []
+    [
+      view_helper_1 model model.shape
+    ]
+
+view_helper_1 : Model -> Shape -> Html Message
+view_helper_1 model (Shape shape)
+  =
+    div
+      []
+      [
+        div
+          []
+          [
+            button
+              []
+              [
+                text "Expand"
+              ]
+          ]
+      ,
+        div
+          []
+          [
+            button
+              []
+              [
+                text "Retract"
+              ]
+          ]
+      ,
+        div
+          []
+          [
+            textarea
+              []
+              []
+          ]
+      ,
+        div
+          []
+          (Array.toList (Array.map (view_helper_1 model) shape))
+      ]
 
 main : Program () Model Message
 main
