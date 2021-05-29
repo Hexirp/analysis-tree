@@ -2,13 +2,19 @@
 
 ## not yet released
 
+https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/14 により次の変更が行われた。
+
+* "Expand" ボタンと "Retact" ボタンを使って木構造を展開したり折り畳みしたりできるようになった。
+* UI がモダンなデザインとなった。
+
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/13 により次の変更が行われた。
 
-* リンターが導入された。
+* リンターを導入した。
 
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/12 により次の変更が行われた。
 
 * `Notation` モジュールという、複数の表記を横断して操作を抽象化するモジュールを追加した。
+* `Notation` モジュールの導入にコードが対応できていないので、 UI を一旦削除した。
 
 ## 0.4.0
 
