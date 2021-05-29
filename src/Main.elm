@@ -3,8 +3,6 @@ module Main
     (
       Shape (..)
     ,
-      initialShape
-    ,
       expandShape
     ,
       retractShape
@@ -46,9 +44,6 @@ import Html exposing (Html, div, text)
 import Browser
 
 type Shape = Shape (Array Shape)
-
-initialShape : Shape
-initialShape = Shape Array.empty
 
 -- 指定された所が丁度いい所なら追加する。具体的には、
 -- 配列の末尾だけ。それ以外は Nothing である。
@@ -184,7 +179,7 @@ initialize : Model
 initialize
   =
     {
-      shape = initialShape
+      shape = Shape Array.empty
     ,
       mapping = emptyMapping
     ,
