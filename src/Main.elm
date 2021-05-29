@@ -39,7 +39,44 @@ import Dict exposing (Dict)
 import Array exposing (Array)
 import Array.Extra as Array
 
-import Css exposing (displayFlex, alignItems, width, height, padding, padding2, margin, backgroundColor, borderStyle, boxShadow, boxShadow4, fontSize, color, center, none, px, rgb, hover)
+import Css
+  exposing
+    (
+      displayFlex
+    ,
+      alignItems
+    ,
+      width
+    ,
+      height
+    ,
+      padding
+    ,
+      padding2
+    ,
+      margin
+    ,
+      backgroundColor
+    ,
+      borderStyle
+    ,
+      boxShadow
+    ,
+      boxShadow4
+    ,
+      fontSize
+    ,
+      color
+    ,
+      center
+    ,
+      none
+    ,
+      px
+    ,
+      rgb
+    ,
+      hover)
 
 import Html.Styled exposing (Html, toUnstyled, div, button, textarea, text)
 import Html.Styled.Attributes exposing (css)
