@@ -9,7 +9,6 @@ import Array
 import Main exposing (..)
 
 import Expect
-import Fuzz
 import Test exposing (Test, describe, test)
 
 test_Shape : Test
