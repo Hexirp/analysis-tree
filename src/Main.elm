@@ -194,7 +194,14 @@ retractShape_helper_1 xp xs (Shape shape)
                 then
                   if Array.length shape - 1 < xp
                     then Just (Shape shape)
-                    else Just (Shape (Array.pop shape))
+                    else
+                      case Array.get xp shape of
+                        Just (Shape shape_)
+                          ->
+                            if Array.isEmpty shape_
+                              then Just (Shape (Array.pop shape))
+                              else Nothing
+                        Nothing -> Nothing
                 else Nothing
             else Nothing
       xsp :: xss
