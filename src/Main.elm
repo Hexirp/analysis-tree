@@ -40,6 +40,7 @@ import Array exposing (Array)
 import Array.Extra as Array
 
 import Html.Styled exposing (Html, toUnstyled, div, button, textarea, text)
+import Html.Styled.Events exposing (onClick)
 
 import Browser
 
@@ -237,7 +238,7 @@ getMemo k (Memo dict) = Dict.get k dict
 insertMemo : List Int -> String -> Memo -> Memo
 insertMemo k v (Memo dict) = Memo (Dict.insert k v dict)
 
-type Message = Edit_Mapping (Array Int) String | Edit_Memo (Array Int) String | Expand (Array Int) | Retract (Array Int)
+type Message = Expand (Array Int) | Retract (Array Int) | Edit_Mapping (Array Int) String | Edit_Memo (Array Int) String
 
 -- 基本的にモデルの操作は単純に。
 -- モデルに不整合が出る操作は view で弾く。
@@ -267,18 +268,32 @@ initialize
     }
 
 update : Message -> Model -> Model
-update message model = model
+update message model
+  =
+    case message of
+      Expand x_int
+        ->
+          case expandShape x_int model.shape of
+            Just shape_ -> { model | shape = shape_ }
+            Nothing -> model
+      Retract x_int
+        ->
+          case retractShape x_int model.shape of
+            Just shape_ -> { model | shape = shape_ }
+            Nothing -> model
+      Edit_Mapping _ _ -> model
+      Edit_Memo _ _ -> model
 
 view : Model -> Html Message
 view model =
   div
     []
     [
-      view_helper_1 model model.shape
+      view_helper_1 model model.shape Array.empty
     ]
 
-view_helper_1 : Model -> Shape -> Html Message
-view_helper_1 model (Shape shape)
+view_helper_1 : Model -> Shape -> Array Int -> Html Message
+view_helper_1 model (Shape shape) x_int
   =
     div
       []
@@ -287,13 +302,17 @@ view_helper_1 model (Shape shape)
           []
           [
             button
-              []
+              [
+                onClick (Expand (Array.push (Array.length shape) x_int))
+              ]
               [
                 text "Expand"
               ]
           ,
             button
-              []
+              [
+                onClick (Retract x_int)
+              ]
               [
                 text "Retract"
               ]
@@ -309,7 +328,7 @@ view_helper_1 model (Shape shape)
       ,
         div
           []
-          (Array.toList (Array.map (view_helper_1 model) shape))
+          (Array.toList (Array.indexedMap (\int shape_ -> view_helper_1 model shape_ (Array.push int x_int)) shape))
       ]
 
 main : Program () Model Message
