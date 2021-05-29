@@ -291,11 +291,7 @@ view_helper_1 model (Shape shape)
               [
                 text "Expand"
               ]
-          ]
-      ,
-        div
-          []
-          [
+          ,
             button
               []
               [
