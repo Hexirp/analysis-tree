@@ -1,15 +1,37 @@
 module Main
   exposing
     (
-      Model
+      Shape (..)
     ,
-      Message
+      initialShape
+    ,
+      expandShape
+    ,
+      retractShape
+    ,
+      Mapping (..)
+    ,
+      emptyMapping
+    ,
+      getMapping
+    ,
+      insertMapping
+    ,
+      emptyMemo
+    ,
+      getMemo
+    ,
+      insertMemo
+    ,
+      Message (..)
+    ,
+      Model
     ,
       initialize
     ,
-      view
-    ,
       update
+    ,
+      view
     ,
       main
     )
@@ -31,24 +53,6 @@ import Html.Attributes exposing (class)
 import Html.Events exposing (onClick, onInput)
 
 import Browser
-
-import Debug
-
--- 基本的にモデルの操作は単純に。
--- モデルに不整合が出る操作は view で弾く。
--- Model でチェックして、 view でもチェックする必要が
--- あるのなら、 View だけでチェックしたほうが簡単である。
--- ボタンの色を薄くするなどの処理が必要なので、
--- view でもチェックする必要があるんだよねえ……
-type alias Model
-  =
-    {
-      shape : Shape
-    ,
-      mapping : Mapping
-    ,
-      memo : Memo
-    }
 
 type Shape = Shape (Array Shape)
 
@@ -168,6 +172,22 @@ insertMemo : List Int -> String -> Memo -> Memo
 insertMemo k v (Memo dict) = Memo (Dict.insert k v dict)
 
 type Message = Edit_Mapping (Array Int) String | Edit_Memo (Array Int) String | Expand (Array Int) | Retract (Array Int)
+
+-- 基本的にモデルの操作は単純に。
+-- モデルに不整合が出る操作は view で弾く。
+-- Model でチェックして、 view でもチェックする必要が
+-- あるのなら、 View だけでチェックしたほうが簡単である。
+-- ボタンの色を薄くするなどの処理が必要なので、
+-- view でもチェックする必要があるんだよねえ……
+type alias Model
+  =
+    {
+      shape : Shape
+    ,
+      mapping : Mapping
+    ,
+      memo : Memo
+    }
 
 initialize : Model
 initialize
