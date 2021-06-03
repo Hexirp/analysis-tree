@@ -25,7 +25,39 @@ import Notation_Util exposing (..)
 import BMS_4_Util exposing (..)
 
 test_RawMatrix : Test
-test_RawMatrix = describe "RawMatrix" []
+test_RawMatrix
+  =
+    describe "RawMatrix"
+      [
+        test_toRawMatrixFromList
+      ]
+
+test_toRawMatrixFromList : Test
+  =
+    describe "toRawMatrixFromList"
+      [
+        let
+          expect _
+            =
+              let
+                target = toRawMatrixFromList [[0, 1], [2, 3]]
+                result = Array.fromList [Array.fromList [0, 1], Array.fromList [2, 3]]
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = toRawMatrixFromList [[0, 1], [-1], []]
+                result = Array.fromList [Array.fromList [0, 1]. Array.fromList [-1], Array.fromList []]
+              in
+                target |> Expect.equal result
+        in
+          test "abnormal case" expect
+      ]
 
 test_Matrix : Test
 test_Matrix
