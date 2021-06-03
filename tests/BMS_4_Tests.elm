@@ -33,6 +33,7 @@ test_RawMatrix
       ]
 
 test_toRawMatrixFromList : Test
+test_toRawMatrixFromList
   =
     describe "toRawMatrixFromList"
       [
