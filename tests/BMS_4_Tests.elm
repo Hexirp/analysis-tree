@@ -1,6 +1,8 @@
 module BMS_4_Tests
   exposing
     (
+      test_RawMatrix
+    ,
       test_Matrix
     ,
       test_Patrix
@@ -21,6 +23,9 @@ import Test exposing (Test, describe, test, fuzz, fuzz2, fuzz3)
 import Case_Util exposing (..)
 import Notation_Util exposing (..)
 import BMS_4_Util exposing (..)
+
+test_RawMatrix : Test
+test_RawMatrix = describe "RawMatrix" []
 
 test_Matrix : Test
 test_Matrix
