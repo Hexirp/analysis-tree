@@ -7,9 +7,7 @@ module BMS_4_Printing
     )
 
 import Tuple
-
 import Array exposing (Array)
-
 import String
 
 import BMS_4
