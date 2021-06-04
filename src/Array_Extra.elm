@@ -1,4 +1,4 @@
-module Array.Extra.Folding
+module Array_Extra
   exposing
     (
       all

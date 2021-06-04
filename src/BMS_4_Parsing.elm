@@ -1,4 +1,4 @@
-module BMS_4.Parsing
+module BMS_4_Parsing
   exposing
     (
       Ast,
@@ -142,7 +142,7 @@ module BMS_4.Parsing
 
 import Parser
   exposing (Parser, succeed, (|=), (|.), oneOf, symbol)
-import Parser.Extra exposing (brackets, braces)
+import Parser_Extra exposing (brackets, braces)
 
 -- 抽象構文木
 

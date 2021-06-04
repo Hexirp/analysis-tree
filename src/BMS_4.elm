@@ -93,7 +93,7 @@ import Dict exposing (Dict)
 
 import Array exposing (Array)
 import Array.Extra as Array
-import Array.Extra.Folding as Array
+import Array_Extra as Array
 
 import Notation
   exposing
