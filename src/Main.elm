@@ -86,6 +86,8 @@ import Browser
 import BMS_4
 import BMS_4_Printing as BMS_4
 
+import Main.BMS_4 as BMS_4
+
 {-| アプリケーションの木構造である。
 
 木構造の節には、それぞれ自然数のリストが割り当てられる。たとえば、次のような木構造を考えよう。
@@ -435,6 +437,17 @@ view_helper_1 model (Shape shape) x_int
                   [
                     text "Retract"
                   ]
+              ]
+          ,
+            div
+              [
+                css
+                  [
+                    padding2 (px 16) (px 8)
+                  ]
+              ]
+              [
+                BMS_4.view x_int
               ]
           ]
       ,
