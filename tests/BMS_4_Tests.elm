@@ -53,7 +53,7 @@ test_toRawMatrixFromList
             =
               let
                 target = toRawMatrixFromList [[0, 1], [-1], []]
-                result = Array.fromList [Array.fromList [0, 1]. Array.fromList [-1], Array.fromList []]
+                result = Array.fromList [Array.fromList [0, 1], Array.fromList [-1], Array.fromList []]
               in
                 target |> Expect.equal result
         in
