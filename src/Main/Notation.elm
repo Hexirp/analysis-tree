@@ -1,4 +1,4 @@
-module Main.BMS_4
+module Main.Notation
   exposing
     (
       view
@@ -7,30 +7,27 @@ module Main.BMS_4
 import Array exposing (Array)
 
 import Case exposing (Case (..))
-import Notation exposing (..)
-import BMS_4
-import BMS_4_Printing exposing (..)
+
+import Notation exposing (OutOfIndexError (..))
+
+import Notation_Printing exposing (NotationPrintable)
 
 import Css exposing (color, rgb)
 
 import Html.Styled exposing (Html, span, text)
 import Html.Styled.Attributes exposing (css)
 
-view : Array Int -> Html msg
-view x_int
+view : NotationPrintable term -> Array Int -> Html msg
+view notation x_int
   =
-    case Notation.toTermFromRawOuter BMS_4.notation x_int of
+    case Notation.toTermFromRawOuter { compare = notation.compare, expand = notation.expand, maximum = notation.maximum } x_int of
       PossibleCase result_result_term
         ->
           case result_result_term of
             Ok result_term
               ->
                 case result_term of
-                  Ok term
-                    ->
-                      case term of
-                        Lower matrix -> text (printMatrix matrix)
-                        Maximum -> text "B"
+                  Ok term -> text (notation.print term)
                   Err (OutOfIndexError term nat coftype)
                     ->
                       span

@@ -84,9 +84,10 @@ import Html.Styled.Events exposing (onClick)
 import Browser
 
 import BMS_4
-import BMS_4_Printing as BMS_4
 
-import Main.BMS_4 as BMS_4
+import BMS_4_Printing
+
+import Main.Notation
 
 {-| アプリケーションの木構造である。
 
@@ -447,7 +448,7 @@ view_helper_1 model (Shape shape) x_int
                   ]
               ]
               [
-                BMS_4.view x_int
+                Main.Notation.view BMS_4_Printing.notation x_int
               ]
           ]
       ,

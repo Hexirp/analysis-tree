@@ -769,7 +769,7 @@ notation
       expand
         =
           let
-            f nat
+            func nat
               =
                 let
                   int = toIntFromNat nat
@@ -778,7 +778,7 @@ notation
                     then Just (Matrix 2 int (Array.fromList [Array.repeat int 0, Array.repeat int 1]))
                     else Nothing
           in
-            expandMaxipointed expandMatrix f
+            expandMaxipointed expandMatrix func
     ,
       maximum = Maximum
     }
