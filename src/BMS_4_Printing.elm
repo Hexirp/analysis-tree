@@ -6,7 +6,9 @@ module BMS_4_Printing
       printMatrix
     )
 
-import Array
+import Tuple
+
+import Array exposing (Array)
 
 import String
 
@@ -25,7 +27,7 @@ printRawMatrix_helper_1 y_int
             then (string ++ "," ++ String.fromInt int, True)
             else (string ++ String.fromInt int, True)
     in
-      "(" ++ Array.foldl func ("", False) y_int ++ ")"
+      "(" ++ Tuple.first (Array.foldl func ("", False) y_int) ++ ")"
 
 printMatrix : BMS_4.Matrix -> String
 printMatrix matrix = printRawMatrix (BMS_4.toRawMatrixFromMatrix matrix)
