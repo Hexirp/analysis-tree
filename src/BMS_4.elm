@@ -11,8 +11,6 @@ module BMS_4
     ,
       compareMatrix
     ,
-      verifyMatrix
-    ,
       toMatrixFromRawMatrix
     ,
       toRawMatrixFromMatrix
@@ -72,7 +70,7 @@ module BMS_4
 @docs RawMatrix, toRawMatrixFromList, toListFromRawMatrix
 
 # 行列
-@docs Matrix, compareMatrix, verifyMatrix, toMatrixFromRawMatrix, toRawMatrixFromMatrix, calcCoftypeOfMatrix, expandMatrix
+@docs Matrix, compareMatrix, toMatrixFromRawMatrix, toRawMatrixFromMatrix, calcCoftypeOfMatrix, expandMatrix
 
 # ピンデックス
 @docs Pindex
@@ -146,11 +144,6 @@ type Matrix = Matrix Int Int RawMatrix
 {-| 行列同士を比較します。 -}
 compareMatrix : Matrix -> Matrix -> Order
 compareMatrix x y = compare (toListFromRawMatrix (toRawMatrixFromMatrix (toMatrixFromRawMatrix (toRawMatrixFromMatrix x)))) (toListFromRawMatrix (toRawMatrixFromMatrix (toMatrixFromRawMatrix (toRawMatrixFromMatrix y))))
-
-{-| 或る値が `Matrix` 型の規約を満たしているか検証します。
--}
-verifyMatrix : Matrix -> Bool
-verifyMatrix (Matrix x y x_y_int) = Array.length x_y_int == x && Array.all (\a -> Array.length a == y) x_y_int
 
 {-| 或る生の行列を或る行列へ変換します。
 
