@@ -10,7 +10,7 @@ import Case exposing (Case (..))
 
 import Notation exposing (OutOfIndexError (..))
 
-import Notation_Printing exposing (NotationPrintable)
+import Notation_Printing exposing (NotationPrintable, toNotationFromNotationPrintable)
 
 import Css exposing (color, rgb)
 
@@ -20,7 +20,7 @@ import Html.Styled.Attributes exposing (css)
 view : NotationPrintable term -> Array Int -> Html msg
 view notation x_int
   =
-    case Notation.toTermFromRawOuter { compare = notation.compare, expand = notation.expand, maximum = notation.maximum } x_int of
+    case Notation.toTermFromRawOuter (toNotationFromNotationPrintable notation) x_int of
       PossibleCase result_result_term
         ->
           case result_result_term of
