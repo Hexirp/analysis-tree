@@ -2,11 +2,13 @@ module Notation_Printing
   exposing
     (
       NotationPrintable
+    ,
+      toNotationFromNotationPrintable
     )
 
 import String exposing (String)
 
-import Notation exposing (Expander)
+import Notation exposing (Expander, Notation)
 
 {-| 項を表示可能な基本列付きの順序数表記です。
 
@@ -28,4 +30,15 @@ type alias NotationPrintable term
       maximum : term
     ,
       print : term -> String
+    }
+
+toNotationFromNotationPrintable : NotationPrintable term -> Notation term
+toNotationFromNotationPrintable notation
+  =
+    {
+      compare = notation.compare
+    ,
+      expand = notation.expand
+    ,
+      maximum = notation.maximum
     }
