@@ -599,7 +599,7 @@ calcBadRootOfPatrix patrix
 {-| 或るパトリックスを或る係数で展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
 expandPatrix : Patrix -> Nat -> Case (Result (OutOfIndexError Patrix) Patrix)
-expandPatrix patrix n
+expandPatrix ((Patrix x y x_y_pindex) as patrix) n
   =
     case calcCoftypeOfPatrix patrix of
       Zero -> PossibleCase (Err (OutOfIndexError patrix n Zero))
@@ -610,7 +610,7 @@ expandPatrix patrix n
               case compareNat One n of
                 LT -> PossibleCase (Err (OutOfIndexError patrix n One))
                 EQ -> PossibleCase (Err (OutOfIndexError patrix n One))
-                GT -> PossibleCase (Ok (Patrix (x - 1) y (Array.pop (toRawPatrixFromPatrix patrix))))
+                GT -> PossibleCase (Ok (Patrix (x - 1) y (Array.pop x_y_pindex)))
             else PossibleCase (Err (OutOfIndexError patrix n One))
       Omega
         ->
@@ -619,15 +619,12 @@ expandPatrix patrix n
               case calcBadRootOfPatrix patrix of
                 Just (xr, yr)
                   ->
-                    case patrix of
-                      Patrix x y x_y_pindex
-                        ->
-                          let
-                            ex = xr + (((x - 1) - xr) * (toIntFromNat n + 1))
-                          in
-                            case expandPatrix_helper_1 x y x_y_pindex n xr yr ex of
-                              PossibleCase x_y_pindex_ -> PossibleCase (Ok (Patrix ex y x_y_pindex_))
-                              ImpossibleCase -> ImpossibleCase
+                    let
+                      ex = xr + (((x - 1) - xr) * (toIntFromNat n + 1))
+                    in
+                      case expandPatrix_helper_1 x y x_y_pindex n xr yr ex of
+                        PossibleCase x_y_pindex_ -> PossibleCase (Ok (Patrix ex y x_y_pindex_))
+                        ImpossibleCase -> ImpossibleCase
                 Nothing -> ImpossibleCase
             else PossibleCase (Err (OutOfIndexError patrix n Omega))
 
