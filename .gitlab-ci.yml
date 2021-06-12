@@ -1,31 +1,33 @@
 image: node:alpine
 
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm/
+
+before_script:
+  - npm ci --cache .npm --prefer-offline
+
 build-job:
   stage: build
   script:
-    - npm install -g --unsafe-perm elm
-    - elm make src/Main.elm
+    - npx elm make src/Main.elm
 
 test-job:
   stage: test
   script:
-    - npm install -g --unsafe-perm elm
-    - npm install -g --unsafe-perm elm-test
-    - elm-test
+    - npx elm-test
 
 lint-job:
   stage: test
   script:
-    - npm install -g --unsafe-perm elm
-    - npm install -g --unsafe-perm elm-review
-    - elm-review
+    - npx elm-review
   allow_failure: true
 
 pages:
   stage: deploy
   script:
-    - npm install -g --unsafe-perm elm
-    - elm make src/Main.elm --optimize --output=public/index.html
+    - npx elm make src/Main.elm --optimize --output=public/index.html
   artifacts:
     paths:
       - public

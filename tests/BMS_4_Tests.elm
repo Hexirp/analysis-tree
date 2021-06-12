@@ -31,7 +31,7 @@ test_RawMatrix
       [
         test_toRawMatrixFromList
       ,
-        test_toListFromRawMatrix 
+        test_toListFromRawMatrix
       ]
 
 test_toRawMatrixFromList : Test
