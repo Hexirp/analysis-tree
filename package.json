@@ -1,7 +1,7 @@
 {
   "devDependencies": {
-    "elm": "*",
+    "elm": "0.19.1-5",
     "elm-review": "^2.5.2",
-    "elm-test": "*"
+    "elm-test": "0.19.1-revision7"
   }
 }
