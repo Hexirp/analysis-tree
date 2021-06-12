@@ -29,6 +29,8 @@ module BMS_4
     ,
       Patrix (..)
     ,
+      toRawPatrixFromPatrix
+    ,
       calcPatrixFromMatrix
     ,
       MemoCalcPatrixFromMatrix
@@ -79,7 +81,7 @@ module BMS_4
 @docs RawPatrix, toRawPatrixFromList, toListFromRawPatrix
 
 # パトリックス
-@docs Patrix (..), calcPatrixFromMatrix, MemoCalcPatrixFromMatrix, emptyMemoCalcPatrixFromMatrix, getMemoCalcParentOnPatrixFromRawMatrix, getMemoCalcAncestorSetOnPatrixFromRawMatrix, insertMemoCalcParentOnPatrixFromRawMatrix, insertMemoCalcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrix, calcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrixWithMemo, calcAncestorSetOnPatrixFromRawMatrixWithMemo, calcMatrixFromPatrix, calcElementOnMatrixFromRawPatrix, calcCoftypeOfPatrix, calcBadRootOfPatrix, expandPatrix
+@docs Patrix (..), toRawPatrixFromPatrix, calcPatrixFromMatrix, MemoCalcPatrixFromMatrix, emptyMemoCalcPatrixFromMatrix, getMemoCalcParentOnPatrixFromRawMatrix, getMemoCalcAncestorSetOnPatrixFromRawMatrix, insertMemoCalcParentOnPatrixFromRawMatrix, insertMemoCalcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrix, calcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrixWithMemo, calcAncestorSetOnPatrixFromRawMatrixWithMemo, calcMatrixFromPatrix, calcElementOnMatrixFromRawPatrix, calcCoftypeOfPatrix, calcBadRootOfPatrix, expandPatrix
 
 # 基本列付きの順序数表記
 @docs notations
@@ -274,6 +276,11 @@ toListFromRawPatrix array = Array.toList (Array.map Array.toList array)
 構築子は `Patrix` 型の規約が守られていることが保証されていないため、テスト以外で使ってはいけません。
 -}
 type Patrix = Patrix Int Int RawPatrix
+
+{-| 或るパトリックスから或る生のパトリックスへ変換します。
+-}
+toRawPatrixFromPatrix : Patrix -> RawPatrix
+toRawPatrixFromPatrix (Patrix x y x_y_int) = x_y_int
 
 {-| 或る行列から或るパトリックスを計算します。
 -}
@@ -592,22 +599,19 @@ calcBadRootOfPatrix patrix
 {-| 或るパトリックスを或る係数で展開します。 `Just` で包んだ結果を返します。其の自然数が其の行列の共終タイプ以上なら `Nothing` を返します。
 -}
 expandPatrix : Patrix -> Nat -> Case (Result (OutOfIndexError Patrix) Patrix)
-expandPatrix patrix n
+expandPatrix ((Patrix x y x_y_pindex) as patrix) n
   =
     case calcCoftypeOfPatrix patrix of
       Zero -> PossibleCase (Err (OutOfIndexError patrix n Zero))
       One
         ->
           if 0 <= toIntFromNat n
-            then PossibleCase (Err (OutOfIndexError patrix n One))
-            else
+            then
               case compareNat One n of
                 LT -> PossibleCase (Err (OutOfIndexError patrix n One))
                 EQ -> PossibleCase (Err (OutOfIndexError patrix n One))
-                GT
-                  ->
-                    case patrix of
-                      Patrix x y x_y_pindex -> PossibleCase (Ok (Patrix (x - 1) y (Array.pop x_y_pindex)))
+                GT -> PossibleCase (Ok (Patrix (x - 1) y (Array.pop x_y_pindex)))
+            else PossibleCase (Err (OutOfIndexError patrix n One))
       Omega
         ->
           if 0 <= toIntFromNat n
@@ -615,15 +619,12 @@ expandPatrix patrix n
               case calcBadRootOfPatrix patrix of
                 Just (xr, yr)
                   ->
-                    case patrix of
-                      Patrix x y x_y_pindex
-                        ->
-                          let
-                            ex = xr + (((x - 1) - xr) * (toIntFromNat n + 1))
-                          in
-                            case expandPatrix_helper_1 x y x_y_pindex n xr yr ex of
-                              PossibleCase x_y_pindex_ -> PossibleCase (Ok (Patrix ex y x_y_pindex_))
-                              ImpossibleCase -> ImpossibleCase
+                    let
+                      ex = xr + (((x - 1) - xr) * (toIntFromNat n + 1))
+                    in
+                      case expandPatrix_helper_1 x y x_y_pindex n xr yr ex of
+                        PossibleCase x_y_pindex_ -> PossibleCase (Ok (Patrix ex y x_y_pindex_))
+                        ImpossibleCase -> ImpossibleCase
                 Nothing -> ImpossibleCase
             else PossibleCase (Err (OutOfIndexError patrix n Omega))
 

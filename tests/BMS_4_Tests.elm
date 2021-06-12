@@ -276,12 +276,12 @@ test_expandMatrix
           expect _
             =
               let
-                target = expandMatrix (Matrix 5 3 (toRawMatrixFromList [[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 2, 0]])) (Nat 4)
-                result = PossibleCase (Ok (Matrix 16 3 (toRawMatrixFromList [[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 1, 1], [5, 2, 2], [6, 3, 3], [7, 1, 1], [8, 2, 2], [9, 3, 3], [10, 1, 1], [11, 2, 2], [12, 3, 3], [13, 1, 1], [14, 2, 2], [15, 3, 3]])))
+                target = expandMatrix (Matrix 5 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1], Array.fromList [2, 2, 2], Array.fromList [3, 3, 3], Array.fromList [4, 2, 0]])) (Nat 4)
+                result = PossibleCase (Ok (Matrix 16 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1], Array.fromList [2, 2, 2], Array.fromList [3, 3, 3], Array.fromList [4, 1, 1], Array.fromList [5, 2, 2], Array.fromList [6, 3, 3], Array.fromList [7, 1, 1], Array.fromList [8, 2, 2], Array.fromList [9, 3, 3], Array.fromList [10, 1, 1], Array.fromList [11, 2, 2], Array.fromList [12, 3, 3], Array.fromList [13, 1, 1], Array.fromList [14, 2, 2], Array.fromList [15, 3, 3]])))
               in
                 target |> Expect.equal result
         in
-          test "normal case 1" expect
+          test "normal case" expect
       ,
         let
           expect _
@@ -292,7 +292,18 @@ test_expandMatrix
               in
                 target |> Expect.equal result
         in
-          test "normal case 2" expect
+          test "normal case with shrinking" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = expandMatrix (Matrix 3 1 (Array.fromList [Array.fromList [0], Array.fromList [1], Array.fromList [0]])) (Nat 0)
+                result = PossibleCase (Ok (Matrix 2 1 (Array.fromList [Array.fromList [0], Array.fromList [1]])))
+              in
+                target |> Expect.equal result
+        in
+          test "term whose coftype is one" expect
       ]
 
 test_Patrix : Test
@@ -499,7 +510,39 @@ test_Notation
   =
     describe "Notation"
       [
+        test_notation_expand
+      ,
         test_toRawOuterFromTerm
+      ,
+        test_toTermFromRawOuter
+      ]
+
+test_notation_expand : Test
+test_notation_expand
+  =
+    describe "notation.expand"
+      [
+        let
+          expect _
+            =
+              let
+                target = notation.expand (Notation.Lower (Matrix 5 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1], Array.fromList [2, 2, 2], Array.fromList [3, 3, 3], Array.fromList [4, 2, 0]]))) (Nat 4)
+                result = PossibleCase (Ok (Notation.Lower (Matrix 16 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1], Array.fromList [2, 2, 2], Array.fromList [3, 3, 3], Array.fromList [4, 1, 1], Array.fromList [5, 2, 2], Array.fromList [6, 3, 3], Array.fromList [7, 1, 1], Array.fromList [8, 2, 2], Array.fromList [9, 3, 3], Array.fromList [10, 1, 1], Array.fromList [11, 2, 2], Array.fromList [12, 3, 3], Array.fromList [13, 1, 1], Array.fromList [14, 2, 2], Array.fromList [15, 3, 3]]))))
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = notation.expand (Notation.Lower (Matrix 3 1 (Array.fromList [Array.fromList [0], Array.fromList [1], Array.fromList [0]]))) (Nat 0)
+                result = PossibleCase (Ok (Notation.Lower (Matrix 2 1 (Array.fromList [Array.fromList [0], Array.fromList [1]]))))
+              in
+                target |> Expect.equal result
+        in
+          test "term whose coftype is one" expect
       ]
 
 test_toRawOuterFromTerm : Test
@@ -511,10 +554,38 @@ test_toRawOuterFromTerm
           expect _
             =
               let
-                target = Notation.toRawOuterFromTerm notation (Notation.Lower (toMatrixFromRawMatrix (toRawMatrixFromList [[0, 0], [1, 1], [2, 0], [3, 1], [1, 1]])))
-                result = PossibleCase (Ok (Notation.toRawOuterFromList [3, 2, 1, 2, 0, 1, 1, 0, 1, 0, 1, 0, 0]))
+                target = Notation.toRawOuterFromTerm notation (Notation.Lower (Matrix 5 2 (Array.fromList [Array.fromList [0, 0], Array.fromList [1, 1], Array.fromList [2, 0], Array.fromList [3, 1], Array.fromList [1, 1]])))
+                result = PossibleCase (Ok (Array.fromList [3, 2, 1, 2, 0, 1, 1, 0, 1, 0, 1, 0, 0]))
               in
                 target |> Expect.equal result
         in
           test "normal case" expect
+      ]
+
+test_toTermFromRawOuter : Test
+test_toTermFromRawOuter
+  =
+    describe "toTermFromRawOuter"
+      [
+        let
+          expect _
+            =
+              let
+                target = Notation.toTermFromRawOuter notation (Array.fromList [4, 2, 1, 1, 0, 1, 1, 1])
+                result = PossibleCase (Ok (Ok (Notation.Lower (Matrix 4 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1], Array.fromList [2, 1, 0], Array.fromList [3, 2, 0]])))))
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = Notation.toTermFromRawOuter notation (Array.fromList [2, 2, 1, 1, 0, 0])
+                result = PossibleCase (Ok (Ok (Notation.Lower (Matrix 2 1 (Array.fromList [Array.fromList [0], Array.fromList [1]])))))
+              in
+                target |> Expect.equal result
+        in
+          test "term whose coftype is one" expect
       ]
