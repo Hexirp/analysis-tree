@@ -29,6 +29,8 @@ module BMS_4
     ,
       Patrix (..)
     ,
+      toRawPatrixFromPatrix
+    ,
       calcPatrixFromMatrix
     ,
       MemoCalcPatrixFromMatrix
@@ -79,7 +81,7 @@ module BMS_4
 @docs RawPatrix, toRawPatrixFromList, toListFromRawPatrix
 
 # パトリックス
-@docs Patrix (..), calcPatrixFromMatrix, MemoCalcPatrixFromMatrix, emptyMemoCalcPatrixFromMatrix, getMemoCalcParentOnPatrixFromRawMatrix, getMemoCalcAncestorSetOnPatrixFromRawMatrix, insertMemoCalcParentOnPatrixFromRawMatrix, insertMemoCalcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrix, calcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrixWithMemo, calcAncestorSetOnPatrixFromRawMatrixWithMemo, calcMatrixFromPatrix, calcElementOnMatrixFromRawPatrix, calcCoftypeOfPatrix, calcBadRootOfPatrix, expandPatrix
+@docs Patrix (..), toRawPatrixFromPatrix, calcPatrixFromMatrix, MemoCalcPatrixFromMatrix, emptyMemoCalcPatrixFromMatrix, getMemoCalcParentOnPatrixFromRawMatrix, getMemoCalcAncestorSetOnPatrixFromRawMatrix, insertMemoCalcParentOnPatrixFromRawMatrix, insertMemoCalcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrix, calcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrixWithMemo, calcAncestorSetOnPatrixFromRawMatrixWithMemo, calcMatrixFromPatrix, calcElementOnMatrixFromRawPatrix, calcCoftypeOfPatrix, calcBadRootOfPatrix, expandPatrix
 
 # 基本列付きの順序数表記
 @docs notations
@@ -274,6 +276,11 @@ toListFromRawPatrix array = Array.toList (Array.map Array.toList array)
 構築子は `Patrix` 型の規約が守られていることが保証されていないため、テスト以外で使ってはいけません。
 -}
 type Patrix = Patrix Int Int RawPatrix
+
+{-| 或るパトリックスから或る生のパトリックスへ変換します。
+-}
+toRawPatrixFromPatrix : Patrix -> RawPatrix
+toRawPatrixFromPatrix (Patrix x y x_y_int) = x_y_int
 
 {-| 或る行列から或るパトリックスを計算します。
 -}
@@ -603,10 +610,7 @@ expandPatrix patrix n
               case compareNat One n of
                 LT -> PossibleCase (Err (OutOfIndexError patrix n One))
                 EQ -> PossibleCase (Err (OutOfIndexError patrix n One))
-                GT
-                  ->
-                    case patrix of
-                      Patrix x y x_y_pindex -> PossibleCase (Ok (Patrix (x - 1) y (Array.pop x_y_pindex)))
+                GT -> PossibleCase (Ok (Patrix (x - 1) y (Array.pop (toRawPatrixFromPatrix patrix))))
             else PossibleCase (Err (OutOfIndexError patrix n One))
       Omega
         ->
