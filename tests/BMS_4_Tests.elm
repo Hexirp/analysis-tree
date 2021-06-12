@@ -511,8 +511,8 @@ test_toRawOuterFromTerm
           expect _
             =
               let
-                target = Notation.toRawOuterFromTerm notation (Notation.Lower (toMatrixFromRawMatrix (toRawMatrixFromList [[0, 0], [1, 1], [2, 0], [3, 1], [1, 1]])))
-                result = PossibleCase (Ok (Notation.toRawOuterFromList [3, 2, 1, 2, 0, 1, 1, 0, 1, 0, 1, 0, 0]))
+                target = Notation.toRawOuterFromTerm notation (Notation.Lower (Matrix 5 2 (Array.fromList [Array.fromList [0, 0], Array.fromList [1, 1], Array.fromList [2, 0], Array.fromList [3, 1], Array.fromList [1, 1]])))
+                result = PossibleCase (Ok (Array.fromList [3, 2, 1, 2, 0, 1, 1, 0, 1, 0, 1, 0, 0]))
               in
                 target |> Expect.equal result
         in
