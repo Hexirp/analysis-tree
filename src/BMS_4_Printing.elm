@@ -20,7 +20,12 @@ import BMS_4 exposing (Matrix)
 import Notation_Printing exposing (NotationPrintable)
 
 printRawMatrix : BMS_4.RawMatrix -> String
-printRawMatrix x_y_int = Array.foldl (++) "" (Array.map printRawMatrix_helper_1 x_y_int)
+printRawMatrix x_y_int
+  =
+    let
+      func x s = s ++ x
+    in
+      Array.foldl func "" (Array.map printRawMatrix_helper_1 x_y_int)
 
 printRawMatrix_helper_1 : Array Int -> String
 printRawMatrix_helper_1 y_int
