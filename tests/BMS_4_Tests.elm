@@ -500,6 +500,8 @@ test_Notation
     describe "Notation"
       [
         test_toRawOuterFromTerm
+      ,
+        test_toTermFromRawOuter
       ]
 
 test_toRawOuterFromTerm : Test
@@ -517,4 +519,28 @@ test_toRawOuterFromTerm
                 target |> Expect.equal result
         in
           test "normal case" expect
+      ]
+
+test_toTermFromRawOuter : Test
+test_toTermFromRawOuter
+  =
+    describe "toTermFromRawOuter"
+      [
+        let
+          let
+            target = Notation.toTermFromRawOuter notation (Array.fromList [4, 2, 1, 1, 0, 1, 1, 1])
+            result = PossibleCase (Ok (Ok (Notation.Lower (Matrix 4 3 (Array.fromList [Array.fromList [0, 0, 0], Array.fromList [1, 1, 1], Array.fromList [2, 1, 0], Array.fromList [3, 2, 0]])))))
+          in
+            target |> Expect.equal result
+        in
+          test "normal case" expect
+      ,
+        let
+          let
+            target = Notation.toTermFromRawOuter notation (Array.fromList [2, 2, 1, 1, 0, 0])
+            result = PossibleCase (Ok (Ok (Notation.Lower (Matrix 2 1 (Array.fromList [Array.fromList [0], Array.fromList [1]])))))
+          in
+            target |> Expect.equal result
+        in
+          test "term whose coftype is one" expect
       ]
