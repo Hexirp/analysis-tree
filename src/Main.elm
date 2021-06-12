@@ -77,17 +77,19 @@ import Css
       hover
     )
 
-import Html.Styled exposing (Html, toUnstyled, div, button, textarea, text)
+import Html.Styled exposing (Html, toUnstyled, div, button, textarea, span, text)
 import Html.Styled.Attributes exposing (css)
 import Html.Styled.Events exposing (onClick)
 
 import Browser
 
+import Case exposing (Case (..))
+
+import Notation
+import Notation_Printing
+
 import BMS_4
-
 import BMS_4_Printing
-
-import Main.Notation
 
 {-| アプリケーションの木構造である。
 
@@ -448,7 +450,75 @@ view_helper_1 model (Shape shape) x_int
                   ]
               ]
               [
-                Main.Notation.view BMS_4_Printing.notation x_int
+                case Notation.toTermFromRawOuter (Notation_Printing.toNotationFromNotationPrintable BMS_4_Printing.notation) x_int of
+                  PossibleCase result_result_term
+                    ->
+                      case result_result_term of
+                        Ok result_term
+                          ->
+                            case result_term of
+                              Ok term
+                                ->
+                                  span
+                                    [
+                                      css
+                                        [
+                                          padding (px 8)
+                                        ,
+                                          fontSize (px 24)
+                                        ]
+                                    ]
+                                    [
+                                      text (BMS_4_Printing.notation.print term)
+                                    ]
+                              Err e
+                                ->
+                                  span
+                                    [
+                                      css
+                                        [
+                                          padding (px 8)
+                                        ,
+                                          fontSize (px 24)
+                                        ,
+                                          color (rgb 220 20 60)
+                                        ]
+                                    ]
+                                    [
+                                      text "Error: OutOfIndexError"
+                                    ]
+                        Err e
+                          ->
+                            span
+                              [
+                                css
+                                  [
+                                    padding (px 8)
+                                  ,
+                                    fontSize (px 24)
+                                  ,
+                                    color (rgb 220 20 60)
+                                  ]
+                              ]
+                              [
+                                text "Fatal Error: An impossible case happened. Please report this error."
+                              ]
+                  ImpossibleCase
+                    ->
+                      span
+                        [
+                          css
+                            [
+                              padding (px 8)
+                            ,
+                              fontSize (px 24)
+                            ,
+                              color (rgb 220 20 60)
+                            ]
+                        ]
+                        [
+                          text "Fatal Error: An impossible case happened. Please report this error."
+                        ]
               ]
           ]
       ,
