@@ -599,8 +599,7 @@ expandPatrix patrix n
       One
         ->
           if 0 <= toIntFromNat n
-            then PossibleCase (Err (OutOfIndexError patrix n One))
-            else
+            then
               case compareNat One n of
                 LT -> PossibleCase (Err (OutOfIndexError patrix n One))
                 EQ -> PossibleCase (Err (OutOfIndexError patrix n One))
@@ -608,6 +607,7 @@ expandPatrix patrix n
                   ->
                     case patrix of
                       Patrix x y x_y_pindex -> PossibleCase (Ok (Patrix (x - 1) y (Array.pop x_y_pindex)))
+            else PossibleCase (Err (OutOfIndexError patrix n One))
       Omega
         ->
           if 0 <= toIntFromNat n
