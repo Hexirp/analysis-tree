@@ -2,6 +2,10 @@
 
 ## not yet released
 
+https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/15 により次の変更が行われた。
+
+* 木構造におけるノードが自らに対応する項を表示するようになった。
+
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/14 により次の変更が行われた。
 
 * "Expand" ボタンと "Retact" ボタンを使って木構造を展開したり折り畳みしたりできるようになった。
