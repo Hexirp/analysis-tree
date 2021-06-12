@@ -1,4 +1,4 @@
-module Parser.Extra exposing (brackets, braces)
+module Parser_Extra exposing (brackets, braces)
 
 {-| パーサーについての便利な関数たちです。
 

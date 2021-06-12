@@ -1,6 +1,8 @@
 module BMS_4_Tests
   exposing
     (
+      test_RawMatrix
+    ,
       test_Matrix
     ,
       test_Patrix
@@ -21,6 +23,72 @@ import Test exposing (Test, describe, test, fuzz, fuzz2, fuzz3)
 import Case_Util exposing (..)
 import Notation_Util exposing (..)
 import BMS_4_Util exposing (..)
+
+test_RawMatrix : Test
+test_RawMatrix
+  =
+    describe "RawMatrix"
+      [
+        test_toRawMatrixFromList
+      ,
+        test_toListFromRawMatrix 
+      ]
+
+test_toRawMatrixFromList : Test
+test_toRawMatrixFromList
+  =
+    describe "toRawMatrixFromList"
+      [
+        let
+          expect _
+            =
+              let
+                target = toRawMatrixFromList [[0, 1], [2, 3]]
+                result = Array.fromList [Array.fromList [0, 1], Array.fromList [2, 3]]
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = toRawMatrixFromList [[0, 1], [-1], []]
+                result = Array.fromList [Array.fromList [0, 1], Array.fromList [-1], Array.fromList []]
+              in
+                target |> Expect.equal result
+        in
+          test "abnormal case" expect
+      ]
+
+test_toListFromRawMatrix : Test
+test_toListFromRawMatrix
+  =
+    describe "toListFromRawMatrix"
+      [
+        let
+          expect _
+            =
+              let
+                target = toListFromRawMatrix (Array.fromList [Array.fromList [0, 1], Array.fromList [2, 3]])
+                result = [[0, 1], [2, 3]]
+              in
+                target |> Expect.equal result
+        in
+          test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = toListFromRawMatrix (Array.fromList [Array.fromList [0, 1], Array.fromList [-1], Array.fromList []])
+                result = [[0, 1], [-1], []]
+              in
+                target |> Expect.equal result
+        in
+          test "abnormal case" expect
+      ]
 
 test_Matrix : Test
 test_Matrix

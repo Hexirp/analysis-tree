@@ -1,11 +1,11 @@
-module Array.Extra.Folding_Tests
+module Array_Extra_Tests
   exposing
     (
       test_Array
     )
 
 import Array
-import Array.Extra.Folding exposing (..)
+import Array_Extra exposing (..)
 
 import Expect
 import Fuzz
