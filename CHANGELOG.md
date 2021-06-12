@@ -2,6 +2,10 @@
 
 ## not yet released
 
+https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/17 により次の変更が行われた。
+
+* CI においてキャッシュを行うようになった。
+
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/16 により次の変更が行われた。
 
 * 共終タイプが 1 である行列に対応するノードを Expand で展開するとエラーのノードが出てくるバグを修正した。
