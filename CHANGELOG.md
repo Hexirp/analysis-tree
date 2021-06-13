@@ -2,6 +2,10 @@
 
 ## not yet released
 
+https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/18 により次の変更が行われた。
+
+* 空の行列を "ε" という風に表示するようにした。空の行列に対応するノードが、何も項についての表示がされない状態で分かりづらかったので。
+
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/17 により次の変更が行われた。
 
 * CI においてキャッシュを行うようになった。
