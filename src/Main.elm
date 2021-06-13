@@ -9,17 +9,7 @@ module Main
     ,
       Mapping (..)
     ,
-      emptyMapping
-    ,
-      getMapping
-    ,
-      insertMapping
-    ,
-      emptyMemo
-    ,
-      getMemo
-    ,
-      insertMemo
+      Memo (..)
     ,
       Message (..)
     ,
@@ -27,9 +17,21 @@ module Main
     ,
       initialize
     ,
+      initializeMapping
+    ,
+      initializeMemo
+    ,
       update
     ,
+      updateMapping
+    ,
+      updateMemo
+    ,
       view
+    ,
+      viewMapping
+    ,
+      viewMemo
     ,
       main
     )
@@ -272,25 +274,7 @@ retractShape_helper_1 xp xs (Shape shape)
 
 type Mapping = Mapping (Dict (List Int) String)
 
-emptyMapping : Mapping
-emptyMapping = Mapping Dict.empty
-
-getMapping : List Int -> Mapping -> Maybe String
-getMapping k (Mapping dict) = Dict.get k dict
-
-insertMapping : List Int -> String -> Mapping -> Mapping
-insertMapping k v (Mapping dict) = Mapping (Dict.insert k v dict)
-
 type Memo = Memo (Dict (List Int) String)
-
-emptyMemo : Memo
-emptyMemo = Memo Dict.empty
-
-getMemo : List Int -> Memo -> Maybe String
-getMemo k (Memo dict) = Dict.get k dict
-
-insertMemo : List Int -> String -> Memo -> Memo
-insertMemo k v (Memo dict) = Memo (Dict.insert k v dict)
 
 type Message = Expand (Array Int) | Retract (Array Int) | Edit_Mapping (Array Int) String | Edit_Memo (Array Int) String
 
@@ -316,10 +300,16 @@ initialize
     {
       shape = Shape Array.empty
     ,
-      mapping = emptyMapping
+      mapping = initializeMapping
     ,
-      memo = emptyMemo
+      memo = initializeMemo
     }
+
+initializeMapping : Mapping
+initializeMapping = Mapping Dict.empty
+
+initializeMemo : Memo
+initializeMemo = Memo Dict.empty
 
 update : Message -> Model -> Model
 update message model
@@ -337,6 +327,12 @@ update message model
             Nothing -> model
       Edit_Mapping _ _ -> model
       Edit_Memo _ _ -> model
+
+updateMapping : List Int -> String -> Mapping -> Mapping
+updateMapping k v (Mapping dict) = Mapping (Dict.insert k v dict)
+
+updateMemo : List Int -> String -> Memo -> Memo
+updateMemo k v (Memo dict) = Memo (Dict.insert k v dict)
 
 view : Model -> Html Message
 view model =
@@ -555,6 +551,12 @@ view_helper_1 model (Shape shape) x_int
           ]
           (Array.toList (Array.indexedMap (\int shape_ -> view_helper_1 model shape_ (Array.push int x_int)) shape))
       ]
+
+viewMapping : List Int -> Mapping -> Maybe String
+viewMapping k (Mapping dict) = Dict.get k dict
+
+viewMemo : List Int -> Memo -> Maybe String
+viewMemo k (Memo dict) = Dict.get k dict
 
 main : Program () Model Message
 main
