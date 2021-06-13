@@ -37,6 +37,17 @@ test_printRawMatrix
                 target |> Expect.equal result
         in
           test "normal case" expect
+      ,
+        let
+          expect _
+            =
+              let
+                target = printRawMatrix (Array.fromList [])
+                result = "ε"
+              in
+                target |> Expect.equal result
+        in
+          test "empty matrix" expect
       ]
 
 test_printMatrix : Test
