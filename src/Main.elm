@@ -562,7 +562,30 @@ view_helper_1 model (Shape shape) x_int
                     backgroundColor (rgb 220 220 220)
                   ]
               ]
-              []
+              [
+                case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable BMS_4_Printing.notation) x_int of
+                  PossibleCase (result_result_result_outer)
+                    ->
+                      case result_result_result_outer of
+                        Ok result_result_outer
+                          ->
+                            case result_result_outer of
+                              Ok result_outer
+                                ->
+                                  case result_outer of
+                                    Ok outer
+                                      ->
+                                        let
+                                          x_int_ = Notation.toRawOuterFromOuter outer
+                                        in
+                                          case viewMapping (Array.toList x_int_) model.mapping of
+                                            Just string -> text string
+                                            Nothing -> text ""
+                                    Err e -> text ""
+                              Err e -> text ""
+                        Err e -> text ""
+                  ImpossibleCase -> text ""
+              ]
           ]
       ,
         div
