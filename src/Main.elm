@@ -81,7 +81,7 @@ import Css
 
 import Html.Styled exposing (Html, toUnstyled, div, button, textarea, span, text)
 import Html.Styled.Attributes exposing (css)
-import Html.Styled.Events exposing (onClick)
+import Html.Styled.Events exposing (onClick, onInput)
 
 import Browser
 
@@ -325,7 +325,28 @@ update message model
           case retractShape x_int model.shape of
             Just shape_ -> { model | shape = shape_ }
             Nothing -> model
-      Edit_Mapping _ _ -> model
+      Edit_Mapping x_int string
+        ->
+          case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable BMS_4_Printing.notation) x_int of
+            PossibleCase (result_result_result_outer)
+              ->
+                case result_result_result_outer of
+                  Ok result_result_outer
+                    ->
+                      case result_result_outer of
+                        Ok result_outer
+                          ->
+                            case result_outer of
+                              Ok outer
+                                ->
+                                  let
+                                    x_int_ = Notation.toRawOuterFromOuter outer
+                                  in
+                                    { model | mapping = updateMapping (Array.toList x_int_) string model.mapping }
+                              Err e -> model
+                        Err e -> model
+                  Err e -> model
+            ImpossibleCase -> model
       Edit_Memo _ _ -> model
 
 updateMapping : List Int -> String -> Mapping -> Mapping
@@ -528,6 +549,8 @@ view_helper_1 model (Shape shape) x_int
           [
             textarea
               [
+                onInput (Edit_Mapping x_int)
+              ,
                 css
                   [
                     height (px 80)
