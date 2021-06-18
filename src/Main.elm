@@ -287,6 +287,8 @@ type Message = Expand (Array Int) | Retract (Array Int) | Edit_Mapping (Array In
 type alias Model
   =
     {
+      notation : Notation_Printing.NotationPrintable (Notation.Maxipointed BMS_4.Matrix)
+    ,
       shape : Shape
     ,
       mapping : Mapping
@@ -298,6 +300,8 @@ initialize : Model
 initialize
   =
     {
+      notation = BMS_4_Printing.notation
+    ,
       shape = Shape Array.empty
     ,
       mapping = initializeMapping
@@ -327,7 +331,7 @@ update message model
             Nothing -> model
       Edit_Mapping x_int string
         ->
-          case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable BMS_4_Printing.notation) x_int of
+          case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable model.notation) x_int of
             PossibleCase (result_result_result_outer)
               ->
                 case result_result_result_outer of
@@ -349,7 +353,7 @@ update message model
             ImpossibleCase -> model
       Edit_Memo x_int string
         ->
-          case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable BMS_4_Printing.notation) x_int of
+          case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable model.notation) x_int of
             PossibleCase (result_result_result_outer)
               ->
                 case result_result_result_outer of
@@ -488,7 +492,7 @@ view_helper_1 model (Shape shape) x_int
                   ]
               ]
               [
-                case Notation.toTermFromRawOuter (Notation_Printing.toNotationFromNotationPrintable BMS_4_Printing.notation) x_int of
+                case Notation.toTermFromRawOuter (Notation_Printing.toNotationFromNotationPrintable model.notation) x_int of
                   PossibleCase result_result_term
                     ->
                       case result_result_term of
@@ -507,7 +511,7 @@ view_helper_1 model (Shape shape) x_int
                                         ]
                                     ]
                                     [
-                                      text (BMS_4_Printing.notation.print term)
+                                      text (model.notation.print term)
                                     ]
                               Err e
                                 ->
@@ -584,7 +588,7 @@ view_helper_1 model (Shape shape) x_int
                   ]
               ]
               [
-                case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable BMS_4_Printing.notation) x_int of
+                case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable model.notation) x_int of
                   PossibleCase (result_result_result_outer)
                     ->
                       case result_result_result_outer of
@@ -633,7 +637,7 @@ view_helper_1 model (Shape shape) x_int
                   ]
               ]
               [
-                case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable BMS_4_Printing.notation) x_int of
+                case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable model.notation) x_int of
                   PossibleCase (result_result_result_outer)
                     ->
                       case result_result_result_outer of
