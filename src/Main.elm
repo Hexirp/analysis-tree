@@ -14,59 +14,11 @@ module Main
       main
     )
 
-import Dict exposing (Dict)
-
-import Array exposing (Array)
-import Array.Extra as Array
-
-import Css
-  exposing
-    (
-      displayFlex
-    ,
-      alignItems
-    ,
-      width
-    ,
-      height
-    ,
-      padding
-    ,
-      padding2
-    ,
-      backgroundColor
-    ,
-      borderStyle
-    ,
-      boxShadow
-    ,
-      boxShadow4
-    ,
-      fontSize
-    ,
-      color
-    ,
-      center
-    ,
-      none
-    ,
-      px
-    ,
-      rgb
-    ,
-      hover
-    )
-
-import Html.Styled exposing (Html, toUnstyled, div, button, textarea, span, text)
-import Html.Styled.Attributes exposing (css)
-import Html.Styled.Events exposing (onClick, onInput)
+import Html.Styled exposing (Html, toUnstyled)
 
 import Browser
 
-import Case exposing (Case (..))
-
 import Notation
-import Notation_Printing
 
 import BMS_4
 import BMS_4_Printing

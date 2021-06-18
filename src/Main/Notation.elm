@@ -31,7 +31,6 @@ module Main.Notation
 import Dict exposing (Dict)
 
 import Array exposing (Array)
-import Array.Extra as Array
 
 import Css
   exposing
@@ -71,19 +70,14 @@ import Css
       hover
     )
 
-import Html.Styled exposing (Html, toUnstyled, div, button, textarea, span, text)
+import Html.Styled exposing (Html, div, button, textarea, span, text)
 import Html.Styled.Attributes exposing (css)
 import Html.Styled.Events exposing (onClick, onInput)
-
-import Browser
 
 import Case exposing (Case (..))
 
 import Notation
 import Notation_Printing
-
-import BMS_4
-import BMS_4_Printing
 
 import Main.Shape exposing (Shape (..), expandShape, retractShape)
 
