@@ -287,8 +287,6 @@ type Message = Expand (Array Int) | Retract (Array Int) | Edit_Mapping (Array In
 type alias Model
   =
     {
-      notation : Notation_Printing.NotationPrintable (Notation.Maxipointed BMS_4.Matrix)
-    ,
       shape : Shape
     ,
       mapping : Mapping
@@ -300,8 +298,6 @@ initialize : Model
 initialize
   =
     {
-      notation = BMS_4_Printing.notation
-    ,
       shape = Shape Array.empty
     ,
       mapping = initializeMapping
@@ -315,8 +311,8 @@ initializeMapping = Mapping Dict.empty
 initializeMemo : Memo
 initializeMemo = Memo Dict.empty
 
-update : Message -> Model -> Model
-update message model
+update : Notation_Printing.NotationPrintable term -> Message -> Model -> Model
+update notation message model
   =
     case message of
       Expand x_int
@@ -331,7 +327,7 @@ update message model
             Nothing -> model
       Edit_Mapping x_int string
         ->
-          case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable model.notation) x_int of
+          case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable notation) x_int of
             PossibleCase (result_result_result_outer)
               ->
                 case result_result_result_outer of
@@ -353,7 +349,7 @@ update message model
             ImpossibleCase -> model
       Edit_Memo x_int string
         ->
-          case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable model.notation) x_int of
+          case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable notation) x_int of
             PossibleCase (result_result_result_outer)
               ->
                 case result_result_result_outer of
@@ -380,16 +376,16 @@ updateMapping k v (Mapping dict) = Mapping (Dict.insert k v dict)
 updateMemo : List Int -> String -> Memo -> Memo
 updateMemo k v (Memo dict) = Memo (Dict.insert k v dict)
 
-view : Model -> Html Message
-view model =
+view : Notation_Printing.NotationPrintable term -> Model -> Html Message
+view notation model =
   div
     []
     [
-      view_helper_1 model model.shape Array.empty
+      view_helper_1 notation model model.shape Array.empty
     ]
 
-view_helper_1 : Model -> Shape -> Array Int -> Html Message
-view_helper_1 model (Shape shape) x_int
+view_helper_1 : Notation_Printing.NotationPrintable term -> Model -> Shape -> Array Int -> Html Message
+view_helper_1 notation model (Shape shape) x_int
   =
     div
       []
@@ -492,7 +488,7 @@ view_helper_1 model (Shape shape) x_int
                   ]
               ]
               [
-                case Notation.toTermFromRawOuter (Notation_Printing.toNotationFromNotationPrintable model.notation) x_int of
+                case Notation.toTermFromRawOuter (Notation_Printing.toNotationFromNotationPrintable notation) x_int of
                   PossibleCase result_result_term
                     ->
                       case result_result_term of
@@ -511,7 +507,7 @@ view_helper_1 model (Shape shape) x_int
                                         ]
                                     ]
                                     [
-                                      text (model.notation.print term)
+                                      text (notation.print term)
                                     ]
                               Err e
                                 ->
@@ -588,7 +584,7 @@ view_helper_1 model (Shape shape) x_int
                   ]
               ]
               [
-                case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable model.notation) x_int of
+                case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable notation) x_int of
                   PossibleCase (result_result_result_outer)
                     ->
                       case result_result_result_outer of
@@ -637,7 +633,7 @@ view_helper_1 model (Shape shape) x_int
                   ]
               ]
               [
-                case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable model.notation) x_int of
+                case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable notation) x_int of
                   PossibleCase (result_result_result_outer)
                     ->
                       case result_result_result_outer of
@@ -669,7 +665,7 @@ view_helper_1 model (Shape shape) x_int
                 padding2 (px 0) (px 18)
               ]
           ]
-          (Array.toList (Array.indexedMap (\int shape_ -> view_helper_1 model shape_ (Array.push int x_int)) shape))
+          (Array.toList (Array.indexedMap (\int shape_ -> view_helper_1 notation model shape_ (Array.push int x_int)) shape))
       ]
 
 viewMapping : List Int -> Mapping -> Maybe String
@@ -685,7 +681,7 @@ main
       {
         init = initialize
       ,
-        view = \model -> toUnstyled (view model)
+        view = \model -> toUnstyled (view BMS_4_Printing.notation model)
       ,
-        update = update
+        update = update BMS_4_Printing.notation
       }
