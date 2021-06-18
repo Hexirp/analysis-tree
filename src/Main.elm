@@ -23,6 +23,7 @@ import Notation
 import BMS_4
 import BMS_4_Printing
 
+import Main.Message exposing (Message)
 import Main.Notation
 
 type Notation = Notation_BMS_4
@@ -44,19 +45,19 @@ initialize
       model_BMS_4 = Main.Notation.initialize BMS_4_Printing.notation
     }
 
-update : Main.Notation.Message -> Model -> Model
+update : Message -> Model -> Model
 update message model
   =
     case model.notation of
       Notation_BMS_4 -> { model | model_BMS_4 = Main.Notation.update message model.model_BMS_4 }
 
-view : Model -> Html Main.Notation.Message
+view : Model -> Html Message
 view model
   =
     case model.notation of
       Notation_BMS_4 -> Main.Notation.view model.model_BMS_4
 
-main : Program () Model Main.Notation.Message
+main : Program () Model Message
 main
   =
     Browser.sandbox

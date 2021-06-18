@@ -5,8 +5,6 @@ module Main.Notation
     ,
       Memo (..)
     ,
-      Message (..)
-    ,
       Model
     ,
       initialize
@@ -79,13 +77,12 @@ import Case exposing (Case (..))
 import Notation
 import Notation_Printing
 
+import Main.Message exposing (Message (..))
 import Main.Shape exposing (Shape (..), expandShape, retractShape)
 
 type Mapping = Mapping (Dict (List Int) String)
 
 type Memo = Memo (Dict (List Int) String)
-
-type Message = Expand (Array Int) | Retract (Array Int) | Edit_Mapping (Array Int) String | Edit_Memo (Array Int) String
 
 -- 基本的にモデルの操作は単純に。
 -- モデルに不整合が出る操作は view で弾く。
