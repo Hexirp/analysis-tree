@@ -347,7 +347,28 @@ update message model
                         Err e -> model
                   Err e -> model
             ImpossibleCase -> model
-      Edit_Memo _ _ -> model
+      Edit_Memo x_int string
+        ->
+          case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable BMS_4_Printing.notation) x_int of
+            PossibleCase (result_result_result_outer)
+              ->
+                case result_result_result_outer of
+                  Ok result_result_outer
+                    ->
+                      case result_result_outer of
+                        Ok result_outer
+                          ->
+                            case result_outer of
+                              Ok outer
+                                ->
+                                  let
+                                    x_int_ = Notation.toRawOuterFromOuter outer
+                                  in
+                                    { model | memo = updateMemo (Array.toList x_int_) string model.memo }
+                              Err e -> model
+                        Err e -> model
+                  Err e -> model
+            ImpossibleCase -> model
 
 updateMapping : List Int -> String -> Mapping -> Mapping
 updateMapping k v (Mapping dict) = Mapping (Dict.insert k v dict)
@@ -579,6 +600,55 @@ view_helper_1 model (Shape shape) x_int
                                           x_int_ = Notation.toRawOuterFromOuter outer
                                         in
                                           case viewMapping (Array.toList x_int_) model.mapping of
+                                            Just string -> text string
+                                            Nothing -> text ""
+                                    Err e -> text ""
+                              Err e -> text ""
+                        Err e -> text ""
+                  ImpossibleCase -> text ""
+              ]
+          ]
+      ,
+        div
+          [
+            css
+              [
+                padding2 (px 0) (px 36)
+              ]
+          ]
+          [
+            textarea
+              [
+                onInput (Edit_Memo x_int)
+              ,
+                css
+                  [
+                    height (px 80)
+                  ,
+                    width (px 400)
+                  ,
+                    borderStyle none
+                  ,
+                    backgroundColor (rgb 220 220 220)
+                  ]
+              ]
+              [
+                case Notation.toOuterFromRawOuter (Notation_Printing.toNotationFromNotationPrintable BMS_4_Printing.notation) x_int of
+                  PossibleCase (result_result_result_outer)
+                    ->
+                      case result_result_result_outer of
+                        Ok result_result_outer
+                          ->
+                            case result_result_outer of
+                              Ok result_outer
+                                ->
+                                  case result_outer of
+                                    Ok outer
+                                      ->
+                                        let
+                                          x_int_ = Notation.toRawOuterFromOuter outer
+                                        in
+                                          case viewMemo (Array.toList x_int_) model.memo of
                                             Just string -> text string
                                             Nothing -> text ""
                                     Err e -> text ""
