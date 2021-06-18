@@ -421,7 +421,6 @@ calcParentOnPatrixFromRawMatrix_withMemo_helper_1 : RawMatrix -> Int -> Int -> A
 calcParentOnPatrixFromRawMatrix_withMemo_helper_1 x_y_int x y y_int int p memo
   =
     let
-      rec_parent = rec_parent_Memo_calcPatrixFromMatrix memo (x, y)
       rem_parent r = (r, rem_parent_Memo_calcPatrixFromMatrix memo (x, y) r)
       ancestor_set = calcAncestorSetOnPatrixFromRawMatrix_withMemo
       parent_0 = calcParentOnPatrixFromRawMatrix_withMemo_helper_1
