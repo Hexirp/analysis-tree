@@ -2,6 +2,14 @@
 
 ## not yet released
 
+https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/19 により次の変更が行われた。
+
+* mapping と memo の内容をそれぞれの項に対して保存できるようにした。解析を記録できるようにするため。 [\#14](https://gitlab.com/Hexirp/analysis-tree/-/issues/14) を閉じるため。
+* `Main` モジュールの内容を `Notation` 型に対してパラメータ化して `Main.Notation` モジュールへ切り離した。表記を切り替えることが出来るようにするため。
+* `Main` モジュールの `Message` 型を `Main.Message` モジュールへ切り離した。 `Message` 型は全体で共有されることを明確にするため。
+* `Main` モジュールの `Shape` 型を `Main.Shape` モジュールへ切り離した。これだけ他の定義から浮いていて異質であるため。
+* `BMS_4` モジュールの `calcPatrixFromMatrix` のメモ化に関する名前をシステム的なものにした。メモ化であることを分かりやすくするため。
+
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/18 により次の変更が行われた。
 
 * 空の行列を "ε" という風に表示するようにした。空の行列に対応するノードが、何も項についての表示がされない状態で分かりづらかったので。
