@@ -1,4 +1,4 @@
-module Main_Tests
+module Main.Shape_Tests
   exposing
     (
       test_Shape
@@ -6,7 +6,7 @@ module Main_Tests
 
 import Array
 
-import Main exposing (..)
+import Main.Shape exposing (..)
 
 import Expect
 import Test exposing (Test, describe, test)
