@@ -83,10 +83,10 @@ module BMS_4
 @docs RawPatrix, toRawPatrixFromList, toListFromRawPatrix
 
 # パトリックス
-@docs Patrix (..), toRawPatrixFromPatrix, calcPatrixFromMatrix, Memo_calcPatrixFromMatrix, With_Memo_calcPatrixFromMatrix, init_Memo_calcPatrixFromMatrix, rec_parent_Memo_calcPatrixFromMatrix, rec_ancestor_set_Memo_calcPatrixFromMatrix, rem_parent_Memo_calcPatrixFromMatrix, rem_ancestor_set_Memo_calcPatrixFromMatrix, calcParentOnPatrixFromRawMatrix, calcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrixWithMemo, calcAncestorSetOnPatrixFromRawMatrixWithMemo, calcMatrixFromPatrix, calcElementOnMatrixFromRawPatrix, calcCoftypeOfPatrix, calcBadRootOfPatrix, expandPatrix
+@docs Patrix, toRawPatrixFromPatrix, calcPatrixFromMatrix, Memo_calcPatrixFromMatrix, With_Memo_calcPatrixFromMatrix, init_Memo_calcPatrixFromMatrix, rec_parent_Memo_calcPatrixFromMatrix, rec_ancestor_set_Memo_calcPatrixFromMatrix, rem_parent_Memo_calcPatrixFromMatrix, rem_ancestor_set_Memo_calcPatrixFromMatrix, calcParentOnPatrixFromRawMatrix, calcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrix_withMemo, calcAncestorSetOnPatrixFromRawMatrix_withMemo, calcMatrixFromPatrix, calcElementOnMatrixFromRawPatrix, calcCoftypeOfPatrix, calcBadRootOfPatrix, expandPatrix
 
 # 基本列付きの順序数表記
-@docs notations
+@docs notation
 -}
 
 import Result exposing (Result)
@@ -766,7 +766,8 @@ expandPatrix_helper_2 x_y_pindex xr yr x_ y_
                                         else PossibleCase (Pindex (x_ - 1))
                         Nothing -> ImpossibleCase
 
-{-| バシク行列システム 4 の `Notation` です。 -}
+{-| `BMS_4` モジュールの `Notation` 型を実装します。
+-}
 notation : Notation (Maxipointed Matrix)
 notation
   =

@@ -6,6 +6,12 @@ module Notation_Printing
       toNotationFromNotationPrintable
     )
 
+{-| その項が印刷可能な順序数表記を表します。
+
+# 定義
+@docs NotationPrintable, toNotationFromNotationPrintable
+-}
+
 import String exposing (String)
 
 import Notation exposing (Expander, Notation)
@@ -32,6 +38,8 @@ type alias NotationPrintable term
       print : term -> String
     }
 
+{-| `NotationPrintable` 型を `Notation` 型へ変換します。
+-}
 toNotationFromNotationPrintable : NotationPrintable term -> Notation term
 toNotationFromNotationPrintable notation
   =

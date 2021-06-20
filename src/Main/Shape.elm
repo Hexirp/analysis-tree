@@ -8,6 +8,12 @@ module Main.Shape
       retractShape
     )
 
+{-| analysis-tree における木構造の状態を取り扱います。
+
+# 定義
+@docs Shape, expandShape, retractShape
+-}
+
 import Array exposing (Array)
 import Array.Extra as Array
 

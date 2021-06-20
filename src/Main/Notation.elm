@@ -26,6 +26,26 @@ module Main.Notation
       viewMemo
     )
 
+{-| `Notation` 型でパラメータ化されたコンポーネントを定義します。
+
+ここでいうコンポーネントは Model と Msg と init と update と view が揃っているものです。
+
+# 型
+@docs Mapping, Memo
+
+# Model
+@docs Model
+
+# init
+@docs initialize, initializeMapping, initializeMemo
+
+# update
+@docs update, updateMapping, updateMemo
+
+# view
+@docs view, viewMapping, viewMemo
+-}
+
 import Dict exposing (Dict)
 
 import Array exposing (Array)
@@ -80,16 +100,16 @@ import Notation_Printing
 import Main.Message exposing (Message (..))
 import Main.Shape exposing (Shape (..), expandShape, retractShape)
 
+{-| 項に対する解析を記録する型です。
+-}
 type Mapping = Mapping (Dict (List Int) String)
 
+{-| 項に対するメモを記録する型です。
+-}
 type Memo = Memo (Dict (List Int) String)
 
--- 基本的にモデルの操作は単純に。
--- モデルに不整合が出る操作は view で弾く。
--- Model でチェックして、 view でもチェックする必要が
--- あるのなら、 View だけでチェックしたほうが簡単である。
--- ボタンの色を薄くするなどの処理が必要なので、
--- view でもチェックする必要があるんだよねえ……
+{-| Model です。
+-}
 type alias Model term
   =
     {
@@ -102,6 +122,8 @@ type alias Model term
       memo : Memo
     }
 
+{-| init です。
+-}
 initialize : Notation_Printing.NotationPrintable term -> Model term
 initialize notation
   =
@@ -115,12 +137,18 @@ initialize notation
       memo = initializeMemo
     }
 
+{-| `Mapping` 型に対する部分的な init です。
+-}
 initializeMapping : Mapping
 initializeMapping = Mapping Dict.empty
 
+{-| `Memo` 型に対する部分的な init です。
+-}
 initializeMemo : Memo
 initializeMemo = Memo Dict.empty
 
+{-| update です。
+-}
 update : Message -> Model term -> Model term
 update message model
   =
@@ -180,12 +208,18 @@ update message model
                   Err e -> model
             ImpossibleCase -> model
 
+{-| `Mapping` 型に対する部分的な update です。
+-}
 updateMapping : List Int -> String -> Mapping -> Mapping
 updateMapping k v (Mapping dict) = Mapping (Dict.insert k v dict)
 
+{-| `Memo` 型に対する部分的な update です。
+-}
 updateMemo : List Int -> String -> Memo -> Memo
 updateMemo k v (Memo dict) = Memo (Dict.insert k v dict)
 
+{-| view です。
+-}
 view : Model term -> Html Message
 view model =
   div
@@ -478,8 +512,12 @@ view_helper_1 model (Shape shape) x_int
           (Array.toList (Array.indexedMap (\int shape_ -> view_helper_1 model shape_ (Array.push int x_int)) shape))
       ]
 
+{-| `Mapping` 型に対する部分的な view です。
+-}
 viewMapping : List Int -> Mapping -> Maybe String
 viewMapping k (Mapping dict) = Dict.get k dict
 
+{-| `Memo` 型に対する部分的な view です。
+-}
 viewMemo : List Int -> Memo -> Maybe String
 viewMemo k (Memo dict) = Dict.get k dict

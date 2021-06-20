@@ -5,7 +5,6 @@
     "exposed-modules": [
         "Array_Extra",
         "BMS_4",
-        "BMS_4_Parsing",
         "BMS_4_Printing",
         "Case",
         "Main",
