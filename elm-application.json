@@ -1,0 +1,19 @@
+{
+    "name": "Hexirp/analysis-tree",
+    "summary": "Analyze googological notations by their tree structures.",
+    "version": "0.5.0",
+    "exposed-modules": [
+        "Array_Extra",
+        "BMS_4",
+        "BMS_4_Parsing",
+        "BMS_4_Printing",
+        "Case",
+        "Main",
+        "Main.Message",
+        "Main.Notation",
+        "Main.Shape",
+        "Notation",
+        "Notation_Printing",
+        "Parser_Extra"
+    ]
+}
