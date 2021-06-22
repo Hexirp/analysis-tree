@@ -12,7 +12,11 @@ module Array_Extra
 
 # 関数
 
-@docs all, maximum, minimum
+@docs all
+
+@docs maximum
+
+@docs minimum
 -}
 
 import Array exposing (..)

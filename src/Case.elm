@@ -26,7 +26,17 @@ module Case
 
 # 関数
 
-@docs isValid, traverseArray, sequenceArray, sequenceArrayWithState, initializeArrayWithCase, initializeArrayWithCaseWithState
+@docs isValid
+
+@docs traverseArray
+
+@docs sequenceArray
+
+@docs sequenceArrayWithState
+
+@docs initializeArrayWithCase
+
+@docs initializeArrayWithCaseWithState
 -}
 
 import Array exposing (Array)

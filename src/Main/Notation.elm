@@ -31,19 +31,38 @@ module Main.Notation
 ここでいうコンポーネントは Model と Msg と init と update と view が揃っているものです。
 
 # 型
-@docs Mapping, Memo
+
+@docs Mapping
+
+@docs Memo
 
 # Model
+
 @docs Model
 
 # init
-@docs initialize, initializeMapping, initializeMemo
+
+@docs initialize
+
+@docs initializeMapping
+
+@docs initializeMemo
 
 # update
-@docs update, updateMapping, updateMemo
+
+@docs update
+
+@docs updateMapping
+
+@docs updateMemo
 
 # view
-@docs view, viewMapping, viewMemo
+
+@docs view
+
+@docs viewMapping
+
+@docs viewMemo
 -}
 
 import Dict exposing (Dict)

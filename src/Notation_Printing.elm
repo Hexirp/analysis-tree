@@ -9,7 +9,10 @@ module Notation_Printing
 {-| その項が印刷可能な順序数表記を表します。
 
 # 定義
-@docs NotationPrintable, toNotationFromNotationPrintable
+
+@docs NotationPrintable
+
+@docs toNotationFromNotationPrintable
 -}
 
 import String exposing (String)

@@ -4,8 +4,9 @@ module Parser_Extra exposing (brackets, braces)
 
 # 関数
 
-@docs brackets, braces
+@docs brackets
 
+@docs braces
 -}
 
 import Parser exposing (..)

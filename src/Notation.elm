@@ -57,19 +57,66 @@ module Notation
 {-| 基本列付きの順序数表記です。
 
 # 自然数
-@docs Nat, zero, succ, IsNegativeError, toNatFromInt, toIntFromNat
+
+@docs Nat
+
+@docs zero
+
+@docs succ
+
+@docs IsNegativeError
+
+@docs toNatFromInt
+
+@docs toIntFromNat
 
 # 共終タイプ
-@docs Coftype, compareNat
+
+@docs Coftype
+
+@docs compareNat
 
 # 順序数表記
-@docs OutOfIndexError, Expander, Notation
+
+@docs OutOfIndexError
+
+@docs Expander
+
+@docs Notation
 
 # 外表記
-@docs RawOuter, toRawOuterFromList, toListFromRawOuter, IsNotConvertOuterError, toRawOuterFromTerm, toTermFromRawOuter, Outer, toOuterFromTerm, toTermFromOuter, toOuterFromRawOuter, toRawOuterFromOuter, canonicalize
+
+@docs RawOuter
+
+@docs toRawOuterFromList
+
+@docs toListFromRawOuter
+
+@docs IsNotConvertOuterError
+
+@docs toRawOuterFromTerm
+
+@docs toTermFromRawOuter
+
+@docs Outer
+
+@docs toOuterFromTerm
+
+@docs toTermFromOuter
+
+@docs toOuterFromRawOuter
+
+@docs toRawOuterFromOuter
+
+@docs canonicalize
 
 # 最大元の添加
-@docs Maxipointed, compareMaxipointed, expandMaxipointed
+
+@docs Maxipointed
+
+@docs compareMaxipointed
+
+@docs expandMaxipointed
 -}
 
 import Array exposing (Array)

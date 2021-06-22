@@ -17,7 +17,18 @@ module Main
 {-| analysis-tree を実装します。
 
 # 定義
-@docs Notation, Model, initialize, update, view, main
+
+@docs Notation
+
+@docs Model
+
+@docs initialize
+
+@docs update
+
+@docs view
+
+@docs main
 -}
 
 import Html.Styled exposing (Html, toUnstyled)

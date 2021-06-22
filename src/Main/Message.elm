@@ -7,6 +7,7 @@ module Main.Message
 {-| `Message` 型を定義します。これは analysis-tree における Msg そのものです。
 
 # Msg
+
 @docs Message
 -}
 

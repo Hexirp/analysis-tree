@@ -71,21 +71,81 @@ module BMS_4
 {-| バシク行列システム 4 です。
 
 # 生の行列
-@docs RawMatrix, toRawMatrixFromList, toListFromRawMatrix
+
+@docs RawMatrix
+
+@docs toRawMatrixFromList
+
+@docs toListFromRawMatrix
 
 # 行列
-@docs Matrix, compareMatrix, toMatrixFromRawMatrix, toRawMatrixFromMatrix, calcCoftypeOfMatrix, expandMatrix
+
+@docs Matrix
+
+@docs compareMatrix
+
+@docs toMatrixFromRawMatrix
+
+@docs toRawMatrixFromMatrix
+
+@docs calcCoftypeOfMatrix
+
+@docs expandMatrix
 
 # ピンデックス
+
 @docs Pindex
 
 # 生のパトリックス
-@docs RawPatrix, toRawPatrixFromList, toListFromRawPatrix
+
+@docs RawPatrix
+
+@docs toRawPatrixFromList
+
+@docs toListFromRawPatrix
 
 # パトリックス
-@docs Patrix, toRawPatrixFromPatrix, calcPatrixFromMatrix, Memo_calcPatrixFromMatrix, With_Memo_calcPatrixFromMatrix, init_Memo_calcPatrixFromMatrix, rec_parent_Memo_calcPatrixFromMatrix, rec_ancestor_set_Memo_calcPatrixFromMatrix, rem_parent_Memo_calcPatrixFromMatrix, rem_ancestor_set_Memo_calcPatrixFromMatrix, calcParentOnPatrixFromRawMatrix, calcAncestorSetOnPatrixFromRawMatrix, calcParentOnPatrixFromRawMatrix_withMemo, calcAncestorSetOnPatrixFromRawMatrix_withMemo, calcMatrixFromPatrix, calcElementOnMatrixFromRawPatrix, calcCoftypeOfPatrix, calcBadRootOfPatrix, expandPatrix
+
+@docs Patrix
+
+@docs toRawPatrixFromPatrix
+
+@docs calcPatrixFromMatrix
+
+@docs Memo_calcPatrixFromMatrix
+
+@docs With_Memo_calcPatrixFromMatrix
+
+@docs init_Memo_calcPatrixFromMatrix
+
+@docs rec_parent_Memo_calcPatrixFromMatrix
+
+@docs rec_ancestor_set_Memo_calcPatrixFromMatrix
+
+@docs rem_parent_Memo_calcPatrixFromMatrix
+
+@docs rem_ancestor_set_Memo_calcPatrixFromMatrix
+
+@docs calcParentOnPatrixFromRawMatrix
+
+@docs calcAncestorSetOnPatrixFromRawMatrix
+
+@docs calcParentOnPatrixFromRawMatrix_withMemo
+
+@docs calcAncestorSetOnPatrixFromRawMatrix_withMemo
+
+@docs calcMatrixFromPatrix
+
+@docs calcElementOnMatrixFromRawPatrix
+
+@docs calcCoftypeOfPatrix
+
+@docs calcBadRootOfPatrix
+
+@docs expandPatrix
 
 # 基本列付きの順序数表記
+
 @docs notation
 -}
 

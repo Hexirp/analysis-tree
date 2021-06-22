@@ -11,7 +11,12 @@ module BMS_4_Printing
 {-| `BMS_4` 型に対して `NotationPrintable` 型を実装します。
 
 # 定義
-@docs printRawMatrix, printMatrix, notation
+
+@docs printRawMatrix
+
+@docs printMatrix
+
+@docs notation
 -}
 
 import Tuple
