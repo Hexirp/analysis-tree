@@ -8,6 +8,17 @@ module BMS_4_Printing
       notation
     )
 
+{-| `BMS_4` 型に対して `NotationPrintable` 型を実装します。
+
+# 定義
+
+@docs printRawMatrix
+
+@docs printMatrix
+
+@docs notation
+-}
+
 import Tuple
 
 import Array exposing (Array)
@@ -19,6 +30,8 @@ import BMS_4 exposing (Matrix)
 
 import Notation_Printing exposing (NotationPrintable)
 
+{-| `RawMatrix` 型の print です。
+-}
 printRawMatrix : BMS_4.RawMatrix -> String
 printRawMatrix x_y_int
   =
@@ -41,9 +54,13 @@ printRawMatrix_helper_1 y_int
     in
       "(" ++ Tuple.first (Array.foldl func ("", False) y_int) ++ ")"
 
+{-| `Matrix` 型の print です。
+-}
 printMatrix : BMS_4.Matrix -> String
 printMatrix matrix = printRawMatrix (BMS_4.toRawMatrixFromMatrix matrix)
 
+{-| `BMS_4` モジュールの `NotationPrintable` 型を実装します。
+-}
 notation : NotationPrintable (Maxipointed Matrix)
 notation
   =

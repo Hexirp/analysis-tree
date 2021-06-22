@@ -4,8 +4,17 @@ module Main.Message
       Message (..)
     )
 
+{-| `Message` 型を定義します。これは analysis-tree における Msg そのものです。
+
+# Msg
+
+@docs Message
+-}
+
 import Array exposing (Array)
 
+{-| Msg です。
+-}
 type Message
   =
     Expand (Array Int)

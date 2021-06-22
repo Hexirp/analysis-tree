@@ -8,6 +8,17 @@ module Main.Shape
       retractShape
     )
 
+{-| analysis-tree における木構造の状態を取り扱います。
+
+# 定義
+
+@docs Shape
+
+@docs expandShape
+
+@docs retractShape
+-}
+
 import Array exposing (Array)
 import Array.Extra as Array
 
@@ -15,25 +26,25 @@ import Array.Extra as Array
 
 木構造の節には、それぞれ自然数のリストが割り当てられる。たとえば、次のような木構造を考えよう。
 
-  x
-  ├ ─ x
-  │   └ ─ x
-  └ ─ x
-      ├ ─ x
-      │   ├ ─ x
-      │   └ ─ x
-      └ ─ x
+    x
+    ├ ─ x
+    │   └ ─ x
+    └ ─ x
+        ├ ─ x
+        │   ├ ─ x
+        │   └ ─ x
+        └ ─ x
 
 これらには、次のような配列が割り当てられる。
 
-  []
-  [0]
-  [0, 0]
-  [1]
-  [1, 0]
-  [1, 0, 0]
-  [1, 0, 1]
-  [1, 1]
+    []
+    [0]
+    [0, 0]
+    [1]
+    [1, 0]
+    [1, 0, 0]
+    [1, 0, 1]
+    [1, 1]
 -}
 type Shape = Shape (Array Shape)
 
@@ -41,33 +52,33 @@ type Shape = Shape (Array Shape)
 
 次のような木構造があったとしよう。
 
-  x
-  ├ ─ x
-  │   └ ─ x
-  └ ─ x
-      ├ ─ x
-      │   ├ ─ x
-      │   └ ─ x
-      └ ─ x
+    x
+    ├ ─ x
+    │   └ ─ x
+    └ ─ x
+        ├ ─ x
+        │   ├ ─ x
+        │   └ ─ x
+        └ ─ x
 
 次のように追加可能な位置が示される。
 
-  x
-  ├ ─ x
-  │   ├ ─ x
-  │   │   └ ─ o
-  │   └ ─ o
-  ├ ─ x
-  │   ├ ─ x
-  │   │   ├ ─ x
-  │   │   │   └ ─ o
-  │   │   ├ ─ x
-  │   │   │   └ ─ o
-  │   │   └ ─ o
-  │   ├ ─ x
-  │   │   └ ─ o
-  │   └ ─ o
-  └ ─ o
+    x
+    ├ ─ x
+    │   ├ ─ x
+    │   │   └ ─ o
+    │   └ ─ o
+    ├ ─ x
+    │   ├ ─ x
+    │   │   ├ ─ x
+    │   │   │   └ ─ o
+    │   │   ├ ─ x
+    │   │   │   └ ─ o
+    │   │   └ ─ o
+    │   ├ ─ x
+    │   │   └ ─ o
+    │   └ ─ o
+    └ ─ o
 
 `o` に該当する位置を配列で与えると、そのように木構造が更新される。
 
@@ -118,25 +129,25 @@ expandShape_helper_1 xp xs (Shape shape)
 
 次のような木構造があったとしよう。
 
-  x
-  ├ ─ x
-  │   └ ─ x
-  └ ─ x
-      ├ ─ x
-      │   ├ ─ x
-      │   └ ─ x
-      └ ─ x
+    x
+    ├ ─ x
+    │   └ ─ x
+    └ ─ x
+        ├ ─ x
+        │   ├ ─ x
+        │   └ ─ x
+        └ ─ x
 
 次のように削除可能な位置が示される。
 
-  x
-  ├ ─ x
-  │   └ ─ o
-  └ ─ x
-      ├ ─ x
-      │   ├ ─ o
-      │   └ ─ o
-      └ ─ o
+    x
+    ├ ─ x
+    │   └ ─ o
+    └ ─ x
+        ├ ─ x
+        │   ├ ─ o
+        │   └ ─ o
+        └ ─ o
 
 `o` に該当する位置を配列で与えると、そのように木構造が更新される。
 

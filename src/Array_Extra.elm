@@ -10,9 +10,13 @@ module Array_Extra
 
 {-| 配列についての便利な折り畳み系の関数たちです。
 
-## 関数たち
+# 関数
 
-@docs all, maximum, minimum
+@docs all
+
+@docs maximum
+
+@docs minimum
 -}
 
 import Array exposing (..)
