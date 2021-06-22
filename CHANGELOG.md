@@ -2,6 +2,12 @@
 
 ## not yet released
 
+https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/20 により次の変更が行われた。
+
+* [elm-doc-preview](https://github.com/dmy/elm-doc-preview) を導入した。ドキュメントを綺麗に表示させるため。
+* parsing に関するモジュールを削除した。使用していないし、使用するにしても作り直しが必要になるため。
+* 一部にドキュメントがない所があったので、その穴埋めをした。ドキュメントを正常に表示させるため。
+
 https://gitlab.com/Hexirp/analysis-tree/-/merge_requests/19 により次の変更が行われた。
 
 * mapping と memo の内容をそれぞれの項に対して保存できるようにした。解析を記録できるようにするため。 [\#14](https://gitlab.com/Hexirp/analysis-tree/-/issues/14) を閉じるため。
