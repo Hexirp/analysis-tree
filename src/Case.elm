@@ -24,7 +24,7 @@ module Case
 
 @docs Case
 
-# 関数たち
+# 関数
 
 @docs isValid, traverseArray, sequenceArray, sequenceArrayWithState, initializeArrayWithCase, initializeArrayWithCaseWithState
 -}

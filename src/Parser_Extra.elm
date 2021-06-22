@@ -2,7 +2,7 @@ module Parser_Extra exposing (brackets, braces)
 
 {-| パーサーについての便利な関数たちです。
 
-## 関数たち
+# 関数
 
 @docs brackets, braces
 
